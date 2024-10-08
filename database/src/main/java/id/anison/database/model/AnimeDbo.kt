@@ -1,0 +1,68 @@
+package id.anison.database.model
+
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+
+@Entity(tableName="anime")
+data class AnimeDbo (
+    @ColumnInfo("id") val id: Long,
+    @ColumnInfo("name") val name: String,
+    @ColumnInfo("en_jp_name") val en_jp_name: String,
+    @ColumnInfo("year") val year: Int,
+    @ColumnInfo("duration") val duration: String = "",
+    @ColumnInfo("company") val company: String,
+    @ColumnInfo("director") val director: String,
+    @ColumnInfo("description") val description: String,
+    @ColumnInfo("bot_id") val bot_id: Int,
+    @ColumnInfo("season") val season: Int,
+    @ColumnInfo("part") val part: Int,
+    @ColumnInfo("views") val views: Int,
+    @ColumnInfo("post_date") val post_date: String = "",
+    @ColumnInfo("post_update") val post_update: String = "",
+    @ColumnInfo("episodes_total") val episodes_total: String? = "",
+    @ColumnInfo("episodes_custom") val episodes_custom: String,
+    @ColumnInfo("dubed_episodes") val dubed_episodes: Int,
+    @ColumnInfo("extra_total") val extra_total:Int,
+    @ColumnInfo("ova_total") val ova_total:Int,
+    @ColumnInfo("liked")val liked: Int = 0,
+    @ColumnInfo("disliked") val disliked: Int = 0,
+    @ColumnInfo("is_current") val is_current: Boolean,
+    @ColumnInfo("is_movie") val is_movie: Boolean = false,
+    @ColumnInfo("is_dubed") val is_dubed: Boolean = false,
+    @ColumnInfo("is_haveSubs")val is_haveSubs: Boolean = false,
+    @ColumnInfo("torrent_url")val torrent_url: String? = null,
+    @ColumnInfo("torrent_4k_url")val torrent_4k_url: String? = null,
+    @ColumnInfo("poster_maker")val poster_maker: String = "",
+    @ColumnInfo("poster") val poster: String = "",
+    @ColumnInfo("poster_thumb") val poster_thumb: String,
+    @ColumnInfo("poster_mini") val poster_mini:String,
+    @ColumnInfo("screens_f")val screens_f: List<List<String>> = emptyList(),
+    @ColumnInfo("genres_f")var genres_f: List<List<Any>> = emptyList(),
+    @ColumnInfo("voices_f")val voices_f: List<List<Any>> = emptyList(),
+    @ColumnInfo("sounds_f") val sounds_f: List<List<Any>> = emptyList(),
+    @ColumnInfo("transl_f")val transl_f: List<List<Any>> = emptyList(),
+    @Embedded("group_f")val group_f: List<GroupF> = emptyList(),
+    @ColumnInfo("episode_count")val episode_count: String,
+    @ColumnInfo("bot_url") val bot_url: String,
+)
+
+data class GroupF(
+    val id: Long = 0,
+    val name: String = "",
+    val is_current: Boolean = false,
+    val en_jp_name: String = "",
+    val dubed_episodes: Int = 0,
+    val episodes_custom: String? = null,
+    val episodes_total: String = "",
+    val extra_total: Int = 0,
+    val ova_total: Int = 0,
+    val year: Int = 0,
+    val season: Int = 0,
+    val part: Int = 0,
+    val views: Int = 0,
+    val poster_thumb: String = "",
+    val poster_mini: String = "",
+    val schedule: String? = null,
+    val episode_count: String = "",
+)

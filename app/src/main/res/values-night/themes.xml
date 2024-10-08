@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AmanogawaSplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="postSplashScreenTheme">@android:style/Theme.Material.Light.NoActionBar</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/amanogawa_main_logo</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+    </style>
+
+    <style name="Theme.Amanogawa" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
