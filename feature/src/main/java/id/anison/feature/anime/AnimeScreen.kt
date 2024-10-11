@@ -28,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -79,6 +78,7 @@ import id.anison.feature.common.component.TitleActions
 import id.anison.feature.common.component.TitleImages
 import id.anison.feature.common.component.UserRatingBar
 import id.anison.feature.common.component.button.CircleButton
+import id.anison.feature.common.component.button.FavoriteButton
 import id.anison.feature.common.component.button.RectangleButton
 import id.anison.feature.model.AnimeUI
 import id.anison.feature.model.EpisodeUI
@@ -182,23 +182,11 @@ data class AnimeScreen(val id: Long) : Screen, Activity() {
                         actionBtnContent = {
                             CircleButton(
                                 onClick = {
-                                    if (isFavorite) onEvents(
-                                        AnimeScreenEvents.RemoveFromFavorite(
-                                            anime
-                                        )
-                                    )
+                                    if (isFavorite) onEvents(AnimeScreenEvents.RemoveFromFavorite(anime))
                                     else onEvents(AnimeScreenEvents.AddToFavorite(anime))
                                 },
-                                containerColor = MaterialTheme.colorScheme.background,
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Favorite,
-                                    tint = if (isFavorite) MaterialTheme.colorScheme.error
-                                    else MaterialTheme.colorScheme.primary,
-                                    contentDescription =
-                                    if (isFavorite) stringResource(id = R.string.unliked)
-                                    else stringResource(id = R.string.liked)
-                                )
+                                FavoriteButton(isFavorite)
                             }
                         },
                         modifier = Modifier.clickable {

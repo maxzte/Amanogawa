@@ -1,45 +1,44 @@
 package id.anison.feature.common.component.button
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import id.anison.feature.R
 
+
+@Composable
+fun FavoriteButton(isFavorite: Boolean) {
+    Icon(
+        imageVector = Icons.Filled.Favorite,
+        tint = if (isFavorite) MaterialTheme.colorScheme.error
+        else MaterialTheme.colorScheme.primary,
+        contentDescription = if (isFavorite) stringResource(id = R.string.unliked)
+        else stringResource(id = R.string.liked)
+    )
+}
 
 @Composable
 fun CircleButton(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
     containerColor: Color = Color.Transparent,
-    borderStroke: BorderStroke? = null,
-    content: @Composable () -> Unit
+    onClick: () -> Unit,
+    iconContent: @Composable () -> Unit
 ) {
-    Box(
+    IconButton(
         modifier = modifier
-            .size(40.dp)
-            .border(borderStroke ?: BorderStroke(0.dp, containerColor), CircleShape)
-            .background(
-                color = containerColor,
-                shape = CircleShape
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) {
-                onClick()
-            },
-        contentAlignment = Alignment.Center,
+            .clip(CircleShape)
+            .background(color = containerColor),
+        onClick = { onClick() },
     ) {
-        content()
+        iconContent()
     }
 }

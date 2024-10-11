@@ -40,7 +40,7 @@ val appModule = module {
 
     single { SettingsRepository(androidContext()) }
     factory { SettingsScreenModel(get()) }
-    factory { MainScreenModel(get()) }
+    single { MainScreenModel(get()) }
 }
 
 //fun provideOkHttpClient(): OkHttpClient {

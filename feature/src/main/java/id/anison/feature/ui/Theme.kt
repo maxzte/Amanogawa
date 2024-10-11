@@ -2,6 +2,7 @@ package id.anison.feature.ui
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -18,9 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 
 private val lightScheme = lightColorScheme(
@@ -334,7 +339,7 @@ fun dynamicBlackColorScheme(context: Context): ColorScheme {
 
 @Composable
 fun AmanogawaTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,// isSystemInDarkTheme(),
     isBlackTheme: Boolean = false,
     dynamicColors: Boolean = false,
     content: @Composable () -> Unit
@@ -384,22 +389,30 @@ fun AmanogawaTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         val window = (view.context as Activity).window
-
+        val insetsController = WindowCompat.getInsetsController(window, view)
+        val configuration = LocalConfiguration.current
         SideEffect {
             /*window.statusBarColor = if (!darkTheme) colorScheme.surfaceContainerLowest.toArgb()
             else Color.Transparent.toArgb()
             window.navigationBarColor = if (!darkTheme) colorScheme.surfaceContainerLowest.toArgb()
             else Color.Transparent.toArgb()*/
 
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = false
+            insetsController.isAppearanceLightStatusBars = !darkTheme
+            insetsController.isAppearanceLightNavigationBars = false
+            if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                insetsController.apply {
+                    insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+                    systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            }
+            window.navigationBarColor = Color.Transparent.toArgb()
         }
     }
     CompositionLocalProvider(
         LocalGradientColors provides gradientColors,
     ) {
         MaterialTheme(
-            colorScheme = /*if (dynamicColor) colorScheme else*/ colorScheme.switch(),
+            colorScheme = colorScheme,//.switch(),
             typography = AppTypography,
             content = content
         )

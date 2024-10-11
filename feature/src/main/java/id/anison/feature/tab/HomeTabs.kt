@@ -4,8 +4,6 @@ import id.anison.feature.R
 
 
 enum class HomeTabs(
-//    val selectedIcon: ImageVector,
-//    val unselectedIcon: ImageVector,
     val textResId: Int
 ) {
     All(

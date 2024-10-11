@@ -1,5 +1,6 @@
 package id.anison.feature.common.component
 
+import android.app.Activity
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -54,6 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.palette.graphics.Palette
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -135,7 +139,7 @@ fun CoilImageLoader(
                     BlurTransformation(radius = radius)
                 )
             )
-            .listener { request, result ->
+            .listener { _, result ->
                 val drawable = result.drawable
                 if (drawable is BitmapDrawable) {
                     val bitmap = drawable.bitmap
@@ -157,16 +161,29 @@ fun FullScreenImage(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+    val insetsController = WindowCompat.getInsetsController(window, view)
     var scale by remember { mutableFloatStateOf(1f) }
     var zoomOffset by remember { mutableStateOf(Offset.Zero) }
     Dialog(
-        onDismissRequest = { onDismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = {
+            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+            onDismiss()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+        ),
         content = {
             BoxWithConstraints(
                 modifier = modifier
                     .fillMaxSize()
-                    .clickable { onDismiss() },
+                    .clickable {
+                        insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+                        onDismiss()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 if (photo != null) {

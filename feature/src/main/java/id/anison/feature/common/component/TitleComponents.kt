@@ -21,7 +21,6 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -56,6 +55,7 @@ import id.anison.feature.R
 import id.anison.feature.anime.AnimeScreen
 import id.anison.feature.anime.AnimeScreenEvents
 import id.anison.feature.common.component.button.CircleButton
+import id.anison.feature.common.component.button.FavoriteButton
 import id.anison.feature.common.component.button.RectangleButton
 import id.anison.feature.model.AnimeUI
 
@@ -258,19 +258,12 @@ fun TitleActions(
             }
             CircleButton(
                 onClick = {
-                    if (isLiked)
-                        onEvents(AnimeScreenEvents.RemoveFromFavorite(anime))
+                    if (isLiked) onEvents(AnimeScreenEvents.RemoveFromFavorite(anime))
                     else onEvents(AnimeScreenEvents.AddToFavorite(anime))
                 },
                 containerColor = MaterialTheme.colorScheme.background,
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Favorite,
-                    tint = if (isLiked) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                    contentDescription = if (isLiked) stringResource(id = R.string.unliked) else stringResource(
-                        id = R.string.liked
-                    )
-                )
+                FavoriteButton(isFavorite = isLiked)
             }
         }
     }
@@ -306,7 +299,7 @@ fun TitleImages(
                 titleImage = image,
                 modifier = modifier
                     .fillMaxWidth()
-                    .aspectRatio(16 / 9f)
+                    .aspectRatio(16f / 9f)
             )
         }
     }
