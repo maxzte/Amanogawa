@@ -8,15 +8,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import id.anison.feature.R
-import id.anison.feature.ui.LocalGradientColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,7 +22,6 @@ fun CustomTopAppBar(
     popNavigate: (() -> Unit)? = null,
     title: String,
     actionBtnContent: @Composable (() -> Unit)? = null,
-    containerColor: Color = LocalGradientColors.current.top,
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
@@ -43,14 +39,12 @@ fun CustomTopAppBar(
                 IconButton(onClick = { popNavigate() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = stringResource(id = R.string.arrow_back)
+                        contentDescription = stringResource(id = R.string.arrow_back),
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
         },
         actions = { if (actionBtnContent != null) actionBtnContent() },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = containerColor,
-        ),
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
     )
 }

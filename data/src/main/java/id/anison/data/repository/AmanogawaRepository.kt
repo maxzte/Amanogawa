@@ -178,17 +178,20 @@ class AmanogawaRepository(
         return withContext(Dispatchers.IO) {
             try {
                 if (ids == null) return@withContext ReqRes.Error(null, Exception("IDs is null"))
-                val unusedIds = ids.filterNot { database.animeIDsDao.isExist(it) }
+                var existingIds = database.animeIDsDao.getAll().map { it.id }
+                var unusedIds = ids.filterNot { it in existingIds }
                 if (unusedIds.isEmpty()) {
                     database.animeIDsDao.deleteAllIDs()
-                    return@withContext getRandomTitle(ids)
+                    existingIds = emptyList()
+                    unusedIds = ids
+                    log.d(TAG, "after deleting")
                 }
                 val randomId = unusedIds.random()
                 database.animeIDsDao.insertID(AnimeIDsDbo(id = randomId))
-                return@withContext getAnime(randomId)
+                getAnime(randomId)
             } catch (e: Exception) {
                 log.d(TAG, "EXCEPTION while getRandomTitle $e")
-                return@withContext ReqRes.Error(null, e.cause)
+                ReqRes.Error(null, e.cause)
             }
         }
     }
@@ -207,6 +210,10 @@ class AmanogawaRepository(
             log.d(TAG, "EXCEPTION while getAnimeIDs $e")
             ReqRes.Error(null, e)
         }
+    }
+
+    suspend fun getExistingAnimeCount(): Int = withContext(Dispatchers.IO) {
+        return@withContext database.animeIDsDao.getAll().map { it.id }.size
     }
 
     suspend fun getFilters(): ReqRes<DataFilter> = withContext(Dispatchers.IO) {

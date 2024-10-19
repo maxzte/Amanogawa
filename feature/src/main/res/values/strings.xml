@@ -7,6 +7,8 @@
     <string name="favorites_tab">Favorites</string>
     <string name="profile_tab">Profile</string>
     <string name="arrow_back" translatable="false">Arrow back</string>
+    <string name="arrow_forward" translatable="false">Arrow forward</string>
+    <string name="arrow_replay" translatable="false">Arrow replay</string>
 
     <!-- ABOUT SCREEN -->
     <string name="about_us">About us</string>

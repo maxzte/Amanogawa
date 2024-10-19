@@ -42,7 +42,7 @@ class NotificationWorker(
 
         fun launch(workManager: WorkManager, uniqueWorkName: String) {
             val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
-                repeatInterval = 24,
+                repeatInterval = 12,
                 repeatIntervalTimeUnit = TimeUnit.HOURS
             )
                 .setBackoffCriteria(

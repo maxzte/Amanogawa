@@ -29,8 +29,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,21 +40,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.palette.graphics.Palette
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -71,6 +64,7 @@ import id.anison.feature.common.component.CustomTopAppBar
 import id.anison.feature.common.component.Message
 import id.anison.feature.common.component.ProgressIndicator
 import id.anison.feature.common.component.button.CircleButton
+import id.anison.feature.common.component.button.FavoriteButton
 import id.anison.feature.model.FavoriteUI
 
 class FavoritesScreen : Screen {
@@ -157,7 +151,9 @@ class FavoritesScreen : Screen {
         }
         LazyColumn(
             state = lazyListState,
-            modifier = modifier.padding(horizontal = 8.dp).fillMaxSize(),
+            modifier = modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
@@ -200,7 +196,9 @@ class FavoritesScreen : Screen {
         }
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = modifier.padding(horizontal = 8.dp).fillMaxSize(),
+            modifier = modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxSize(),
             state = lazyGridState,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -229,7 +227,6 @@ class FavoritesScreen : Screen {
         modifier: Modifier = Modifier,
     ) {
         val itemVisibility = remember { Animatable(1f) }
-        var dominantColor by remember { mutableStateOf(Color.Unspecified) }
         val infiniteTransition = rememberInfiniteTransition(label = "")
         val color by infiniteTransition.animateColor(
             initialValue = MaterialTheme.colorScheme.primary,
@@ -248,16 +245,11 @@ class FavoritesScreen : Screen {
                 CoilImageLoader(
                     titleImage = favorite.poster,
                     radius = 25,
-                    onPaletteGenerated = { palette: Palette? ->
-                        dominantColor = palette?.getDominantColor(Color.Unspecified.toArgb())
-                            ?.let { Color(it) }!!
-                    },
                     modifier = Modifier.aspectRatio(16f / 9f)
                 )
                 if (favorite.isNewEpisode)
                     CircleButton(
                         onClick = {  },
-                        containerColor = MaterialTheme.colorScheme.background,
                         modifier = Modifier
                             .padding(4.dp)
                             .align(Alignment.TopEnd),
@@ -282,16 +274,10 @@ class FavoritesScreen : Screen {
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
-                CircleButton(
-                    onClick = { onEvents(FavoritesScreenEvents.RemoveFromFavorite(favorite)) },
-                    containerColor = MaterialTheme.colorScheme.background,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Favorite,
-                        tint = MaterialTheme.colorScheme.error,
-                        contentDescription = stringResource(id = R.string.liked)
-                    )
-                }
+                FavoriteButton(
+                    isFavorite = true,
+                    onFavoriteClick = { onEvents(FavoritesScreenEvents.RemoveFromFavorite(favorite)) }
+                )
             }
         }
     }

@@ -22,24 +22,20 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
@@ -48,14 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.palette.graphics.Palette
 import androidx.window.core.layout.WindowWidthSizeClass
 import cafe.adriel.voyager.navigator.Navigator
 import id.anison.feature.R
 import id.anison.feature.anime.AnimeScreen
-import id.anison.feature.anime.AnimeScreenEvents
-import id.anison.feature.common.component.button.CircleButton
-import id.anison.feature.common.component.button.FavoriteButton
 import id.anison.feature.common.component.button.RectangleButton
 import id.anison.feature.model.AnimeUI
 
@@ -64,8 +56,6 @@ fun TitleHead(
     anime: AnimeUI,
     modifier: Modifier = Modifier,
     navigator: Navigator? = null,
-    dominantColor: (Color?) -> Unit = {},
-    gradientBackground: (Brush?) -> Unit = {}
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val isCompact = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
@@ -73,7 +63,6 @@ fun TitleHead(
     val componentHeight = if (isCompact) (configuration.screenHeightDp / 3.5).toInt()
     else (configuration.screenHeightDp / 1.3).toInt()
     val localUriHandler: UriHandler = LocalUriHandler.current
-    var mainColor by remember { mutableStateOf(Color.Transparent) }
     var isActivePhoto by rememberSaveable { mutableStateOf<String?>(null) }
 
     Column(
@@ -88,29 +77,13 @@ fun TitleHead(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Bottom
         ) {
-            Box(
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .shadow(
-                        elevation = 24.dp,
-                        shape = CardDefaults.elevatedShape,
-                        ambientColor = mainColor,
-                        spotColor = mainColor,
-                        clip = true,
-                    )
+            ElevatedCard(
+                modifier = Modifier.clickable { isActivePhoto = anime.poster }
             ) {
-                ElevatedCard(
-                    modifier = Modifier.clickable { isActivePhoto = anime.poster }
-                ) {
-                    CoilImageLoader(
-                        titleImage = anime.poster.toString(),
-                        onPaletteGenerated = { palette: Palette? ->
-                            mainColor = palette?.getDominantColor(Color.Unspecified.toArgb())
-                                ?.let { Color(it) }!!
-                        },
-                        modifier = Modifier.aspectRatio(7f / 10f)
-                    )
-                }
+                CoilImageLoader(
+                    titleImage = anime.poster.toString(),
+                    modifier = Modifier.aspectRatio(7f / 10f)
+                )
             }
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -226,13 +199,11 @@ fun TitleHead(
 @Composable
 fun TitleActions(
     modifier: Modifier = Modifier,
-    anime: AnimeUI,
-    isLiked: Boolean,
-    isLandscape: Boolean = false,
-    onEvents: (AnimeScreenEvents) -> Unit,
+    actionIconContent: @Composable () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .fillMaxWidth()
             .heightIn(max = 64.dp)
@@ -246,29 +217,19 @@ fun TitleActions(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            CircleButton(
-                onClick = { onEvents(AnimeScreenEvents.PopBack) },
-                containerColor = MaterialTheme.colorScheme.background,
+            IconButton(
+                onClick = { onBackClick() },
+                modifier = modifier,
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = stringResource(R.string.arrow_back),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
-            CircleButton(
-                onClick = {
-                    if (isLiked) onEvents(AnimeScreenEvents.RemoveFromFavorite(anime))
-                    else onEvents(AnimeScreenEvents.AddToFavorite(anime))
-                },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) {
-                FavoriteButton(isFavorite = isLiked)
-            }
+            actionIconContent()
         }
     }
-    Spacer(modifier = Modifier.height(16.dp))
-    if (isLandscape) TitleHead(anime = anime)
 }
 
 @Composable

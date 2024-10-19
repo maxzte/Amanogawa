@@ -21,12 +21,14 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.ElevatedCard
@@ -46,6 +48,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -75,6 +78,7 @@ import id.anison.feature.common.component.ErrorMessage
 import id.anison.feature.common.component.ExpandedText
 import id.anison.feature.common.component.ProgressIndicator
 import id.anison.feature.common.component.TitleActions
+import id.anison.feature.common.component.TitleHead
 import id.anison.feature.common.component.TitleImages
 import id.anison.feature.common.component.UserRatingBar
 import id.anison.feature.common.component.button.CircleButton
@@ -180,14 +184,15 @@ data class AnimeScreen(val id: Long) : Screen, Activity() {
                         title = anime.name,
                         popNavigate = { onEvents(AnimeScreenEvents.PopBack) },
                         actionBtnContent = {
-                            CircleButton(
-                                onClick = {
-                                    if (isFavorite) onEvents(AnimeScreenEvents.RemoveFromFavorite(anime))
+                            FavoriteButton(
+                                isFavorite = isFavorite,
+                                onFavoriteClick = {
+                                    if (isFavorite) onEvents(
+                                        AnimeScreenEvents.RemoveFromFavorite(anime)
+                                    )
                                     else onEvents(AnimeScreenEvents.AddToFavorite(anime))
-                                },
-                            ) {
-                                FavoriteButton(isFavorite)
-                            }
+                                }
+                            )
                         },
                         modifier = Modifier.clickable {
                             coroutineScope.launch { lazyListState.animateScrollToItem(0) }
@@ -213,9 +218,27 @@ data class AnimeScreen(val id: Long) : Screen, Activity() {
                                     .onGloballyPositioned { sizeImage = it.size },
                             )
                             TitleActions(
-                                anime = anime,
-                                isLiked = isFavorite,
-                                onEvents = onEvents,
+                                onBackClick = { onEvents(AnimeScreenEvents.PopBack) },
+                                actionIconContent = {
+                                    CircleButton(
+                                        onClick = { },
+                                        containerColor = MaterialTheme.colorScheme.background,
+                                        iconContent = {
+                                            FavoriteButton(
+                                                isFavorite = isFavorite,
+                                                onFavoriteClick = {
+                                                    if (isFavorite) onEvents(
+                                                        AnimeScreenEvents.RemoveFromFavorite(anime)
+                                                    )
+                                                    else onEvents(AnimeScreenEvents.AddToFavorite(anime))
+                                                }
+                                            )
+                                        }
+                                    )
+                                },
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .background(color = MaterialTheme.colorScheme.background)
                             )
                             Box(
                                 modifier = Modifier
@@ -245,12 +268,45 @@ data class AnimeScreen(val id: Long) : Screen, Activity() {
                     }
                 } else {
                     item {
-                        TitleActions(
-                            anime = anime,
-                            isLiked = isFavorite,
-                            isLandscape = true,
-                            onEvents = onEvents,
+                        val backgroundGradient = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.background
+                            ),
                         )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = configuration.screenHeightDp.dp + 32.dp)
+                        ) {
+                            CoilImageLoader(
+                                titleImage = anime.poster.toString(),
+                                radius = 30,
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .background(backgroundGradient)
+                            )
+                            TitleActions(
+                                onBackClick = { onEvents(AnimeScreenEvents.PopBack) },
+                                actionIconContent = {
+                                    FavoriteButton(
+                                        isFavorite = isFavorite,
+                                        onFavoriteClick = {
+                                            if (isFavorite) onEvents(
+                                                AnimeScreenEvents.RemoveFromFavorite(anime)
+                                            )
+                                            else onEvents(AnimeScreenEvents.AddToFavorite(anime))
+                                        }
+                                    )
+                                },
+                            )
+                            TitleHead(
+                                anime = anime,
+                                modifier = Modifier.align(Alignment.BottomStart)
+                            )
+                        }
                     }
                 }
                 item { Anime(anime = anime, onEvents = onEvents) }
@@ -266,7 +322,7 @@ data class AnimeScreen(val id: Long) : Screen, Activity() {
                         torrentUrl = anime.torrent_url.toString(),
                     )
                 }
-                item {  }
+                item { }
             }
         }
     }
@@ -509,7 +565,7 @@ data class AnimeScreen(val id: Long) : Screen, Activity() {
         val configuration = LocalConfiguration.current
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         val uriHandler = LocalUriHandler.current
-        val itemWidth = (configuration.screenWidthDp  - 64) / 3
+        val itemWidth = (configuration.screenWidthDp - 64) / 3
         Column(
             modifier = modifier
                 .fillMaxWidth()

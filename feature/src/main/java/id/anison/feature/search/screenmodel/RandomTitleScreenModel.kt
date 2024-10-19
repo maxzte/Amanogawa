@@ -1,8 +1,5 @@
 package id.anison.feature.search.screenmodel
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.core.graphics.ColorUtils
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.data.ReqRes
@@ -23,7 +20,6 @@ class RandomTitleScreenModel(
 ) : StateScreenModel<RandomTitleState>(RandomTitleState.None) {
     private val _randomTitleState = MutableStateFlow(RandomTitleState.None)
     val randomTitleState: StateFlow<RandomTitleState> = _randomTitleState.asStateFlow()
-    var dominantColor = MutableStateFlow(Color.Unspecified)
 
     init {
         getAnimeIDs()
@@ -31,16 +27,6 @@ class RandomTitleScreenModel(
 
     fun refresh() {
         getAnimeIDs()
-    }
-
-    fun updateDominantColor(newColor: Color) {
-        val hsv = FloatArray(3)
-
-        ColorUtils.colorToHSL(newColor.toArgb(), hsv)
-        hsv[1] = (hsv[1] * 0.15f).coerceIn(0f, 1f)
-        val adjustedColor = Color(ColorUtils.HSLToColor(hsv))
-
-        dominantColor.value = adjustedColor
     }
 
     fun getRandomAnime() {
@@ -68,7 +54,7 @@ class RandomTitleScreenModel(
                     _randomTitleState.update {
                         it.copy(
                             randomAnime = DataState.Success(randTitle.data.toAnimeUI()),
-                            animeCount = _randomTitleState.value.animeCount.plus(1),
+                            animeCount = _randomTitleState.value.animeCount + 1,
                         )
                     }
                 }
@@ -87,6 +73,7 @@ class RandomTitleScreenModel(
         }
         if (animeIDs == null) {
             screenModelScope.launch {
+                val animeCount = repository.getExistingAnimeCount()
                 try {
                     withTimeout(10000L) {
                         when (val res = repository.getAnimeIDs()) {
@@ -101,7 +88,7 @@ class RandomTitleScreenModel(
                                     it.copy(
                                         maxTitles = res.data.size,
                                         animeIDs = DataState.Success(res.data),
-                                        animeCount = 1,
+                                        animeCount = animeCount
                                     )
                                 }
                                 getRandomAnime()

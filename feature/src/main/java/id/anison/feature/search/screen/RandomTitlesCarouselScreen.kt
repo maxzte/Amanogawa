@@ -4,29 +4,37 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.window.core.layout.WindowWidthSizeClass
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -36,12 +44,13 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.feature.R
 import id.anison.feature.common.DataState
-import id.anison.feature.common.component.CustomTopAppBar
+import id.anison.feature.common.component.CoilImageLoader
 import id.anison.feature.common.component.DetailText
 import id.anison.feature.common.component.DetailTextWithLinks
 import id.anison.feature.common.component.ErrorMessage
 import id.anison.feature.common.component.ExpandedText
 import id.anison.feature.common.component.ProgressIndicator
+import id.anison.feature.common.component.TitleActions
 import id.anison.feature.common.component.TitleHead
 import id.anison.feature.common.component.TitleImages
 import id.anison.feature.model.AnimeUI
@@ -92,7 +101,6 @@ class RandomTitlesCarouselScreen : Screen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun CarouselTitlesContent(
         anime: AnimeUI,
@@ -101,48 +109,64 @@ class RandomTitlesCarouselScreen : Screen {
         onEvents: (RandomScreenEvents) -> Unit,
         modifier: Modifier = Modifier,
     ) {
-        val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
         val scrollState = rememberScrollState()
-        val dominantColor by screenModel.dominantColor.collectAsState()
-//        AmanogawaBackground(gradientColors = GradientColors(container = dominantColor)) {
-            Column(
+        val configuration = LocalConfiguration.current
+        val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+        val isCompact = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
+        val backgroundHeight = if (isCompact) (configuration.screenHeightDp / 2.4).toInt()
+        else configuration.screenHeightDp
+        val backgroundGradient = Brush.verticalGradient(
+            colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background),
+        )
+        Column(
+            modifier = modifier
+                .verticalScroll(state = scrollState)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
                 modifier = Modifier
-                    .background(dominantColor.copy(alpha = 0.1f))
-                    .fillMaxSize()
-                    .nestedScroll(connection = scrollBehavior.nestedScrollConnection)
+                    .fillMaxWidth()
+                    .heightIn(max = backgroundHeight.dp + 32.dp)
             ) {
-                CustomTopAppBar(
-                    title = stringResource(R.string.random_titles),
-                    popNavigate = { onEvents(RandomScreenEvents.PopBack) },
-                    actionBtnContent = {
-                        OutlinedButton(onClick = { onEvents(RandomScreenEvents.Next) }) {
-                            Text(
-                                text = if (screenModel.isLast()) stringResource(R.string.new_cycle)
-                                else stringResource(R.string.next)
-                            )
+                CoilImageLoader(
+                    titleImage = anime.poster.toString(),
+                    radius = 35,
+                )
+                Box(
+                    Modifier
+                        .matchParentSize()
+                        .background(backgroundGradient)
+                )
+                TitleActions(
+                    onBackClick = { navigator.pop() },
+                    actionIconContent = {
+                        IconButton(onClick = { onEvents(RandomScreenEvents.Next) }) {
+                            if (screenModel.isLast()) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_replay_24px),
+                                    contentDescription = stringResource(id = R.string.arrow_replay),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.ArrowForward,
+                                    contentDescription = stringResource(id = R.string.arrow_forward),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     },
-                    containerColor = dominantColor.copy(alpha = 0.1f),
-                    scrollBehavior = scrollBehavior,
                 )
-                Column(
-                    modifier = modifier
-                        .verticalScroll(state = scrollState)
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Spacer(modifier = Modifier.height(0.dp))
-                    TitleHead(
-                        anime = anime,
-                        navigator = navigator,
-                        dominantColor = { it?.let { screenModel.updateDominantColor(it) } },
-                    )
-                    TitleDetails(anime, modifier, onEvents = onEvents)
-                    TitleImages(anime.screens_f.map { imgLink -> imgLink[0] })
-                    Spacer(modifier = Modifier.height(0.dp))
-                }
+                TitleHead(
+                    anime = anime,
+                    navigator = navigator,
+                )
             }
-        //}
+            TitleDetails(anime, modifier, onEvents = onEvents)
+            TitleImages(anime.screens_f.map { imgLink -> imgLink[0] })
+            Spacer(modifier = Modifier.height(0.dp))
+        }
     }
 
     @Composable

@@ -14,12 +14,7 @@ import id.anison.feature.ui.AmanogawaTheme
 
 @Composable
 fun AmanogawaApp() {
-    Navigator(
-        screen = MainScreen(),
-        key = "rootNavigator"
-    ) {
-        CurrentScreen()
-    }
+    MainScreen().Content()
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")

@@ -1,6 +1,7 @@
 package id.anison.feature.common.component
 
 import android.app.Activity
+import android.content.res.Configuration
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -127,18 +129,14 @@ fun CoilImageLoader(
     modifier: Modifier = Modifier,
     contentCrop: ContentScale = ContentScale.Crop,
     radius: Int = 0,
-    onPaletteGenerated: (Palette?) -> Unit = {}
+    onPaletteGenerated: (Palette?) -> Unit = {},
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
             .data(stringResource(R.string.image_loader_link, titleImage))
             .allowHardware(false)
             .crossfade(true)
-            .transformations(
-                listOf(
-                    BlurTransformation(radius = radius)
-                )
-            )
+            .transformations(listOf(BlurTransformation(radius = radius)))
             .listener { _, result ->
                 val drawable = result.drawable
                 if (drawable is BitmapDrawable) {
@@ -151,7 +149,7 @@ fun CoilImageLoader(
             .build(),
         contentDescription = stringResource(R.string.image_loader),
         contentScale = contentCrop,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
     )
 }
 
@@ -166,9 +164,11 @@ fun FullScreenImage(
     val insetsController = WindowCompat.getInsetsController(window, view)
     var scale by remember { mutableFloatStateOf(1f) }
     var zoomOffset by remember { mutableStateOf(Offset.Zero) }
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     Dialog(
         onDismissRequest = {
-            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+            if (isLandscape) insetsController.hide(WindowInsetsCompat.Type.navigationBars())
             onDismiss()
         },
         properties = DialogProperties(
@@ -181,7 +181,7 @@ fun FullScreenImage(
                 modifier = modifier
                     .fillMaxSize()
                     .clickable {
-                        insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+                        if (isLandscape) insetsController.hide(WindowInsetsCompat.Type.navigationBars())
                         onDismiss()
                     },
                 contentAlignment = Alignment.Center

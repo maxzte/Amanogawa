@@ -21,9 +21,6 @@ interface AnimeIDsDao {
     @Query("SELECT COUNT(id) FROM animeIDs")
     fun getCount(): Int
 
-    /*@Query("SELECT maxTitles FROM animeIDs LIMIT 1")
-    fun getMaxTitles(): Int*/
-
     @Query("DELETE FROM animeIDs")
     suspend fun deleteAllIDs()
 }

@@ -16,14 +16,23 @@ import id.anison.feature.R
 
 
 @Composable
-fun FavoriteButton(isFavorite: Boolean) {
-    Icon(
-        imageVector = Icons.Filled.Favorite,
-        tint = if (isFavorite) MaterialTheme.colorScheme.error
-        else MaterialTheme.colorScheme.primary,
-        contentDescription = if (isFavorite) stringResource(id = R.string.unliked)
-        else stringResource(id = R.string.liked)
-    )
+fun FavoriteButton(
+    modifier: Modifier = Modifier,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
+) {
+    IconButton(
+        onClick = { onFavoriteClick() },
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Favorite,
+            tint = if (isFavorite) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.primary,
+            contentDescription = if (isFavorite) stringResource(id = R.string.unliked)
+            else stringResource(id = R.string.liked),
+        )
+    }
 }
 
 @Composable
