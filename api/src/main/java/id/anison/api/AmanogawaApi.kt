@@ -13,7 +13,7 @@ import id.anison.api.model.Title
 
 interface AmanogawaApi {
     suspend fun getAll(): Result<List<Title>>
-    suspend fun getTitles(page: Int): Result<AnimeTitles<Title>>
+    suspend fun getTitles(page: Int): Result<AnimeTitles>
     suspend fun getCurrentTitles(): Result<List<CurrentTitle>>
     suspend fun getAnime(id: Long): Result<Anime>
     suspend fun getAnimeEpisodes(id: Long): Result<AnimeEpisodes<Episode>>
@@ -25,10 +25,10 @@ interface AmanogawaApi {
         voices: List<Int>?,
         sounds: List<Int>?,
         translators: List<Int>?,
-    ): Result<AnimeTitles<Title>>
+    ): Result<AnimeTitles>
 
     suspend fun getRandomAnime(): Result<Long>
     suspend fun getCountAnimeAndTheirIDs(): Result<AnimeIDs>
-    suspend fun getFoundAnime(name: String): Result<List<FoundAnime>>
+    suspend fun searchAnimeByName(name: String): Result<List<FoundAnime>>
     suspend fun getTeam(): Result<List<TeamItem>>
 }

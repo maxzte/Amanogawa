@@ -1,7 +1,6 @@
 package id.anison.api.model
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 data class Title(
@@ -25,8 +24,7 @@ data class Title(
 )
 
 @Serializable
-data class AnimeTitles<E>(
+data class AnimeTitles(
     val pages: Int,
-    @Transient val page: Int = 0,
     val data: List<Title>
 )

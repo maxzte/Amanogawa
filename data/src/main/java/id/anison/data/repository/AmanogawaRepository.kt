@@ -240,7 +240,7 @@ class AmanogawaRepository(
 
     fun searchTitle(query: String): Flow<ReqRes<List<DataFoundAnime>>> = flow {
         try {
-            val response = api.getFoundAnime(query.trim())
+            val response = api.searchAnimeByName(query.trim())
             response.fold(
                 onSuccess = { animeList ->
                     emit(ReqRes.Success(animeList.map { it.toDataFoundAnime() }))
