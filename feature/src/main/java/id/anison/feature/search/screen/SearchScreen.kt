@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -42,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -105,8 +103,8 @@ class SearchScreen : Screen {
         val isOnline by screenModel.isOnline.collectAsState()
         Column(
             modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.statusBars)
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.statusBars)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -143,7 +141,11 @@ class SearchScreen : Screen {
                                 contentDescription = stringResource(id = R.string.no_internet_icon)
                             )
                         }
-                        AnimatedVisibility(visible = searchQuery.isBlank()) {
+                        AnimatedVisibility(
+                            visible = searchQuery.isBlank(),
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                        ) {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -303,7 +305,7 @@ internal fun FoundAnimeList(
             ListItem(
                 headlineContent = {
                     Text(
-                        text = "${anime.name} $season/${anime.en_jp_name} ${anime.year}",
+                        text = "${anime.name} $season / ${anime.en_jp_name} ${anime.year}",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                     )

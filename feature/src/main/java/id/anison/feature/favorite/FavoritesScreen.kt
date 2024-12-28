@@ -1,6 +1,7 @@
 package id.anison.feature.favorite
 
 import android.content.res.Configuration
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.Animatable
@@ -67,7 +68,7 @@ import id.anison.feature.common.component.button.CircleButton
 import id.anison.feature.common.component.button.FavoriteButton
 import id.anison.feature.model.FavoriteUI
 
-class FavoritesScreen : Screen {
+class FavoritesScreen : Screen, ComponentActivity() {
     override val key: ScreenKey = uniqueScreenKey
 
     @Composable
@@ -249,7 +250,7 @@ class FavoritesScreen : Screen {
                 )
                 if (favorite.isNewEpisode)
                     CircleButton(
-                        onClick = {  },
+                        onClick = { },
                         modifier = Modifier
                             .padding(4.dp)
                             .align(Alignment.TopEnd),

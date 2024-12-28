@@ -6,12 +6,13 @@ plugins {
 
 android {
     namespace = "id.anison.amanogawa"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "id.anison.amanogawa"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
+
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -20,24 +21,23 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFile(getDefaultProguardFile("proguard-android-optimize.txt"),)
+            proguardFile(file("proguard/"))
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
     }
+
     buildFeatures {
         buildConfig = true
         compose = true
-    }
-    composeOptions {
     }
 }
 

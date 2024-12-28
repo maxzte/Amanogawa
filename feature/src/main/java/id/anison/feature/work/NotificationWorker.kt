@@ -3,6 +3,7 @@ package id.anison.feature.work
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -20,7 +21,7 @@ import id.anison.data.ReqRes
 import id.anison.data.model.DataFavorite
 import id.anison.data.repository.AmanogawaRepository
 import id.anison.feature.R
-import id.anison.feature.anime.AnimeScreen
+import id.anison.feature.favorite.FavoritesScreen
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.core.component.KoinComponent
@@ -73,6 +74,7 @@ class NotificationWorker(
     override suspend fun doWork(): Result {
         return try {
             createNotificationChannel()
+            showTestNotification("Click on me!")
             val result =
                 repository.getFavorites().filterNot { it is ReqRes.InProgress }.firstOrNull()
             when (result) {
@@ -105,7 +107,7 @@ class NotificationWorker(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "episodes_channel"
             val name = "New Episodes Channel"
-            val descriptionText = "Channel for new episodes notifications"
+            val descriptionText = "Channel for new episodes."
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(channelId, name, importance).apply {
                 description = descriptionText
@@ -119,12 +121,22 @@ class NotificationWorker(
     }
 
     private fun showTestNotification(message: String) {
+        val resultIntent = Intent(applicationContext, FavoritesScreen::class.java)
+        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(applicationContext).run {
+            addNextIntentWithParentStack(resultIntent)
+            getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
         val notificationManager = applicationContext
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notification = NotificationCompat.Builder(applicationContext, "episodes_channel")
             .setSmallIcon(R.drawable.ic_watch_eye)
             .setContentTitle("Test Notification")
             .setContentText(message)
+            .setContentIntent(resultPendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
@@ -132,14 +144,14 @@ class NotificationWorker(
     }
 
     private fun showNotification(favorite: DataFavorite) {
-        val intent = Intent(applicationContext, AnimeScreen::class.java).apply {
-            putExtra("animeID", favorite.id)
+        val resultIntent = Intent(applicationContext, FavoritesScreen::class.java).apply {
+//            putExtra("animeID", favorite.id)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
             applicationContext,
             0,
-            intent,
+            resultIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
 
