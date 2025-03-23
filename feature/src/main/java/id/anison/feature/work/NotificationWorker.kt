@@ -18,8 +18,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import id.anison.data.ReqRes
-import id.anison.data.model.DataFavorite
-import id.anison.data.repository.AmanogawaRepository
+import id.anison.data.favorite.FavoriteDto
+import id.anison.data.favorite.FavoriteRepo
 import id.anison.feature.R
 import id.anison.feature.favorite.FavoritesScreen
 import kotlinx.coroutines.flow.filterNot
@@ -32,7 +32,7 @@ class NotificationWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams), KoinComponent {
-    private val repository: AmanogawaRepository by inject()
+    private val favoriteRepo: FavoriteRepo by inject()
 
     companion object : KoinComponent {
         private const val TAG = "NotificationWorker"
@@ -76,7 +76,7 @@ class NotificationWorker(
             createNotificationChannel()
             showTestNotification("Click on me!")
             val result =
-                repository.getFavorites().filterNot { it is ReqRes.InProgress }.firstOrNull()
+                favoriteRepo.getFavorites().filterNot { it is ReqRes.InProgress }.firstOrNull()
             when (result) {
                 is ReqRes.Error -> {
                     showTestNotification("FAIL")
@@ -85,7 +85,7 @@ class NotificationWorker(
 
                 is ReqRes.Success -> {
                     result.data.forEach { favorite ->
-                        if (favorite.isCurrent && repository.checkForNewEpisode(favorite))
+                        if (favorite.isCurrent && favoriteRepo.checkForNewEpisode(favorite))
                             showNotification(favorite)
                     }
                     return Result.success()
@@ -143,7 +143,7 @@ class NotificationWorker(
         notificationManager.notify((0..1000).random(), notification)
     }
 
-    private fun showNotification(favorite: DataFavorite) {
+    private fun showNotification(favorite: FavoriteDto) {
         val resultIntent = Intent(applicationContext, FavoritesScreen::class.java).apply {
 //            putExtra("animeID", favorite.id)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -162,12 +162,12 @@ class NotificationWorker(
         val notification = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.ic_rounded_info_24)
             .setContentTitle("New Episode Available!")
-            .setContentText("A new episode is available for ${favorite.en_jap_name}.")
+            .setContentText("A new episode is available for ${favorite.enJpName}.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(favorite.id.toInt(), notification)
+        notificationManager.notify(favorite.favoriteId.toInt(), notification)
     }
 }

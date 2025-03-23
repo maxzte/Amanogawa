@@ -13,7 +13,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import id.anison.feature.R
-import id.anison.feature.common.MainScreenModel
+import id.anison.feature.MainScreenModel
 import id.anison.feature.home.HomeScreen
 
 object HomeTab : Tab {
@@ -41,14 +41,21 @@ object HomeTab : Tab {
     override fun Content() {
         val sm = koinScreenModel<MainScreenModel>()
         val toRoute by sm.toRoute.collectAsState()
+
         Navigator(
             screen = HomeScreen(),
             key = "homeNavigator",
         ) { navigator ->
+
+            /*LaunchedEffect(navigator.lastItem) {
+                onNavigator(navigator.lastItem is HomeScreen)
+            }*/
+
             if (toRoute) {
                 navigator.popUntilRoot()
-                sm.setToRoute(false)
+                sm.setNavigateToRoute(false)
             }
+
             SlideTransition(
                 navigator = navigator,
             )

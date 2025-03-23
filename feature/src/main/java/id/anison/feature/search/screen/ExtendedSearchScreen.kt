@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,11 +46,11 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.feature.R
 import id.anison.feature.common.DataState
-import id.anison.feature.common.component.CustomTopAppBar
+import id.anison.feature.common.component.layout.AmanogawaTopBar
 import id.anison.feature.common.component.ErrorMessage
 import id.anison.feature.common.component.ProgressIndicator
-import id.anison.feature.model.FilterUI
 import id.anison.feature.search.event.ExtendedSearchScreenEvents
+import id.anison.feature.search.model.FilterUI
 import id.anison.feature.search.screenmodel.ExtendedSearchScreenModel
 
 class ExtendedSearchScreen : Screen {
@@ -60,33 +61,64 @@ class ExtendedSearchScreen : Screen {
     override fun Content() {
         val navigator: Navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<ExtendedSearchScreenModel>()
-        val state = screenModel.extendedSearchState.collectAsState()
-        when (val filterOptionsUI = state.value.filterOptions) {
-            is DataState.Loading -> ProgressIndicator()
-            is DataState.Success -> ExtendedSearchScreenContent(
-                searchOptions = filterOptionsUI.data,
-                onEvents = { event ->
-                    when (event) {
-                        is ExtendedSearchScreenEvents.PopBack -> navigator.pop()
-                        is ExtendedSearchScreenEvents.AddGenre -> screenModel.addGenre(event.genre)
-                        is ExtendedSearchScreenEvents.AddTranslator -> screenModel.addTranslator(
-                            event.translator
-                        )
+        val state by screenModel.extendedSearchState.collectAsState()
+        LaunchedEffect(Unit) {
+            screenModel.getFilters()
+        }
+        when (val filterOptionsUI = state.filterOptions) {
+            is DataState.Error -> {
+                ErrorMessage(onUpdate = { })
+            }
 
-                        is ExtendedSearchScreenEvents.AddVoice -> screenModel.addVoice(event.voice)
-                        is ExtendedSearchScreenEvents.AddSound -> screenModel.addSound(event.sound)
-                        is ExtendedSearchScreenEvents.AddYear -> screenModel.addYear(event.year)
-                        is ExtendedSearchScreenEvents.RemoveYear -> screenModel.removeYear(event.year)
-                        is ExtendedSearchScreenEvents.Search -> {
-                            screenModel.search()
-                            navigator.push(ExtendedSearchTitlesScreen())
+            is DataState.Loading -> {
+                ProgressIndicator()
+            }
+
+            is DataState.Success -> {
+                ExtendedSearchScreenContent(
+                    searchOptions = filterOptionsUI.data,
+                    onEvents = { event ->
+                        when (event) {
+                            is ExtendedSearchScreenEvents.PopBack -> {
+                                navigator.pop()
+                            }
+
+                            is ExtendedSearchScreenEvents.AddGenre -> {
+                                screenModel.addGenre(event.genre)
+                            }
+
+                            is ExtendedSearchScreenEvents.AddTranslator -> {
+                                screenModel.addTranslator(t = event.t)
+                            }
+
+                            is ExtendedSearchScreenEvents.AddVoice -> {
+                                screenModel.addVoice(v = event.v)
+                            }
+
+                            is ExtendedSearchScreenEvents.AddSound -> {
+                                screenModel.addSound(s = event.s)
+                            }
+
+                            is ExtendedSearchScreenEvents.AddYear -> {
+                                screenModel.addYear(event.year)
+                            }
+
+                            is ExtendedSearchScreenEvents.RemoveYear -> {
+                                screenModel.removeYear(event.year)
+                            }
+
+                            is ExtendedSearchScreenEvents.Search -> {
+                                screenModel.search()
+                                navigator.push(ExtendedSearchTitlesScreen())
+                            }
+
+                            is ExtendedSearchScreenEvents.Refresh -> {
+                                screenModel.refresh()
+                            }
                         }
-                        is ExtendedSearchScreenEvents.Refresh -> screenModel.refresh()
-                    }
-                },
-            )
-            is DataState.Error ->  ErrorMessage(onUpdate = {  })
-            else -> Unit//Message(stringResource(id = R.string.check_your_internet_connection_and_try_again))
+                    },
+                )
+            }
         }
     }
 
@@ -99,9 +131,10 @@ class ExtendedSearchScreen : Screen {
         modifier: Modifier = Modifier
     ) {
         val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
         Scaffold(
             topBar = {
-                CustomTopAppBar(
+                AmanogawaTopBar(
                     title = stringResource(R.string.extended_search),
                     popNavigate = { onEvents(ExtendedSearchScreenEvents.PopBack) },
                     scrollBehavior = scrollBehavior,
@@ -163,7 +196,7 @@ class ExtendedSearchScreen : Screen {
                                     contentColor = contentColor
                                 ),
                             ) {
-                                Text(text = t.name)
+                                Text(text = t.value)
                             }
                         }
                     }
@@ -188,7 +221,7 @@ class ExtendedSearchScreen : Screen {
                                     contentColor = contentColor,
                                 ),
                             ) {
-                                Text(text = v.name)
+                                Text(text = v.value)
                             }
                         }
                     }
@@ -213,7 +246,7 @@ class ExtendedSearchScreen : Screen {
                                     contentColor = contentColor,
                                 ),
                             ) {
-                                Text(text = s.name)
+                                Text(text = s.value)
                             }
                         }
                     }

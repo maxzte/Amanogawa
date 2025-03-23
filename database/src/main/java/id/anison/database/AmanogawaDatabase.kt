@@ -5,27 +5,35 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import id.anison.database.dao.AnimeIDsDao
-import id.anison.database.dao.CurrentTitlesDao
-import id.anison.database.dao.FavoriteDao
-import id.anison.database.dao.FilterDao
-import id.anison.database.dao.FoundAnimeDao
-import id.anison.database.dao.TitleDao
-import id.anison.database.model.AnimeIDsDbo
-import id.anison.database.model.CurrentTitlesDbo
-import id.anison.database.model.FavoriteDbo
-import id.anison.database.model.FilterDbo
-import id.anison.database.model.FoundAnimeDbo
-import id.anison.database.model.TitleDbo
+import id.anison.database.anime.AnimeDao
+import id.anison.database.anime.AnimeDetailsDao
+import id.anison.database.anime.AnimeIdsDao
+import id.anison.database.anime.RemoteKeyDao
+import id.anison.database.anime.entity.AnimeDbo
+import id.anison.database.anime.entity.AnimeDetailsDbo
+import id.anison.database.anime.entity.RemoteKeyDbo
+import id.anison.database.favorite.FavoriteDao
+import id.anison.database.favorite.FavoriteDbo
+import id.anison.database.filter.FilterDao
+import id.anison.database.filter.FilterDbo
+import id.anison.database.foundanime.FoundAnimeDao
+import id.anison.database.foundanime.FoundAnimeDbo
+import id.anison.database.genre.GenreDao
+import id.anison.database.genre.GenreDbo
+import id.anison.database.anime.entity.AnimeIdsDbo
 import id.anison.database.util.Converters
 
-class AmanogawaDatabase internal constructor(private val database: TitlesRoomDatabase) {
-    val titleDao: TitleDao
-        get() = database.titleDao()
-    val currentTitleDao: CurrentTitlesDao
-        get() = database.currentTitleDao()
+/*class AmanogawaDatabase internal constructor(private val database: ARoomDatabase) {
+    val animeDao: AnimeDao
+        get() = database.animeDao()
+    val remoteKeyDao: RemoteKeyDao
+        get() = database.remoteKeyDao()
+    val animeDetailsDao: AnimeDetailsDao
+        get() = database.animeDetailsDao()
     val filterDao: FilterDao
         get() = database.filterDao()
+    val genreDao: GenreDao
+        get() = database.genreDao()
     val foundAnimeDao: FoundAnimeDao
         get() = database.foundAnimeDao()
     val favoriteDao: FavoriteDao
@@ -33,35 +41,43 @@ class AmanogawaDatabase internal constructor(private val database: TitlesRoomDat
     val animeIDsDao: AnimeIDsDao
         get() = database.animeIDsDao()
 
-}
+    *//*suspend fun runInTransaction(transaction: suspend () -> Unit) {
+        withContext(Dispatchers.IO) {
+            database.runInTransaction { runBlocking { transaction() } }
+        }
+    }*//*
+}*/
 
 @Database(
     entities =
     [
-        TitleDbo::class,
-        CurrentTitlesDbo::class,
+        AnimeDbo::class,
+        RemoteKeyDbo::class,
+        AnimeDetailsDbo::class,
         FilterDbo::class,
+        GenreDbo::class,
         FoundAnimeDbo::class,
         FavoriteDbo::class,
-        AnimeIDsDbo::class,
+        AnimeIdsDbo::class,
     ], version = 1
 )
 @TypeConverters(Converters::class)
-internal abstract class TitlesRoomDatabase : RoomDatabase() {
-    abstract fun titleDao(): TitleDao
-    abstract fun currentTitleDao(): CurrentTitlesDao
+abstract class AmanogawaDatabase : RoomDatabase() {
+    abstract fun animeDao(): AnimeDao
+    abstract fun animeIdsDao(): AnimeIdsDao
+    abstract fun remoteKeyDao(): RemoteKeyDao
+    abstract fun animeDetailsDao(): AnimeDetailsDao
     abstract fun filterDao(): FilterDao
+    abstract fun genreDao(): GenreDao
     abstract fun foundAnimeDao(): FoundAnimeDao
     abstract fun favoriteDao(): FavoriteDao
-    abstract fun animeIDsDao(): AnimeIDsDao
 }
 
 fun AmanogawaDatabase(applicationContext: Context): AmanogawaDatabase {
-    val animeRoomDatabase =
-        Room.databaseBuilder(
-            checkNotNull(applicationContext.applicationContext),
-            TitlesRoomDatabase::class.java,
-            "amanogawa"
-        ).build()
-    return AmanogawaDatabase(animeRoomDatabase)
+    return Room.databaseBuilder(
+        checkNotNull(applicationContext.applicationContext),
+        AmanogawaDatabase::class.java,
+        "amanogawa"
+    ).build()
 }
+

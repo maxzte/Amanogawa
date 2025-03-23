@@ -26,6 +26,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
@@ -45,18 +46,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.feature.R
-import id.anison.feature.anime.AnimeScreen
+import id.anison.feature.anime.AnimeDetailsScreen
+import id.anison.feature.anime.model.AnimeDetailsUI
 import id.anison.feature.common.component.button.RectangleButton
-import id.anison.feature.model.AnimeUI
 
 @Composable
 fun TitleHead(
-    anime: AnimeUI,
+    anime: AnimeDetailsUI,
     modifier: Modifier = Modifier,
-    navigator: Navigator? = null,
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val isCompact = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
     val configuration = LocalConfiguration.current
@@ -89,8 +92,8 @@ fun TitleHead(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Text(
-                    text = anime.name,
+                /*Text(
+                    text = anime.animeUI.name,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold,
                     ),
@@ -98,9 +101,9 @@ fun TitleHead(
                     color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))*/
                 Text(
-                    text = anime.en_jp_name,
+                    text = anime.animeUI.enJpName,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.SemiBold,
                     ),
@@ -130,7 +133,7 @@ fun TitleHead(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = anime.views.toString(),
+                        text = anime.animeUI.views.toString(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodyMedium,
@@ -142,18 +145,19 @@ fun TitleHead(
                     UserRatingBar(rating = anime.rating)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                if (navigator != null)
-                    RectangleButton(
-                        title = stringResource(R.string.watch_btn),
-                        iconContent = {
-                            Icon(
-                                imageVector = Icons.Rounded.PlayArrow,
-                                contentDescription = stringResource(R.string.play_icon)
-                            )
+                if (navigator != null) {
+                    OutlinedButton(
+                        onClick = {
+                            navigator.push(AnimeDetailsScreen(anime.animeUI.animeId))
                         },
-                        onClick = { navigator.push(AnimeScreen(anime.id)) },
-                    )
-                else {
+                    ) {
+                        Text(text = stringResource(R.string.watch_btn))
+                        Icon(
+                            imageVector = Icons.Rounded.PlayArrow,
+                            contentDescription = stringResource(R.string.play_icon)
+                        )
+                    }
+                } else {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -168,8 +172,7 @@ fun TitleHead(
                                 )
                             },
                             onClick = {
-                                localUriHandler
-                                    .openUri(anime.bot_url + "?start=sttl_" + anime.bot_id)
+                                localUriHandler.openUri(anime.botUrl + "?start=sttl_" + anime.botId)
                             },
                         )
                         RectangleButton(
@@ -180,7 +183,7 @@ fun TitleHead(
                                     contentDescription = stringResource(id = R.string.download_icon)
                                 )
                             },
-                            onClick = { anime.torrent_url?.let { localUriHandler.openUri(it) } },
+                            onClick = { anime.torrentUrl?.let { localUriHandler.openUri(it) } },
                         )
                     }
                 }
@@ -199,6 +202,8 @@ fun TitleHead(
 @Composable
 fun TitleActions(
     modifier: Modifier = Modifier,
+    title: String = "",
+    isArrowDown: Boolean = false,
     actionIconContent: @Composable () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -217,15 +222,29 @@ fun TitleActions(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            IconButton(
-                onClick = { onBackClick() },
-                modifier = modifier,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = stringResource(R.string.arrow_back),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
+                IconButton(
+                    onClick = { onBackClick() },
+                    modifier = modifier,
+                ) {
+                    if (isArrowDown) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_downward_24dp),
+                            contentDescription = stringResource(R.string.arrow_back),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.arrow_back),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+                Text(text = title)
             }
             actionIconContent()
         }
@@ -233,7 +252,7 @@ fun TitleActions(
 }
 
 @Composable
-fun TitleImages(
+fun AnimeImages(
     images: List<String>,
     modifier: Modifier = Modifier
 ) {

@@ -37,10 +37,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.feature.R
 import id.anison.feature.common.DataState
-import id.anison.feature.common.component.CustomTopAppBar
+import id.anison.feature.common.component.layout.AmanogawaTopBar
 import id.anison.feature.common.component.DetailText
 import id.anison.feature.common.component.ProgressIndicator
-import id.anison.feature.model.TeamItemUI
+import id.anison.feature.profile.TeamMemberUI
 import id.anison.feature.profile.AboutUsScreenModel
 import id.anison.feature.profile.event.AboutUsScreenEvents
 import id.anison.feature.search.screen.ExtendedSearchTitlesScreen
@@ -56,44 +56,53 @@ class AboutUsScreen : Screen {
         val screenModel = koinScreenModel<AboutUsScreenModel>()
         val extendedSearchScreenModel = koinScreenModel<ExtendedSearchScreenModel>()
         val state by screenModel.teamState.collectAsState()
-        when (val team = state.team) {
-            is DataState.Error ->
-                AboutUsContent(
-                    onEvents = { event ->
-                        when (event) {
-                            is AboutUsScreenEvents.PopBack -> navigator.pop()
-                            is AboutUsScreenEvents.NavigateToTitlesByTeammateName -> {
-                                extendedSearchScreenModel.searchByTeammateName(event.name)
-                                navigator.push(ExtendedSearchTitlesScreen(event.name))
-                            }
-                        }
-                    }
-                )
 
-            is DataState.Loading -> ProgressIndicator()
-            is DataState.Success -> {
+        when (val team = state.team) {
+            is DataState.Error -> {
                 AboutUsContent(
-                    team = team.data,
                     onEvents = { event ->
                         when (event) {
-                            is AboutUsScreenEvents.PopBack -> navigator.pop()
+                            is AboutUsScreenEvents.PopBack -> {
+                                navigator.pop()
+                            }
+
                             is AboutUsScreenEvents.NavigateToTitlesByTeammateName -> {
-                                extendedSearchScreenModel.searchByTeammateName(event.name)
-                                navigator.push(ExtendedSearchTitlesScreen(event.name))
+                                extendedSearchScreenModel.searchByTeammateName(event.teammateName)
+                                navigator.push(ExtendedSearchTitlesScreen(event.teammateName))
                             }
                         }
                     }
                 )
             }
 
-            null -> Unit
+            is DataState.Loading -> {
+                ProgressIndicator()
+            }
+
+            is DataState.Success -> {
+                AboutUsContent(
+                    team = team.data,
+                    onEvents = { event ->
+                        when (event) {
+                            is AboutUsScreenEvents.PopBack -> {
+                                navigator.pop()
+                            }
+
+                            is AboutUsScreenEvents.NavigateToTitlesByTeammateName -> {
+                                extendedSearchScreenModel.searchByTeammateName(event.teammateName)
+                                navigator.push(ExtendedSearchTitlesScreen(event.teammateName))
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AboutUsContent(
-        team: List<TeamItemUI>? = null,
+        team: List<TeamMemberUI>? = null,
         onEvents: (AboutUsScreenEvents) -> Unit,
     ) {
         Column(
@@ -101,7 +110,7 @@ class AboutUsScreen : Screen {
                 .fillMaxSize()
                 .padding(horizontal = 8.dp)
         ) {
-            CustomTopAppBar(
+            AmanogawaTopBar(
                 title = stringResource(R.string.about_us),
                 popNavigate = { onEvents(AboutUsScreenEvents.PopBack) },
             )
@@ -126,7 +135,7 @@ class AboutUsScreen : Screen {
 
     @Composable
     fun AboutUs(
-        team: List<TeamItemUI>? = null,
+        team: List<TeamMemberUI>? = null,
         onEvents: (AboutUsScreenEvents) -> Unit,
     ) {
         val linkStyle = SpanStyle(
@@ -180,8 +189,11 @@ class AboutUsScreen : Screen {
                 value = stringResource(R.string.main_target_val)
             )
             Text(text = annotatedText)
-            if (team == null) TeamOffline(onEvents)
-            else Team(team, onEvents)
+            if (team == null) {
+                TeamOffline(onEvents)
+            } else {
+                Team(team, onEvents)
+            }
         }
     }
 
@@ -246,7 +258,7 @@ class AboutUsScreen : Screen {
 
     @Composable
     fun Team(
-        team: List<TeamItemUI>,
+        team: List<TeamMemberUI>,
         onEvents: (AboutUsScreenEvents) -> Unit,
     ) {
         Column {
@@ -265,9 +277,9 @@ class AboutUsScreen : Screen {
                 DetailText(
                     label = teammate.name,
                     teammateName = annotatedString,
-                    value = " — " + teammate.role_text,
+                    value = " — " + teammate.roleText,
                     modifier = Modifier.clickable {
-                        onEvents(AboutUsScreenEvents.NavigateToTitlesByTeammateName(name = teammate.name.trim()))
+                        onEvents(AboutUsScreenEvents.NavigateToTitlesByTeammateName(teammateName = teammate.name.trim()))
                     }
                 )
             }

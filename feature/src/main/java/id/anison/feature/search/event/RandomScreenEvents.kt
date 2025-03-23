@@ -1,6 +1,7 @@
 package id.anison.feature.search.event
 
-import id.anison.feature.model.FilterUI
+import id.anison.feature.search.model.FilterUI
+
 
 interface RandomScreenEvents {
     data object PopBack: RandomScreenEvents

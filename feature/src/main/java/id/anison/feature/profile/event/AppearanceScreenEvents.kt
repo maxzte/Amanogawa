@@ -1,6 +1,6 @@
 package id.anison.feature.profile.event
 
-import id.anison.data.model.AppTheme
+import id.anison.data.settings.AppTheme
 
 interface AppearanceScreenEvents {
     data object PopBack: AppearanceScreenEvents

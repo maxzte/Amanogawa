@@ -7,228 +7,197 @@ import androidx.paging.map
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.data.ReqRes
-import id.anison.data.repository.AmanogawaRepository
-import id.anison.data.repository.ConnectivityRepository
+import id.anison.data.ConnectivityRepo
+import id.anison.data.search.SearchRepo
+import id.anison.feature.anime.model.AnimeUI
+import id.anison.feature.anime.model.toAnimeUI
 import id.anison.feature.common.DataState
-import id.anison.feature.model.DubersUI
-import id.anison.feature.model.FilterUI
-import id.anison.feature.model.GenreUI
-import id.anison.feature.model.SUI
-import id.anison.feature.model.TUI
-import id.anison.feature.model.VUI
-import id.anison.feature.model.toDataFilter
-import id.anison.feature.model.toFilterUI
-import id.anison.feature.model.toTitleUI
-import id.anison.feature.search.state.ExtendedSearchState
+import id.anison.feature.search.model.DubersUI
+import id.anison.feature.search.model.FilterUI
+import id.anison.feature.search.model.GenreUI
+import id.anison.feature.search.model.toFilterDto
+import id.anison.feature.search.model.toFilterUI
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ExtendedSearchScreenModel(
-    private val repository: AmanogawaRepository,
-    private val connectivityRepository: ConnectivityRepository,
-) : StateScreenModel<ExtendedSearchState>(ExtendedSearchState.None) {
-    private val _extendedSearchState = MutableStateFlow(ExtendedSearchState.None)
+    private val searchRepo: SearchRepo,
+) : StateScreenModel<ExtendedSearchState>(ExtendedSearchState()) {
+
+    private val _extendedSearchState = MutableStateFlow(ExtendedSearchState())
     val extendedSearchState: StateFlow<ExtendedSearchState> = _extendedSearchState.asStateFlow()
-    val isOnline = connectivityRepository.isConnected
-        .stateIn(
-            scope = screenModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = true,
-        )
+
+    companion object {
+        const val TAG = "ExtendedSearchSM"
+    }
 
     init {
-        Log.d("TAG", "INIT")
-        screenModelScope.launch {
-            _extendedSearchState.update { state -> state.copy(isOnline = isOnline.value) }
-        }
-        getFilters()
-//        observeConnection()
+//        getFilters()
     }
 
-    /*private fun observeConnection() {
-        screenModelScope.launch {
-            isOnline.collect { isConnected ->
-                if (isConnected) {
-                    _extendedSearchState.update { it.copy(isOnline = true) }
+    fun getFilters() = screenModelScope.launch {
+        when (val options = searchRepo.getFilters()) {
+            is ReqRes.Error -> {
+                _extendedSearchState.update { state ->
+                    state.copy(filterOptions = DataState.Error(options.error))
                 }
-                else _extendedSearchState.update { it.copy(isOnline = false) }
             }
-        }
-    }*/
 
-    fun refresh(filterName: String? = null) {
-        if (_extendedSearchState.value.isOnline && _extendedSearchState.value.filterOptions is DataState.Loading) {
-            getFilters()
-            if (filterName != null && _extendedSearchState.value.filterOptions !is DataState.Loading) {
-                searchByTeammateName(filterName) /*else search()*/
-                _extendedSearchState.update { it.copy(isOnline = true) }
-            }
-        }
-    }
-
-    private fun getFilters() {
-        screenModelScope.launch {
-//        isOnline.collectLatest {
-//            _extendedSearchState.update { state -> state.copy(isOnline = _extendedSearchState.value.isOnline) }
-//        }
-            when (val options = repository.getFilters()) {
-                is ReqRes.Error -> {
-                    _extendedSearchState.update { state ->
-                        state.copy(filterOptions = options.error?.let { DataState.Error(it) })
-                    }
+            is ReqRes.InProgress -> {
+                _extendedSearchState.update { state ->
+                    state.copy(filterOptions = DataState.Loading)
                 }
+            }
 
-                is ReqRes.InProgress ->
-                    _extendedSearchState.update { it.copy(filterOptions = DataState.Loading) }
-
-                is ReqRes.Success -> {
-                    _extendedSearchState.update {
-                        it.copy(
-                            filterOptions = DataState.Success(options.data.toFilterUI()),
-                            isOnline = true
-                        )
-                    }
+            is ReqRes.Success -> {
+                _extendedSearchState.update { state ->
+                    state.copy(
+                        filterOptions = DataState.Success(options.data.toFilterUI()),
+                    )
                 }
             }
         }
     }
 
-    fun addGenre(genre: GenreUI) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = currentState.filter
-        val updatedGenres =
-            if (currentFilter.genres.any { it.id == genre.id }) {
-                currentFilter.genres.mapNotNull { if (it.id == genre.id) null else it }
-            } else currentFilter.genres + genre
-
-        val updatedFilterUI = currentFilter.copy(genres = updatedGenres)
-        _extendedSearchState.value = currentState.copy(filter = updatedFilterUI)
+    private fun updateDubers(
+        current: Map<Long, String>,
+        new: Map<Long, String>
+    ): Map<Long, String> {
+        return current.toMutableMap().apply {
+            new.forEach { (id, name) ->
+                if (containsKey(id)) {
+                    remove(id)
+                } else {
+                    put(id, name)
+                }
+            }
+        }
     }
 
-    fun addTranslator(translator: TUI) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = currentState.filter
-        val updatedTranslators = if (currentFilter.dubers.t.any { it.id == translator.id }) {
-            currentFilter.dubers.t.mapNotNull { if (it.id == translator.id) null else it }
-        } else currentFilter.dubers.t + translator
+    private fun findMatchingFilter(dubers: DubersUI, name: String): FilterUI {
+        val matchedV = dubers.v.filterValues { it == name }
+        val matchedS = dubers.s.filterValues { it == name }
+        val matchedT = dubers.t.filterValues { it == name }
 
-        val updatedDubers = currentFilter.dubers.copy(t = updatedTranslators)
-        val updatedFilterUI = currentFilter.copy(dubers = updatedDubers)
-        _extendedSearchState.value = currentState.copy(filter = updatedFilterUI)
+        val matchesDubers = DubersUI(v = matchedV, s = matchedS, t = matchedT)
+
+        return if (matchesDubers.v.isNotEmpty() || matchesDubers.s.isNotEmpty() || matchesDubers.t.isNotEmpty()) {
+            FilterUI(dubers = matchesDubers)
+        } else {
+            FilterUI()
+        }
     }
 
-    fun addVoice(voice: VUI) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = currentState.filter
-        val updatedVoices = if (currentFilter.dubers.v.any { it.id == voice.id }) {
-            currentFilter.dubers.v.mapNotNull { if (it.id == voice.id) null else it }
-        } else currentFilter.dubers.v + voice
-
-        val updatedDubers = currentFilter.dubers.copy(v = updatedVoices)
-        val updatedFilterUI = currentFilter.copy(dubers = updatedDubers)
-        _extendedSearchState.value = currentState.copy(filter = updatedFilterUI)
+    fun addGenre(genre: GenreUI) = updateFilter { currentFilter ->
+        val updatedGenres = currentFilter.genres.toMutableList().apply {
+            if (!remove(genre)) {
+                add(genre)
+            }
+        }
+        currentFilter.copy(genres = updatedGenres)
     }
 
-    fun addSound(sound: SUI) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = currentState.filter
-        val updatedSound = if (currentFilter.dubers.s.any { it.id == sound.id }) {
-            currentFilter.dubers.s.mapNotNull { if (it.id == sound.id) null else it }
-        } else currentFilter.dubers.s + sound
+    fun addTranslator(t: Map.Entry<Long, String>) = updateDubersFilter(t, DubersUI::t)
 
-        val updatedDubers = currentFilter.dubers.copy(s = updatedSound)
-        val updatedFilterUI = currentFilter.copy(dubers = updatedDubers)
-        _extendedSearchState.value = currentState.copy(filter = updatedFilterUI)
+    fun addVoice(v: Map.Entry<Long, String>) = updateDubersFilter(v, DubersUI::v)
+
+    fun addSound(s: Map.Entry<Long, String>) = updateDubersFilter(s, DubersUI::s)
+
+    private fun updateDubersFilter(
+        entry: Map.Entry<Long, String>,
+        selector: (DubersUI) -> Map<Long, String>
+    ) {
+        updateFilter { filter ->
+            filter.copy(
+                dubers = filter.dubers.copy(
+                    updateDubers(
+                        selector(filter.dubers),
+                        mapOf(entry.key to entry.value)
+                    )
+                )
+            )
+        }
     }
 
-    fun addYear(year: Int) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = currentState.filter
-
-        val updatedYears = currentFilter.years + year
-        val updatedFilterUI = currentFilter.copy(years = updatedYears)
-        _extendedSearchState.value = currentState.copy(filter = updatedFilterUI)
+    fun addYear(year: Short) = updateFilter { currentFilter ->
+        currentFilter.copy(years = currentFilter.years + year)
     }
 
-    fun removeYear(year: Int) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = currentState.filter
+    fun removeYear(year: Short) = updateFilter { currentFilter ->
+        currentFilter.copy(years = currentFilter.years - year)
+    }
 
-        val updatedYears = currentFilter.years - year
-        val updatedFilterUI = currentFilter.copy(years = updatedYears)
-        _extendedSearchState.value = currentState.copy(filter = updatedFilterUI)
+    fun updateFilter(transform: (FilterUI) -> FilterUI) {
+        _extendedSearchState.update { it.copy(filter = transform(it.filter)) }
     }
 
     fun search(filter: FilterUI? = null) {
-        val currentState = _extendedSearchState.value
-        val currentFilter = filter ?: currentState.filter
-        Log.d("esm", "filter is: $filter")
+        val appliedFilter = filter ?: _extendedSearchState.value.filter
+        Log.e(TAG, "filter is: $filter")
         screenModelScope.launch {
-            val filteredTitles =
-                repository.getFilteredTitles(currentFilter.toDataFilter())
-                    .map { pagingData -> pagingData.map { dataTitle -> dataTitle.toTitleUI() } }
-                    .cachedIn(screenModelScope)
-                    .stateIn(screenModelScope, SharingStarted.Lazily, PagingData.empty())
-            if (filter == null)
-                _extendedSearchState.value = currentState.copy(filteredTitles = filteredTitles)
-            else _extendedSearchState.value = currentState.copy(titlesByLink = filteredTitles)
+            val filteredTitles = searchRepo.getFilteredTitles(appliedFilter.toFilterDto())
+                .map { pagingData -> pagingData.map { dataTitle -> dataTitle.toAnimeUI() } }
+                .cachedIn(screenModelScope)
+                .stateIn(
+                    scope = screenModelScope,
+                    started = SharingStarted.WhileSubscribed(5000L),
+                    initialValue = PagingData.empty()
+                )
+
+            _extendedSearchState.update { state ->
+                if (filter == null) {
+                    state.copy(filteredTitles = filteredTitles)
+                } else {
+                    state.copy(titlesByLink = filteredTitles)
+                }
+            }
         }
     }
 
     fun searchByTeammateName(name: String) {
-        Log.d("esm", "filter is: $name")
-        if (isOnline.value) {
-            when (val currentFilter = _extendedSearchState.value.filterOptions) {
-                is DataState.Success -> {
-                    val updFilter = findMatchingFilter(currentFilter.data.dubers, name)
-                    screenModelScope.launch {
-                        val filteredTitles =
-                            repository.getFilteredTitles(updFilter.toDataFilter())
-                                .map { pagingData -> pagingData.map { dataTitle -> dataTitle.toTitleUI() } }
-                                .cachedIn(screenModelScope)
-                                .stateIn(
-                                    screenModelScope,
-                                    SharingStarted.Lazily,
-                                    PagingData.empty()
-                                )
+        Log.e(TAG, "filter is: $name")
+        val currentFilter = _extendedSearchState.value.filterOptions
+        if (currentFilter is DataState.Success) {
+            screenModelScope.launch {
+                val updatedFilter = findMatchingFilter(currentFilter.data.dubers, name)
+                val filteredTitles = searchRepo.getFilteredTitles(updatedFilter.toFilterDto())
+                    .map { it.map { dataTitle -> dataTitle.toAnimeUI() } }
+                    .cachedIn(screenModelScope)
+                    .stateIn(
+                        scope = screenModelScope,
+                        started = SharingStarted.WhileSubscribed(5000L),
+                        initialValue = PagingData.empty()
+                    )
 
-                        _extendedSearchState.update { state -> state.copy(titlesByLink = filteredTitles) }
-                    }
-                }
-
-                is DataState.Error -> {
-                    Log.d("esm", "SOMETHIN WENT WRONG\n${currentFilter.exception}")
-                }
-
-                else -> {}
+                _extendedSearchState.update { state -> state.copy(titlesByLink = filteredTitles) }
             }
+        } else {
+            Log.e(TAG, "SOMETHING WENT WRONG\n${(currentFilter as? DataState.Error)?.exception}")
         }
     }
 
-    private fun findMatchingFilter(dubersFromFilterOptions: DubersUI, name: String): FilterUI {
-        val matchedRoles = mutableListOf<Any>()
-        dubersFromFilterOptions.v.find { it.name == name }
-            ?.let { matchedRoles.add(VUI(it.id, it.name)) }
-        dubersFromFilterOptions.s.find { it.name == name }
-            ?.let { matchedRoles.add(SUI(it.id, it.name)) }
-        dubersFromFilterOptions.t.find { it.name == name }
-            ?.let { matchedRoles.add(TUI(it.id, it.name)) }
-
-        return if (matchedRoles.isNotEmpty()) {
-            FilterUI(
-                dubers = DubersUI(
-                    v = matchedRoles.filterIsInstance<VUI>(),
-                    s = matchedRoles.filterIsInstance<SUI>(),
-                    t = matchedRoles.filterIsInstance<TUI>()
-                )
-            )
-        } else FilterUI()
+    fun refresh(filterName: String? = null) {
+        if (_extendedSearchState.value.filterOptions is DataState.Loading) return
+        getFilters()
+        filterName?.let { searchByTeammateName(it) }
+        /*if (_extendedSearchState.value.filterOptions is DataState.Loading) {
+            getFilters()
+            if (filterName != null && _extendedSearchState.value.filterOptions !is DataState.Loading) {
+                searchByTeammateName(filterName)
+            }
+        }*/
     }
 }
+
+data class ExtendedSearchState(
+    val filterOptions: DataState<FilterUI> = DataState.Loading,
+    val filter: FilterUI = FilterUI(),
+    val filteredTitles: StateFlow<PagingData<AnimeUI>> = MutableStateFlow(PagingData.empty()),
+    val titlesByLink: StateFlow<PagingData<AnimeUI>> = MutableStateFlow(PagingData.empty()),
+)

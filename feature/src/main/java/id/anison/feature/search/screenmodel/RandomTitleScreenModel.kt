@@ -3,95 +3,64 @@ package id.anison.feature.search.screenmodel
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.data.ReqRes
-import id.anison.data.repository.AmanogawaRepository
+import id.anison.data.search.SearchRepo
+import id.anison.feature.anime.model.AnimeDetailsUI
+import id.anison.feature.anime.model.toAnimeUI
 import id.anison.feature.common.DataState
-import id.anison.feature.model.toAnimeUI
-import id.anison.feature.search.state.RandomTitleState
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 
 class RandomTitleScreenModel(
-    private val repository: AmanogawaRepository,
-) : StateScreenModel<RandomTitleState>(RandomTitleState.None) {
-    private val _randomTitleState = MutableStateFlow(RandomTitleState.None)
+    private val searchRepo: SearchRepo,
+) : StateScreenModel<RandomTitleState>(RandomTitleState()) {
+
+    private val _randomTitleState = MutableStateFlow(RandomTitleState())
     val randomTitleState: StateFlow<RandomTitleState> = _randomTitleState.asStateFlow()
 
     init {
         getAnimeIDs()
     }
 
-    fun refresh() {
-        getAnimeIDs()
-    }
-
-    fun getRandomAnime() {
-        screenModelScope.launch {
-            val animeIDs = when (val state = _randomTitleState.value.animeIDs) {
-                is DataState.Success -> state.data
-                else -> null
-            }
-            when (
-                val randTitle = repository.getRandomTitle(
-                    ids = animeIDs,
-                    count = _randomTitleState.value.animeCount
-                )
-            ) {
-                is ReqRes.Error -> _randomTitleState.update {
-                    it.copy(randomAnime = DataState.Error(randTitle.error))
-                }
-
-                is ReqRes.InProgress -> _randomTitleState.update {
-                    it.copy(randomAnime = DataState.Loading)
-                }
-
-                is ReqRes.Success -> {
-                    if (isLast()) _randomTitleState.update { it.copy(animeCount = 0) }
-                    _randomTitleState.update {
-                        it.copy(
-                            randomAnime = DataState.Success(randTitle.data.toAnimeUI()),
-                            animeCount = _randomTitleState.value.animeCount + 1,
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    fun isLast(): Boolean {
-        return _randomTitleState.value.maxTitles == _randomTitleState.value.animeCount
-    }
-
     private fun getAnimeIDs() {
         val animeIDs = when (val state = _randomTitleState.value.animeIDs) {
-            is DataState.Success -> state.data
-            else -> null
+            is DataState.Success -> {
+                state.data
+            }
+
+            else -> {
+                null
+            }
         }
         if (animeIDs == null) {
             screenModelScope.launch {
-                val animeCount = repository.getExistingAnimeCount()
+                val existingAnimeCount = searchRepo.getExistingAnimeCount()
                 try {
                     withTimeout(10000L) {
-                        when (val res = repository.getAnimeIDs()) {
-                            is ReqRes.Error -> _randomTitleState
-                                .update { it.copy(animeIDs = DataState.Error(res.error)) }
+                        when (val res = searchRepo.getAnimeIDs()) {
+                            is ReqRes.Error -> {
+                                _randomTitleState.update { it.copy(animeIDs = DataState.Error(res.error)) }
+                            }
 
-                            is ReqRes.InProgress -> _randomTitleState
-                                .update { it.copy(animeIDs = DataState.Loading) }
+                            is ReqRes.InProgress -> {
+                                _randomTitleState.update { it.copy(animeIDs = DataState.Loading) }
+                            }
 
                             is ReqRes.Success -> {
                                 _randomTitleState.update {
                                     it.copy(
-                                        maxTitles = res.data.size,
                                         animeIDs = DataState.Success(res.data),
-                                        animeCount = animeCount
+                                        maxTitles = res.data.size,
+                                        animeCount = existingAnimeCount,
                                     )
                                 }
-                                getRandomAnime()
+                                getRandomAnime(res.data)
                             }
                         }
                     }
@@ -99,6 +68,58 @@ class RandomTitleScreenModel(
                     _randomTitleState.update { it.copy(animeIDs = DataState.Error(e.cause)) }
                 }
             }
-        } else getRandomAnime()
+        } else {
+            getRandomAnime(animeIDs)
+        }
+    }
+
+    fun getRandomAnime(animeIDs: List<Long>) {
+        screenModelScope.launch {
+            searchRepo.getRandomAnime(
+                ids = animeIDs,
+                count = _randomTitleState.value.animeCount
+            ).collectLatest { randTitle ->
+                when (randTitle) {
+                    is ReqRes.Error -> {
+                        _randomTitleState.update {
+                            it.copy(randomAnime = DataState.Error(randTitle.error))
+                        }
+                    }
+
+                    is ReqRes.InProgress -> {
+                        _randomTitleState.update {
+                            it.copy(randomAnime = DataState.Loading)
+                        }
+                    }
+
+                    is ReqRes.Success -> {
+                        if (isLast()) {
+                            _randomTitleState.update { it.copy(animeCount = 0) }
+                        }
+                        _randomTitleState.update {
+                            it.copy(
+                                randomAnime = DataState.Success(randTitle.data.toAnimeUI()),
+                                animeCount = _randomTitleState.value.animeCount + 1,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun refresh() {
+        getAnimeIDs()
+    }
+
+    fun isLast(): Boolean {
+        return _randomTitleState.value.maxTitles == _randomTitleState.value.animeCount
     }
 }
+
+data class RandomTitleState(
+    val maxTitles: Int = 0,
+    val animeCount: Int = 0,
+    val animeIDs: DataState<List<Long>> = DataState.Loading,
+    val randomAnime: DataState<AnimeDetailsUI> = DataState.Loading,
+)

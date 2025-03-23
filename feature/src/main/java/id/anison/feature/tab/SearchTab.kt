@@ -15,7 +15,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import id.anison.feature.R
-import id.anison.feature.common.MainScreenModel
+import id.anison.feature.MainScreenModel
 import id.anison.feature.search.screen.SearchScreen
 
 object SearchTab : Tab {
@@ -49,7 +49,7 @@ object SearchTab : Tab {
         ) { navigator ->
             if (toRoute) {
                 navigator.popUntilRoot()
-                sm.setToRoute(false)
+                sm.setNavigateToRoute(false)
             }
             SlideTransition(
                 navigator = navigator,

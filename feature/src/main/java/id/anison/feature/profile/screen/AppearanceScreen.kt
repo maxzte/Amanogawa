@@ -51,12 +51,12 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import id.anison.data.model.AppSettings
-import id.anison.data.model.AppTheme
+import id.anison.data.settings.AppSettings
+import id.anison.data.settings.AppTheme
 import id.anison.feature.R
 import id.anison.feature.common.component.CustomListItem
 import id.anison.feature.common.component.CustomListItemSwitch
-import id.anison.feature.common.component.CustomTopAppBar
+import id.anison.feature.common.component.layout.AmanogawaTopBar
 import id.anison.feature.common.component.ProgressIndicator
 import id.anison.feature.profile.SettingsScreenModel
 import id.anison.feature.profile.SettingsUIState
@@ -70,26 +70,40 @@ class AppearanceScreen : Screen {
         val navigator: Navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<SettingsScreenModel>()
         val appSettings by screenModel.appSettings.collectAsState()
+
         when (appSettings) {
-            is SettingsUIState.Loading -> ProgressIndicator()
+            is SettingsUIState.Loading -> {
+                ProgressIndicator()
+            }
+
             is SettingsUIState.Success -> {
                 AppearanceContent(
                     appSettings = (appSettings as SettingsUIState.Success).settings,
                     onEvents = { event ->
                         when (event) {
-                            is AppearanceScreenEvents.PopBack -> navigator.pop()
-                            is AppearanceScreenEvents.SaveTheme -> screenModel.setThemeValue(event.theme)
-                            is AppearanceScreenEvents.SaveDynamicColors ->
+                            is AppearanceScreenEvents.PopBack -> {
+                                navigator.pop()
+                            }
+
+                            is AppearanceScreenEvents.SaveTheme -> {
+                                screenModel.setThemeValue(event.theme)
+                            }
+
+                            is AppearanceScreenEvents.SaveDynamicColors -> {
                                 screenModel.setDynamicThemeValue(event.isDynamicColors)
+                            }
 
-                            is AppearanceScreenEvents.SaveBlackTheme ->
+                            is AppearanceScreenEvents.SaveBlackTheme -> {
                                 screenModel.setBlackThemeValue(event.isBlackTheme)
+                            }
 
-                            is AppearanceScreenEvents.SaveColumnsInRow ->
+                            is AppearanceScreenEvents.SaveColumnsInRow -> {
                                 screenModel.setColumnsInRowValue(event.columns)
+                            }
 
-                            is AppearanceScreenEvents.SaveColumnsInRowLandscape ->
+                            is AppearanceScreenEvents.SaveColumnsInRowLandscape -> {
                                 screenModel.setColumnsInRowValueLandscape(event.columns)
+                            }
                         }
                     }
                 )
@@ -118,7 +132,7 @@ class AppearanceScreen : Screen {
                 .fillMaxSize()
                 .nestedScroll(connection = scrollBehavior.nestedScrollConnection)
         ) {
-            CustomTopAppBar(
+            AmanogawaTopBar(
                 title = stringResource(id = R.string.appearance),
                 popNavigate = { onEvents(AppearanceScreenEvents.PopBack) },
                 scrollBehavior = scrollBehavior,
@@ -129,7 +143,7 @@ class AppearanceScreen : Screen {
                     .fillMaxSize()
                     .padding(horizontal = 8.dp)
             ) {
-                item {  }
+                item { }
                 item {
                     CustomListItemSwitch(
                         text = stringResource(R.string.black_theme),
@@ -162,7 +176,10 @@ class AppearanceScreen : Screen {
                 item {
                     AnimatedContent(
                         targetState = count,
-                        transitionSpec = { horizontalSlideAndScale(targetState, initialState) },
+                        transitionSpec = {
+//                            horizontalSlideAndScale(targetState, initialState)
+                            slideInHorizontally() togetherWith slideOutHorizontally()
+                        },
                         label = "Animation for example columns in row"
                     ) { targetCount ->
                         ExampleCardView(targetCount, itemWidth, itemHeight)
@@ -306,7 +323,7 @@ class AppearanceScreen : Screen {
         count: Int,
         onEvents: (AppearanceScreenEvents) -> Unit,
         isLandscape: Boolean,
-        ) {
+    ) {
         Text(
             text = stringResource(id = R.string.columns_in_row),
             modifier = Modifier.padding(horizontal = 16.dp)

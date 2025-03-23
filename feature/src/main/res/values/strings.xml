@@ -102,6 +102,7 @@
     <string name="download_icon" translatable="false">Download icon</string>
     <string name="download_btn">Download</string>
     <string name="image_loader" translatable="false">Image loader</string>
+    <string name="base_link" translatable="false">https://amanogawa.space/</string>
     <string name="image_loader_link" translatable="false">https://amanogawa.space/%1$s</string>
     <string name="something_wrong">Something went wrong(</string>
     <string name="clear_all">CLEAR ALL</string>

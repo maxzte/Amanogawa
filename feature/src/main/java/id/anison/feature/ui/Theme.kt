@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -395,14 +396,16 @@ fun AmanogawaTheme(
             window.navigationBarColor = if (!darkTheme) colorScheme.surfaceContainerLowest.toArgb()
             else Color.Transparent.toArgb()*/
 
+            window.navigationBarColor = Color.Transparent.toArgb()
+
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = false
-            if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            /*if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 insetsController.apply {
                     insetsController.hide(WindowInsetsCompat.Type.navigationBars())
                     systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 }
-            }
+            }*/
 
 //            window.navigationBarColor = Color.Transparent.toArgb()
         }

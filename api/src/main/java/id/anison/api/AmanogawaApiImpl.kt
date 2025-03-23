@@ -1,29 +1,36 @@
 package id.anison.api
 
-import id.anison.api.model.Anime
-import id.anison.api.model.AnimeEpisodes
 import id.anison.api.model.AnimeIDs
-import id.anison.api.model.AnimeTitles
-import id.anison.api.model.CurrentTitle
-import id.anison.api.model.Episode
 import id.anison.api.model.Filter
-import id.anison.api.model.FoundAnime
-import id.anison.api.model.TeamItem
-import id.anison.api.model.Title
+import id.anison.api.model.TeamMember
+import id.anison.api.model.anime.Anime
+import id.anison.api.model.anime.AnimeDetails
+import id.anison.api.model.anime.AnimeTitles
+import id.anison.api.model.anime.Episode
+import id.anison.api.model.anime.Episodes
+import id.anison.api.model.anime.FoundAnime
 import id.anison.api.util.AmanogawaApiInterceptor
 import id.anison.api.util.Constants
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
+import okhttp3.Dispatcher
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okio.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 
-class AmanogawaApiImpl : AmanogawaApi {
+open class AmanogawaApiImpl() : AmanogawaApi {
+
     private val client: OkHttpClient by lazy {
-        OkHttpClient.Builder().addInterceptor(AmanogawaApiInterceptor())
+        OkHttpClient.Builder()
+            .addInterceptor(AmanogawaApiInterceptor())
             .callTimeout(timeout = 15, unit = TimeUnit.SECONDS)
             .readTimeout(timeout = 15, unit = TimeUnit.SECONDS)
             .build()
@@ -42,14 +49,14 @@ class AmanogawaApiImpl : AmanogawaApi {
         return lenientJson.decodeFromString<T>(body)
     }
 
-    private fun baseUrl(): HttpUrl.Builder {
+    override fun baseUrl(): HttpUrl.Builder {
         return HttpUrl.Builder()
             .scheme("https")
             .host(Constants.HOST.url)
             .addPathSegment(Constants.API.url)
     }
 
-    override suspend fun getAll(): Result<List<Title>> {
+    override suspend fun getAll(): Result<AnimeTitles<Anime>> {
         return try {
             val url = baseUrl().addPathSegment(Constants.TITLES.url).build()
             val request = Request.Builder().url(url).build()
@@ -58,27 +65,30 @@ class AmanogawaApiImpl : AmanogawaApi {
             if (!response.isSuccessful) {
                 return Result.failure(Exception("Request failed: ${response.code}"))
             }
-            val initialData = parseResponse<AnimeTitles>(response)
-            val allTitles = (1..initialData.pages).flatMap { page ->
-                val url = baseUrl().addPathSegment(Constants.TITLES.url)
-                    .addQueryParameter("page", page.toString())
-                    .build()
-                val pagedRequest = Request.Builder().url(url).build()
-                val pagedResponse = executeRequest(pagedRequest)
+            val initialData = parseResponse<AnimeTitles<Anime>>(response)
+            val allTitles = coroutineScope {
+                (1..initialData.pages).map { page ->
+                    async(Dispatchers.IO) {
+                        val pageUrl = baseUrl().addPathSegment(Constants.TITLES.url)
+                            .addQueryParameter("page", page.toString())
+                            .build()
+                        val pagedRequest = Request.Builder().url(pageUrl).build()
+                        val pagedResponse = executeRequest(pagedRequest)
 
-                if (pagedResponse.isSuccessful) {
-                    parseResponse<AnimeTitles>(pagedResponse).data
-                } else {
-                    throw Exception("Failed to load page $page: ${pagedResponse.code}")
-                }
+                        if (!pagedResponse.isSuccessful) {
+                            throw Exception("Failed to load page $page: ${pagedResponse.code}")
+                        }
+                        parseResponse<AnimeTitles<Anime>>(pagedResponse).data
+                    }
+                }.awaitAll().flatten()
             }
-            Result.success(allTitles.toList())
+            Result.success(AnimeTitles(data = allTitles, pages = initialData.pages))
         } catch (e: IOException) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getTitles(page: Int): Result<AnimeTitles> {
+    override suspend fun getTitlesByPage(page: Int): Result<AnimeTitles<Anime>> {
         return try {
             if (page <= 0) {
                 return Result.failure(Exception("Page:${page} is not exist"))
@@ -91,17 +101,19 @@ class AmanogawaApiImpl : AmanogawaApi {
             if (!response.isSuccessful) {
                 return Result.failure(Exception("Request failed: ${response.code}"))
             }
-            val responseData = parseResponse<AnimeTitles>(response)
+            val responseData = parseResponse<AnimeTitles<Anime>>(response = response)
             if (page > responseData.pages) {
                 return Result.failure(Exception("Page:${page} is not exist\t${response.code}"))
             }
+            responseData.currentPage = page
             Result.success(responseData)
         } catch (e: IOException) {
+            println(e.message)
             Result.failure(e)
         }
     }
 
-    override suspend fun getCurrentTitles(): Result<List<CurrentTitle>> {
+    override suspend fun getCurrentTitles(): Result<List<Anime>> {
         return try {
             val url = baseUrl()
                 .addPathSegment(Constants.TITLES.url).addPathSegment(Constants.CURRENT.url)
@@ -111,13 +123,13 @@ class AmanogawaApiImpl : AmanogawaApi {
             if (!response.isSuccessful) {
                 return Result.failure(Exception("Request failed: ${response.code}"))
             }
-            Result.success(parseResponse<List<CurrentTitle>>(response))
+            Result.success(parseResponse<List<Anime>>(response))
         } catch (e: IOException) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getAnime(id: Long): Result<Anime> {
+    override suspend fun getAnime(id: Long): Result<AnimeDetails> {
         return try {
             val url = baseUrl()
                 .addPathSegment(Constants.TITLE.url)
@@ -128,43 +140,51 @@ class AmanogawaApiImpl : AmanogawaApi {
             if (!response.isSuccessful) {
                 return Result.failure(Exception("Request failed: ${response.code}"))
             }
-            Result.success(parseResponse<Anime>(response))
+            Result.success(parseResponse<AnimeDetails>(response))
         } catch (e: IOException) {
             Result.failure(e)
         }
     }
 
-    override suspend fun getAnimeEpisodes(id: Long): Result<AnimeEpisodes<Episode>> {
+    override suspend fun getAnimeEpisodes(id: Long): Result<Episodes> {
         return try {
             fun buildEpisodesUrl(page: Int = 1): HttpUrl {
                 return baseUrl()
                     .addPathSegment(Constants.EPISODES.url)
                     .addPathSegment(id.toString())
                     .apply {
-                        if (page > 1) addQueryParameter("page", page.toString())
+                        if (page >= 1) addQueryParameter("page", page.toString())
                     }
                     .build()
             }
 
-            val request = Request.Builder().url(buildEpisodesUrl()).build()
-            val response = executeRequest(request)
-            if (!response.isSuccessful) {
-                return Result.failure(Exception("Request failed: ${response.code}"))
-            }
-            val responseData = parseResponse<AnimeEpisodes<Episode>>(response)
-            val episodes = (2..responseData.pages).flatMap { page ->
-                val pagedRequest = Request.Builder().url(buildEpisodesUrl(page)).build()
-                val pagedResponse = executeRequest(pagedRequest)
-                if (!pagedResponse.isSuccessful) {
-                    return Result.failure(Exception("Failed to load page $page: ${pagedResponse.code}"))
+            fun fetchEpisodes(page: Int): Result<Episodes> {
+                val request = Request.Builder().url(buildEpisodesUrl(page)).build()
+                val response = executeRequest(request)
+                if (!response.isSuccessful) {
+                    return Result.failure(Exception("Failed to load page $page: ${response.code}"))
                 }
-                parseResponse<AnimeEpisodes<Episode>>(pagedResponse).data
+                return try {
+                    Result.success(parseResponse<Episodes>(response))
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
             }
+
+            val episodes = mutableListOf<Episode>()
+            val initialResponse = fetchEpisodes(1)
+            val initialData = initialResponse.getOrThrow()
+
+            episodes.addAll(initialData.data)
+            val afterFirstPageEpisodes = (2..initialData.pages).mapNotNull { page ->
+                fetchEpisodes(page).getOrThrow().data
+            }.flatten()
+            episodes.addAll(afterFirstPageEpisodes)
             Result.success(
-                AnimeEpisodes<Episode>(
-                    pages = responseData.pages,
+                Episodes(
+                    pages = initialData.pages,
                     data = episodes,
-                    bot_url = responseData.bot_url,
+                    botUrl = initialData.botUrl,
                 )
             )
         } catch (e: IOException) {
@@ -188,14 +208,14 @@ class AmanogawaApiImpl : AmanogawaApi {
 
     override suspend fun getFilteredTitles(
         page: Int,
-        years: List<Int>?,
-        genres: List<Int>?,
-        voices: List<Int>?,
-        sounds: List<Int>?,
-        translators: List<Int>?,
-    ): Result<AnimeTitles> {
+        years: List<Short>?,
+        genres: List<Long>?,
+        voices: List<Long>?,
+        sounds: List<Long>?,
+        translators: List<Long>?,
+    ): Result<AnimeTitles<Anime>> {
         return try {
-            fun List<Int>.toQueryParam() =
+            fun List<Any>.toQueryParam() =
                 joinToString(prefix = "[", postfix = "]", separator = ",") { it.toString() }
 
             val params = mutableMapOf<String, String>().apply {
@@ -219,7 +239,7 @@ class AmanogawaApiImpl : AmanogawaApi {
             if (!response.isSuccessful) {
                 return Result.failure(Exception("Request failed: ${response.code}"))
             }
-            Result.success(parseResponse<AnimeTitles>(response))
+            Result.success(parseResponse<AnimeTitles<Anime>>(response))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -256,18 +276,17 @@ class AmanogawaApiImpl : AmanogawaApi {
                 return Result.failure(Exception("Request failed: ${firstResponse.code}"))
             }
 
-            val firstPageData = parseResponse<AnimeTitles>(firstResponse)
+            val firstPageData = parseResponse<AnimeTitles<Anime>>(firstResponse)
             val ids = mutableListOf<Long>()
-            ids.addAll(firstPageData.data.map { it.id })
+            ids.addAll(firstPageData.data.map { it.animeId })
             for (page in 2..firstPageData.pages) {
-                val pagedUrl = buildCountAnimeUrl(page)
-                val pagedRequest = Request.Builder().url(pagedUrl).build()
-                val pagedResponse = executeRequest(pagedRequest)
-                if (!pagedResponse.isSuccessful) {
-                    return Result.failure(Exception("Failed to load page $page: ${pagedResponse.code}"))
+                val pagedResponse = getTitlesByPage(page)
+                if (!pagedResponse.isSuccess) {
+                    return Result.failure(Exception("Failed to load page $page: ${pagedResponse.getOrThrow()}"))
                 }
-                val pagedData = parseResponse<AnimeTitles>(pagedResponse)
-                ids.addAll(pagedData.data.map { it.id })
+                val pagedData = pagedResponse.getOrThrow().data
+
+                ids.addAll(pagedData.map { it.animeId })
             }
             Result.success(AnimeIDs(ids, ids.size))
         } catch (e: IOException) {
@@ -291,7 +310,7 @@ class AmanogawaApiImpl : AmanogawaApi {
         }
     }
 
-    override suspend fun getTeam(): Result<List<TeamItem>> {
+    override suspend fun getTeam(): Result<List<TeamMember>> {
         return try {
             val url = baseUrl().addPathSegment(Constants.TEAM.url).build()
             val request = Request.Builder().url(url).build()
@@ -299,7 +318,7 @@ class AmanogawaApiImpl : AmanogawaApi {
             if (!response.isSuccessful) {
                 return Result.failure(Exception("Request failed: ${response.code}"))
             }
-            Result.success(parseResponse<List<TeamItem>>(response))
+            Result.success(parseResponse<List<TeamMember>>(response))
         } catch (e: Exception) {
             Result.failure(e)
         }

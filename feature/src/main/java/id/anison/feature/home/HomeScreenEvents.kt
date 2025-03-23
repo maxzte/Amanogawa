@@ -1,9 +1,8 @@
 package id.anison.feature.home
 
-interface HomeScreenEvents {
-    data class PushAnime(val id: Long, val schedule: String): HomeScreenEvents
-    data object GetCurrentTitles: HomeScreenEvents
-    data object OnRefresh: HomeScreenEvents
-    data object OnCurrentTitlesRefresh: HomeScreenEvents
-    data class ObserveConnection(val index: Int, val currIndex: Int): HomeScreenEvents
+sealed interface HomeScreenEvents {
+    data class PushAnime(val animeId: Long) : HomeScreenEvents
+    data class SetChipFilter(val chipTitle: String) : HomeScreenEvents
+    data object OnRefresh : HomeScreenEvents
+    data class ObserveConnection(val index: Int, val currIndex: Int) : HomeScreenEvents
 }

@@ -2,9 +2,9 @@ package id.anison.feature.profile
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import id.anison.data.repository.SettingsRepository
-import id.anison.data.model.AppSettings
-import id.anison.data.model.AppTheme
+import id.anison.data.settings.SettingsRepo
+import id.anison.data.settings.AppSettings
+import id.anison.data.settings.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,58 +14,43 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SettingsScreenModel(
-    private val repository: SettingsRepository
-) : StateScreenModel<SettingsState>(SettingsState.None) {
-    private val _settingsState = MutableStateFlow(SettingsState.None)
-    val settingsState = _settingsState.asStateFlow()
+    private val repository: SettingsRepo
+) : StateScreenModel<SettingsUIState>(SettingsUIState.Loading) {
 
     val appSettings: StateFlow<SettingsUIState> = repository.settings
-        .map {
+        .map { settings ->
             SettingsUIState.Success(
                 settings = AppSettings(
-                    theme = it.theme,
-                    isDynamicColors = it.isDynamicColors,
-                    isBlackTheme = it.isBlackTheme,
-                    countColumnsInRow = it.countColumnsInRow,
-                    countColumnsInRowLandscape = it.countColumnsInRowLandscape,
+                    theme = settings.theme,
+                    isDynamicColors = settings.isDynamicColors,
+                    isBlackTheme = settings.isBlackTheme,
+                    countColumnsInRow = settings.countColumnsInRow,
+                    countColumnsInRowLandscape = settings.countColumnsInRowLandscape,
                 )
             )
         }
         .stateIn(
             scope = screenModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = SettingsUIState.Loading,
+            initialValue = SettingsUIState.Loading
         )
 
-    fun setThemeValue(value: AppTheme) {
+    private fun updateSettings(updateAction: suspend (SettingsRepo) -> Unit) {
         screenModelScope.launch {
-            repository.saveTheme(value)
+            updateAction(repository)
         }
     }
 
-    fun setDynamicThemeValue(value: Boolean) {
-        screenModelScope.launch {
-            repository.saveDynamicColor(value)
-        }
-    }
+    fun setThemeValue(value: AppTheme) = updateSettings { it.saveTheme(value) }
 
-    fun setBlackThemeValue(value: Boolean) {
-        screenModelScope.launch {
-            repository.saveBlackTheme(value)
-        }
-    }
+    fun setDynamicThemeValue(value: Boolean) = updateSettings { it.saveDynamicColor(value) }
 
-    fun setColumnsInRowValue(value: Int) {
-        screenModelScope.launch {
-            repository.saveCountColumnsInRow(value)
-        }
-    }
+    fun setBlackThemeValue(value: Boolean) = updateSettings { it.saveBlackTheme(value) }
 
-    fun setColumnsInRowValueLandscape(value: Int) {
-        screenModelScope.launch {
-            repository.saveCountColumnsInRowLandscape(value)
-        }
-    }
+    fun setColumnsInRowValue(value: Int) = updateSettings { it.saveCountColumnsInRow(value) }
+
+    fun setColumnsInRowValueLandscape(value: Int) =
+        updateSettings { it.saveCountColumnsInRowLandscape(value) }
 }
 
 sealed interface SettingsUIState {

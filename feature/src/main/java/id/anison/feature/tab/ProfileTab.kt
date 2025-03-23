@@ -13,7 +13,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import id.anison.feature.R
-import id.anison.feature.common.MainScreenModel
+import id.anison.feature.MainScreenModel
 import id.anison.feature.profile.screen.ProfileScreen
 
 object ProfileTab : Tab {
@@ -47,7 +47,7 @@ object ProfileTab : Tab {
         ) { navigator ->
             if (toRoute) {
                 navigator.popUntilRoot()
-                sm.setToRoute(false)
+                sm.setNavigateToRoute(false)
             }
             SlideTransition(
                 navigator = navigator,

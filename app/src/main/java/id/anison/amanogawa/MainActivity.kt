@@ -13,17 +13,17 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import id.anison.data.model.AppTheme
-import id.anison.feature.common.MainScreenModel
-import id.anison.feature.common.MainUIState
+import id.anison.data.settings.AppTheme
+import id.anison.feature.MainScreenModel
+import id.anison.feature.MainUIState
 import id.anison.feature.ui.AmanogawaTheme
 import kotlinx.coroutines.launch
 import org.koin.compose.KoinContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.context.KoinContext
 
 class MainActivity : ComponentActivity(), KoinComponent {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         enableEdgeToEdge()

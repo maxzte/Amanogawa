@@ -40,6 +40,7 @@ dependencies {
 
     //ROOM
     implementation(libs.androidx.room.ktx)
+    runtimeOnly(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     api(libs.androidx.room.paging)
 
@@ -47,7 +48,7 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
 
-    testImplementation(libs.junit)
+    testImplementation(libs.junit.api)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

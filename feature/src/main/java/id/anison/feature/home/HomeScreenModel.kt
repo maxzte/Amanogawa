@@ -1,51 +1,64 @@
 package id.anison.feature.home
 
 import android.util.Log
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import id.anison.data.repository.AmanogawaRepository
-import id.anison.data.repository.ConnectivityRepository
-import id.anison.feature.model.toCurrentTitleUI
-import id.anison.feature.model.toTitleUI
+import id.anison.data.ConnectivityRepo
+import id.anison.data.ReqRes
+import id.anison.data.anime.AnimeRepo
+import id.anison.feature.anime.model.AnimeUI
+import id.anison.feature.anime.model.toAnimeUI
+import id.anison.feature.common.Chip
+import id.anison.feature.common.DataState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeScreenModel(
-    private val repository: AmanogawaRepository,
-    private val connectivityRepository: ConnectivityRepository,
-) : StateScreenModel<HomeState>(HomeState.None) {
-    private val _state = MutableStateFlow(HomeState.None)
+    private val repo: AnimeRepo,
+    private val connectivityRepo: ConnectivityRepo,
+) : StateScreenModel<HomeState>(HomeState()) {
+
+    private val _state = MutableStateFlow(HomeState())
     val animeState: StateFlow<HomeState> = _state.asStateFlow()
-    val isOnline = connectivityRepository.isConnected
+
+    val pagingAnimeState = repo.getAllWithPagination()
+        .map {
+            it.map { animeDto -> animeDto.toAnimeUI() }
+        }
         .stateIn(
             scope = screenModelScope,
             started = SharingStarted.Lazily,
+            initialValue = PagingData.empty()
+        )
+        .cachedIn(screenModelScope)
+
+    val isOnline = connectivityRepo.isConnected
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
             initialValue = true,
         )
 
-    //var currentPosition: Int? = _state.value.titlesState.collectAsLazyPagingItems().peek()//null
-    private var currentPosition: Int? = null
-    private var currentPositionCurrent: Int? = null
-
-    init {
-        getTitles()
-        //observeConnectivity()
+    companion object {
+        const val TAG = "HomeScreenModel"
     }
 
-    fun updateScrollPosition(newPosition: Int, newPositionForCurrent: Int) {
-        Log.d("Home", "updScrollPos is: $newPosition and curr is: $newPosition")
-        currentPosition = newPosition
-        currentPositionCurrent = newPositionForCurrent
+    init {
+        Log.e(TAG, "Init")
+        if (_state.value.currentAnimeState is DataState.Loading) {
+            getCurrentAnimeList()
+        }
     }
 
     fun observeConnectivity() {
@@ -53,68 +66,53 @@ class HomeScreenModel(
             isOnline.collect { isConnected ->
                 _state.update { it.copy(isOnline = isConnected) }
                 if (isConnected) {
-//                    getTitles()
-//                    getCurrentTitles()
                     refreshTitles()
-                    refreshCurrentTitles()
                 }
             }
         }
     }
 
-    fun refreshTitles(): Boolean {
-        _state.value = _state.value.copy(isTitlesLoaded = false)
-        getTitles()
-        return _state.value.isTitlesLoaded
+    fun refreshTitles() {
+        if (_state.value.currentAnimeState !is DataState.Loading) {
+            getCurrentAnimeList()
+        }
     }
 
-    fun refreshCurrentTitles() {
-        _state.value = _state.value.copy(isCurrentTitlesLoaded = false)
-        getCurrentTitles()
-    }
-
-    private fun getTitles() {
-        screenModelScope.launch {
-            if (!_state.value.isTitlesLoaded) {
-                val titlesState = repository.getAll().map {
-                    it.map { dataTitle -> dataTitle.toTitleUI() }
+    fun getCurrentAnimeList() = screenModelScope.launch {
+        Log.e(TAG, "fetching curr")
+        repo.getCurrentAnime().collectLatest { state ->
+            when (val animeData = state) {
+                is ReqRes.Error -> {
+                    _state.update { state ->
+                        state.copy(currentAnimeState = DataState.Error(animeData.error))
+                    }
                 }
-                    .cachedIn(screenModelScope)
-                    .stateIn(screenModelScope, SharingStarted.Lazily, PagingData.empty())
 
-                _state.value = _state.value.copy(isTitlesLoaded = true, titlesState = titlesState)
+                is ReqRes.InProgress -> {
+                    _state.update { state ->
+                        state.copy(currentAnimeState = DataState.Loading)
+                    }
+                }
+
+                is ReqRes.Success -> {
+                    delay(1000)
+                    _state.update { state ->
+                        state.copy(
+                            currentAnimeState = DataState.Success(animeData.data.map { it.toAnimeUI() })
+                        )
+                    }
+                }
             }
         }
     }
 
-    fun getCurrentTitles() {
-        screenModelScope.launch {
-            if (!_state.value.isCurrentTitlesLoaded) {
-                Log.d("Home", "currentTitlesCurrent is $currentPositionCurrent")
-                val currentTitlesState = repository.getAllCurrent()
-                    .map { pagingData -> pagingData.map { it.toCurrentTitleUI() } }
-                    .cachedIn(screenModelScope)
-                    .stateIn(screenModelScope, SharingStarted.Lazily, PagingData.empty())
-
-                _state.value = _state.value.copy(
-                    isCurrentTitlesLoaded = true,
-                    currentTitlesState = currentTitlesState
-                )
-            }
-        }
+    fun setSelectedFilterChip(value: String) {
+        _state.update { state -> state.copy(selectedChipFilter = value) }
     }
-
-    /*private fun getTitles() {
-        screenModelScope.launch {
-            if (!_state.value.isTitlesLoaded) {
-                Log.d("Home", "currentTitles is $currentPosition")
-                val titlesState: StateFlow<PagingData<TitleUI>> = repository.getAll(pagingConfig, currentPositionCurrent)
-                    .map { it.map { dataTitle -> dataTitle.toTitleUI() } }
-                    .cachedIn(screenModelScope)
-                    .stateIn(screenModelScope, SharingStarted.Lazily, PagingData.empty())
-
-                _state.value = _state.value.copy(isTitlesLoaded = true, titlesState = titlesState)
-            }
-        }
-    }*/
 }
+
+data class HomeState(
+    val currentAnimeState: DataState<List<AnimeUI>> = DataState.Loading,
+    val isOnline: Boolean = true,
+    val selectedChipFilter: String = Chip.ALL.title,
+)

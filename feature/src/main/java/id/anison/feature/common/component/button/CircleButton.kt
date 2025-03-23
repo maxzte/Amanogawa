@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,20 +18,34 @@ import id.anison.feature.R
 
 @Composable
 fun FavoriteButton(
-    modifier: Modifier = Modifier,
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
+    backgroundColor: Color? = null,
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { onFavoriteClick() },
-        modifier = modifier
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = if (backgroundColor == null) {
+                Color.Unspecified
+            } else {
+                backgroundColor
+            }
+        ),
+        modifier = modifier,
     ) {
         Icon(
             imageVector = Icons.Filled.Favorite,
-            tint = if (isFavorite) MaterialTheme.colorScheme.error
-            else MaterialTheme.colorScheme.primary,
-            contentDescription = if (isFavorite) stringResource(id = R.string.unliked)
-            else stringResource(id = R.string.liked),
+            tint = if (isFavorite) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.primary
+            },
+            contentDescription = if (isFavorite) {
+                stringResource(id = R.string.unliked)
+            } else {
+                stringResource(id = R.string.liked)
+            },
         )
     }
 }
