@@ -6,7 +6,7 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         apply(plugin = "amanogawa.android.lib")
-        apply(plugin = "amanogawa.koin")
+//        apply(plugin = "amanogawa.koin")
 
 
         dependencies {

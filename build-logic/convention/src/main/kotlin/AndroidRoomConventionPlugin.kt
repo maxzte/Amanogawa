@@ -19,11 +19,14 @@ class AndroidRoomConventionPlugin : Plugin<Project> {
         extensions.configure<RoomExtension> {
             schemaDirectory("$projectDir/schemas")
         }
+        
+//        runtimeOnly(libs.androidx.room.runtime)
 
         dependencies {
-            "implementation"(libs.findLibrary("room.runtime").get())
+            "implementation"(libs.findLibrary("room.runtime").get()) //imp isn`t working
             "implementation"(libs.findLibrary("room.ktx").get())
             "ksp"(libs.findLibrary("room.compiler").get())
+            "implementation"(libs.findLibrary("room.paging").get())
         }
     }
 }

@@ -19,10 +19,9 @@ class AndroidLibConventionPlugin : Plugin<Project> {
         }
 
         dependencies {
-            "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
-            "testImplementation"(libs.findLibrary("kotlin.test").get())
-
-            "implementation"(libs.findLibrary("androidx.tracing.ktx").get())
+            "androidTestImplementation"(libs.findLibrary("androidx.espresso.core").get())
+            "androidTestImplementation"(libs.findLibrary("androidx.junit").get())
+            "testImplementation"(libs.findLibrary("junit").get())
         }
     }
 }
