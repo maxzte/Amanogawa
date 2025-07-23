@@ -41,9 +41,13 @@ gradlePlugin {
             id = libs.plugins.amanogawa.android.feature.get().pluginId
             implementationClass = "AndroidFeatureConventionPlugin"
         }
+        register("koinApp") {
+            id = libs.plugins.amanogawa.koin.app.get().pluginId
+            implementationClass = "AndroidKoinAppConventionPlugin"
+        }
         register("koin") {
-            id = libs.plugins.amanogawa.koin.get().pluginId
-            implementationClass = "KoinConventionPlugin"
+            id = libs.plugins.amanogawa.koin.asProvider().get().pluginId
+            implementationClass = "AndroidKoinConventionPlugin"
         }
         register("androidRoom") {
             id = libs.plugins.amanogawa.android.room.get().pluginId

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- NAVIGATION -->
+    <string name="home_tab">Головна</string>
+    <string name="search_tab">Пошук</string>
+    <string name="favorites_tab">Улюблені</string>
+    <string name="profile_tab">Профіль</string>
+
+    <!-- ABOUT SCREEN -->
+    <string name="about_us">Про нас</string>
+    <string name="amanogawa_about">" – це українська аніме спільнота… озвучення аніме українською. Цілком логічно. Ми перекладаємо та озвучуємо ваші улюблені тайтли, ведемо соцмережі, пиляємо відео для YouTube, робимо подкаст і маємо власний дискорд-сервер. 12 січня 2020 року почала свою історію команда з назвою Amanogawa, що в перекладі з японської означає «Чумацький Шлях»💫 Тут зібралися амбіційні люди, які горіли аніме та озвучкою і бачили один в одному потенціал, що допоможе рухатись через терни до зірок і далі! Аманоґава — це команда, яка зараз налічує 10 даберів і даберок, 4 перекладачі та перекладачки, релізера, відповідального за партнерства — словом це багато людей, що працюють і вночі, і на вихідних, а уві сні ще вигадують ідеї для постів і Тік-Току."</string>
+    <string name="mission">"Місія: "</string>
+    <string name="translators_mission">не вмерти, коли у серії 400 рядків тексту</string>
+    <string name="what_are_they_doing">"Що забули в Аманоґаві? "</string>
+    <string name="translators_do">Перекладають аніме так, щоб ви занурились в атмосферу тайтлу і, де потрібно, лахали з адаптованих жартів і мемів.</string>
+    <string name="dabers_mission">звучити, щоб знімати про це Тік-Токи</string>
+    <string name="dabers_do">Озвучують аніме вдень і вночі, постійно покращують дикційну спритність, акторську майстерність, ліпсинк і інші штуки з розумними назвами.</string>
+    <string name="sound">Звукарі</string>
+    <string name="sound_mission">ловити дзен, коли хтось знову озвучив не той наголос</string>
+    <string name="sound_do">Чистять звук і роблять ефектики, щоб ви повністю занурились у події аніме. А ще слідкують за якістю озвучення даберів.</string>
+    <string name="main_target">Основна мета Аманоґави?</string>
+    <string name="main_target_val">" Робити офігезно."</string>
+    <string name="our_plans">"Наші плани? Їх багато, тому підписуйтесь на нас у "</string>
+    <string name="telegram_link">Телеграмі</string>
+    <string name="after_telegramLinkText">" і дивіться, як ми зростатимемо. А ще спільнота Аманоґава — це глядачі! Тисячі аманоґавчиків, яких ми намагаємось закидувати якісним контентом, трохи веселити і не залишати без озвучки улюблених тайтлів навіть під час війни. Ми безмежно вдячні всім за моральну і фінансову підтримку, адже саме це допомагає нам рухатися далі і донатити ЗСУ."</string>
+    <string name="team">Команда:</string>
+    <string name="rainy_position">" — керівник, дабер, звукар"</string>
+    <string name="bodya500icq_position">" — дабер, звукар"</string>
+    <string name="yunko_position">" — даберкa"</string>
+    <string name="spalah_position">" — даберкa"</string>
+    <string name="suni_position">" — даберкa"</string>
+    <string name="maira_position">" — даберка"</string>
+    <string name="son_position">" — даберка"</string>
+    <string name="boni_position">" — даберка"</string>
+    <string name="yudgi_position">" — даберка"</string>
+    <string name="dedrds_position">" — дабер"</string>
+    <string name="alisand_position">" — дабер"</string>
+    <string name="nutix_position">" — дабер"</string>
+    <string name="dennyprout_position">" — дабер"</string>
+    <string name="furunze_position">" — перекладач"</string>
+    <string name="seraficus_position">" — перекладач"</string>
+    <string name="andr_position">" — перекладач"</string>
+    <string name="angelbagel_position">" — перкладачка"</string>
+    <string name="hazuki_position">" — релізер, розробник сайту та бота"</string>
+    <string name="nekonosan_position">" — відповідальний за партнерства"</string>
+
+    <!-- ANIME SCREEN -->
+    <string name="original_name">"Оригінальна назва: "</string>
+    <string name="year">"Рік: "</string>
+    <string name="type">"Тип: "</string>
+    <string name="movie">фільм</string>
+    <string name="series">серіал</string>
+    <string name="season">"Сезон: "</string>
+    <string name="part_two_dots">"Частина: "</string>
+    <string name="episodes_two_dots">"Епізоди: "</string>
+    <string name="episodes_of_extra">%1$s з %2$s (+EXTRA%3$s)</string>
+    <string name="episodes_of">%1$s з %2$s</string>
+    <string name="duration">"Тривалість: "</string>
+    <string name="genres_two_dots">"Жанри: "</string>
+    <string name="genres">"Жанри"</string>
+    <string name="company">"Компанія: "</string>
+    <string name="director">"Режисер: "</string>
+    <string name="translated">"Переклали: "</string>
+    <string name="voiced">"Озвучили: "</string>
+    <string name="work_with_sound">"Робота зі звуком: "</string>
+    <string name="description">Опис</string>
+    <string name="collection">"Колекція "</string>
+    <string name="episodes">"Епізоди "</string>
+    <string name="more">… більше</string>
+    <string name="less">… менше</string>
+
+
+    <!-- OTHER -->
+    <string name="watch_btn">Дивитися</string>
+    <string name="download_btn">Завантажити</string>
+    <string name="something_wrong">Щось пішло не так(</string>
+    <string name="search">Пошук!</string>
+    <string name="found_titles">Знайдені тайтли</string>
+    <string name="clear_all">ОЧИСТИТИ ВСЕ</string>
+    <string name="coming_soon">Скоро!</string>
+    <string name="all">Всі</string>
+    <string name="current">Поточні</string>
+    <string name="ago"> тому</string>
+    <string name="not_connected">"Ви не підʼєднані до інтернету"</string>
+
+
+
+    <!-- EXTENDED SEARCH SCREEN -->
+    <string name="extended_search">Розширений пошук</string>
+    <string name="reset">СКИНУТИ</string>
+    <string name="translators">Перекладачі</string>
+    <string name="voice_actors">Актори озвучення</string>
+    <string name="sound_engineers">Звукорежисери</string>
+    <string name="years">Роки</string>
+    <string name="no_titles_found_for_this_filter">За обраним фільтром жодного тайтлу не знайдено(</string>
+
+    <!-- FAVORITES SCREEN -->
+    <string name="favorites">Улюблені</string>
+    <string name="oops_you_don_t_have_favorites_yet">Йой, тут поки що пусто(</string>
+    <string name="part">Частина %1$s</string>
+    <string name="check_your_internet_connection_and_try_again">Перевірте з\'єднання з інтернетом. Якщо нічого не змінилося у Аманогави проблеми. Спробуйте пізніше.</string>
+
+    <!-- PROFILE SCREEN -->
+    <string name="profile">Профіль</string>
+
+    <!-- RANDOM TITLES CAROUSEL SCREEN -->
+    <string name="random_titles">Рандомні тайтли</string>
+    <string name="next">Далі</string>
+    <string name="new_cycle">Новий цикл</string>
+
+
+    <!-- SEARCH SCREEN -->
+    <string name="search_anime">Шукати аніме</string>
+    <string name="random_title">Рандомчик</string>
+    <string name="search_history">Історія пошуку</string>
+
+    <!-- SETTINGS SCREEN -->
+    <string name="settings">Налаштування</string>
+    <string name="black_theme">Чорна тема</string>
+    <string name="our_socials">Наші соціальні мережі</string>
+    <string name="support_us">Підтримати нас</string>
+    <string name="app_theme">ТЕМА</string>
+    <string name="light">Світла</string>
+    <string name="dynamic">Динамічна</string>
+    <string name="dark">Темна</string>
+
+    <!-- APPEARANCE SCREEN -->
+    <string name="appearance">Зовнішній вигляд</string>
+    <string name="dynamic_colors">Динамічні кольори</string>
+    <string name="colors_based_on_wallpapers">Кольори додатку будуть базуватися на ваших шпалерах</string>
+    <string name="columns_in_row">КОЛОНОК В РЯДКУ</string>
+    <string name="episodes_in_row">ЕПІЗОДІВ В РЯДКУ</string>
+    <string name="one">Один</string>
+    <string name="two">Дві</string>
+    <string translatable="false" name="two1">Два</string>
+    <string name="three">Три</string>
+    <string name="four">Чотири</string>
+    <string name="five">П\'ять</string>
+    <string name="six">Шість</string>
+    <string name="seven">Сім</string>
+
+</resources>
