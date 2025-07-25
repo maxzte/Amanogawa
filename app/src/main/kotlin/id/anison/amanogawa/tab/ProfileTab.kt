@@ -50,6 +50,8 @@ object ProfileTab : AmanogawaTab {
             key = "ProfileTabNavigator",
         ) { navigator ->
 
+            AmanogawaBackHandler(navigator = navigator)
+
             LaunchedEffect(navigator.lastItem) {
                 screenModel.setIsRoot(navigator.lastItem is ProfileScreen)
             }

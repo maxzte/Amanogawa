@@ -44,6 +44,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.TeamUI
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.component.DetailText
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
@@ -128,7 +129,7 @@ class AboutUsScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + 8.dp
+                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
                 ),
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),

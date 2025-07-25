@@ -29,6 +29,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
@@ -88,7 +89,7 @@ class SettingsScreen : Screen {
             LazyColumn(
                 contentPadding = PaddingValues(
                     top = paddingValues.calculateTopPadding() + 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + 8.dp,
+                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
                     start = 8.dp,
                     end = 8.dp
                 ),

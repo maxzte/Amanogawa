@@ -87,7 +87,7 @@
 
 
     <!-- EXTENDED SEARCH SCREEN -->
-    <string name="extended_search">Розширений пошук</string>
+    <string name="filters">Фільтри</string>
     <string name="reset">СКИНУТИ</string>
     <string name="translators">Перекладачі</string>
     <string name="voice_actors">Актори озвучення</string>

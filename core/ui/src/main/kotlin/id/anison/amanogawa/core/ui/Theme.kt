@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import android.view.WindowInsets
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -388,7 +389,7 @@ fun AmanogawaTheme(
         SideEffect {
 
             // 1. Прозорий статус-бар із альфою (0.5f = 50%)
-//            window.statusBarColor = statusBarColor.toArgb()
+//            window.statusBarColor = statusBarColor.toArgb ()
 //                if (!isBlackTheme) Color.Black.copy(alpha = 0.5f).toArgb()
 //            else Color.White.copy(alpha = 0.5f).toArgb()
 

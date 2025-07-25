@@ -63,6 +63,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.data.settings.AppSettings
 import id.anison.amanogawa.core.data.settings.AppTheme
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.CustomListItemSwitch
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
@@ -140,7 +141,7 @@ class AppearanceScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + 8.dp,
+                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
                 ),
                 modifier = Modifier.fillMaxSize()
             ) {

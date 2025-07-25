@@ -55,21 +55,23 @@ class AnimeDetailsScreenModel(
             is AnimeDetailsScreenEvents.PopBack -> {
                 if (singleEventHandler.canTrigger()) {
                     screenModelScope.launch {
-                        _navEventState.tryEmit(value = NavigationEvent.NavigateToBack)
+                        _navEventState.emit(value = NavigationEvent.NavigateToBack)
                     }
                 }
             }
 
             is AnimeDetailsScreenEvents.ScrollToTop -> {
                 if (singleEventHandler.canTrigger()) {
-                    _scrollToTopEvent.tryEmit(Unit)
+                    screenModelScope.launch {
+                        _scrollToTopEvent.emit(Unit)
+                    }
                 }
             }
 
             is AnimeDetailsScreenEvents.PushAnimeDetailsScreen -> {
                 if (singleEventHandler.canTrigger()) {
                     screenModelScope.launch {
-                        _navEventState.tryEmit(
+                        _navEventState.emit(
                             value = NavigationEvent.NavigateToAnimeDetails(
                                 animeId = event.animeId
                             )
@@ -88,7 +90,7 @@ class AnimeDetailsScreenModel(
                 log.d(TAG, "$event")
                 if (singleEventHandler.canTrigger()) {
                     screenModelScope.launch {
-                        _navEventState.tryEmit(
+                        _navEventState.emit(
                             value = NavigationEvent.NavigateToFilteredResult(
                                 filterId = event.filterId ?: -1,
                                 filterName = event.filterName,

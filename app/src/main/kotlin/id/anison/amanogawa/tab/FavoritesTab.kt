@@ -47,6 +47,8 @@ object FavoritesTab : Tab {
             key = "FavoriteTabNavigator",
         ) { navigator ->
 
+            AmanogawaBackHandler(navigator = navigator)
+
             LaunchedEffect(navigator.lastItem) {
                 screenModel.setIsRoot(navigator.lastItem is FavoritesScreen)
             }

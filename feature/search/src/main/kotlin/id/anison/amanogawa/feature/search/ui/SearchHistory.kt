@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.model.SearchResultUI
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.feature.search.screenmodel.SearchScreenEvents
 
 @Composable
@@ -44,7 +45,11 @@ internal fun SearchHistory(
     LazyColumn(
         state = lazyListState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp),
+        contentPadding = PaddingValues(
+//            start = 8.dp,
+//            end = 8.dp,
+            bottom = AmanogawaConst.bottomBarInsets
+        ),
     ) {
         item(
             key = "searchHistoryHeader",

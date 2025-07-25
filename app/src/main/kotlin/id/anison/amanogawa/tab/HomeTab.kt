@@ -45,11 +45,12 @@ object HomeTab : AmanogawaTab {
     override fun Content() {
         val screenModel = koinScreenModel<MainScreenModel>()
         val homeScreenModel = koinScreenModel<HomeScreenModel>()
-
         Navigator(
             screen = HomeScreen(),
             key = "HomeTabNavigator",
         ) { navigator ->
+
+            AmanogawaBackHandler(navigator = navigator)
 
             LaunchedEffect(navigator.lastItem) {
                 screenModel.setIsRoot(navigator.lastItem is HomeScreen)

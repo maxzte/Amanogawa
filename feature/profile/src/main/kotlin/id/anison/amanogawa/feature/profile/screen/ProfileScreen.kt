@@ -38,6 +38,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.feature.profile.ProfileNavigationEvent
 import id.anison.amanogawa.feature.profile.ProfileScreenModel
@@ -96,7 +97,7 @@ class ProfileScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + 8.dp,
+                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)

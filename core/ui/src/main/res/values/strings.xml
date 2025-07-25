@@ -117,7 +117,7 @@
     <string name="not_connected">"You aren`t connected to the internet"</string>
 
     <!-- EXTENDED SEARCH SCREEN -->
-    <string name="extended_search">Extended Search</string>
+    <string name="filters">Filters</string>
     <string name="reset">RESET</string>
     <string name="translators">Translators</string>
     <string name="voice_actors">Voice actors</string>

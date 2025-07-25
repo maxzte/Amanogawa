@@ -43,6 +43,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.PagingEvent
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.columnsInRow
@@ -174,7 +175,7 @@ class HomeScreen : Screen {
                                                 top = if (isLandscape) paddingValues.calculateTopPadding() else 0.dp,
                                                 start = 8.dp,
                                                 end = 8.dp,
-                                                bottom = paddingValues.calculateBottomPadding()
+                                                bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                                             ),
                                             state = lazyGridState,
                                             verticalArrangement = Arrangement.spacedBy(8.dp),

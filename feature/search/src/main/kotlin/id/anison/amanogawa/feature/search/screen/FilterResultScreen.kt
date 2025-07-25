@@ -37,6 +37,7 @@ import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.PagingEvent
 import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.columnsInRow
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
@@ -162,7 +163,7 @@ class FilterResultScreen(
                             start = 8.dp,
                             top = paddingValues.calculateTopPadding() + 8.dp,
                             end = 8.dp,
-                            bottom = paddingValues.calculateBottomPadding() + 8.dp,
+                            bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
                         ),
                         state = lazyGridState,
                         verticalArrangement = Arrangement.spacedBy(8.dp),

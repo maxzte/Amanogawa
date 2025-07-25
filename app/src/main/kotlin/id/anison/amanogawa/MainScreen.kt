@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -48,10 +50,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection.Ltr
+import androidx.compose.ui.unit.LayoutDirection.Rtl
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -60,11 +68,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.LineSide
 import id.anison.amanogawa.core.ui.common.grayLine
 import id.anison.amanogawa.tab.AmanogawaTab
@@ -104,37 +114,72 @@ class MainScreen : Screen {
             tab = HomeTab,
         ) { tabNavigator ->
 
-            BackHandler {
-                val previousTab = screenModel.popFromTabHistory()
-                if (previousTab != null) {
-                    tabNavigator.current = previousTab
-                } else {
-                    activity.moveTaskToBack(true)
-                }
-            }
+//            BackHandler {
+//                val previousTab = screenModel.popFromTabHistory()
+//                if (previousTab != null) {
+//                    tabNavigator.current = previousTab
+//                } else {
+//                    activity.moveTaskToBack(true)
+//                }
+//            }
 
             Scaffold(
                 bottomBar = {
                     if (isCompact) {
                         AnimatedVisibility(
                             visible = isBottomBarVisible,
-                            enter = slideInVertically { it },
-                            exit = slideOutVertically { it }
+                            enter = fadeIn(),
+                            exit = fadeOut()
                         ) {
                             // TODO FlexibleBottBar
-                            BottomAppBar(
-                                content = {
-                                    TabNavigationItem(tab = HomeTab)
-                                    TabNavigationItem(tab = SearchTab)
-                                    TabNavigationItem(tab = ProfileTab)
-                                },
-                                contentPadding = PaddingValues(0.dp),
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(64.dp)
-                                    .grayLine(side = LineSide.Top),
-                                containerColor = Color.Transparent,
-                            )
+                                    .padding(16.dp)
+                                    .height(AmanogawaConst.barHeight)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape)
+                                        .background(
+                                            brush = Brush.radialGradient(
+                                                colors = listOf(
+                                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                                                ),
+                                            )
+                                        )
+                                        .border(
+                                            width = Dp.Hairline,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+                                            shape = CircleShape
+                                        )
+                                        .blur(24.dp)
+                                        .shadow(
+                                            elevation = 10.dp,
+                                            shape = CircleShape,
+                                            ambientColor = Color.Black.copy(alpha = 0.1f),
+                                            spotColor = Color.Black.copy(alpha = 0.1f)
+                                        )
+                                )
+                                BottomAppBar(
+                                    content = {
+                                        TabNavigationItem(tab = HomeTab)
+                                        TabNavigationItem(tab = SearchTab)
+                                        TabNavigationItem(tab = ProfileTab)
+                                    },
+                                    windowInsets = WindowInsets(0, 0, 0, 0),
+                                    contentPadding = PaddingValues(
+                                        vertical = 4.dp,
+                                        horizontal = 4.dp
+                                    ),
+                                    modifier = Modifier.fillMaxSize(),
+                                    containerColor = Color.Transparent,
+                                    tonalElevation = 10.dp,
+                                )
+
+                            }
                         }
                     }
                 },
@@ -150,7 +195,14 @@ class MainScreen : Screen {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(padding)
+                        .padding(
+                            paddingValues = PaddingValues(
+                                start = padding.calculateLeftPadding(layoutDirection = Ltr),
+                                top = padding.calculateTopPadding(),
+                                end = padding.calculateRightPadding(layoutDirection = Rtl),
+                                bottom = 0.dp,
+                            )
+                        )
                         .consumeWindowInsets(padding)
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                 ) {
@@ -175,7 +227,7 @@ class MainScreen : Screen {
                             },
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .widthIn(max = 64.dp)
+                                .widthIn(AmanogawaConst.barHeight)
                                 .grayLine(side = LineSide.Right),
                             containerColor = Color.Transparent,
                         )
@@ -209,7 +261,7 @@ class MainScreen : Screen {
                 .clip(CircleShape)
                 .clickable(
                     interactionSource = interactionSource,
-                    indication = ripple(bounded = false, radius = 50.dp)
+                    indication = ripple(bounded = false, radius = 35.dp)
                 ) {
                     when {
                         isSelected && isRoot -> {
@@ -224,7 +276,7 @@ class MainScreen : Screen {
 
                         else -> {
                             tabNavigator.current = tab
-                            screenModel.pushTabToHistory(tab)
+//                            screenModel.pushTabToHistory(tab)
                         }
                     }
                 },
@@ -237,7 +289,6 @@ class MainScreen : Screen {
                 Icon(
                     painter = icon!!,
                     contentDescription = tab.options.title,
-                    tint = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
@@ -277,7 +328,7 @@ class MainScreen : Screen {
 
                     else -> {
                         tabNavigator.current = tab
-                        screenModel.pushTabToHistory(tab)
+//                        screenModel.pushTabToHistory(tab)
                     }
                 }
             },
@@ -285,7 +336,6 @@ class MainScreen : Screen {
                 Icon(
                     painter = icon!!,
                     contentDescription = tab.options.title,
-                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
             label = {

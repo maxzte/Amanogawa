@@ -36,6 +36,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.FavoriteUI
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.columnsInRow
 import id.anison.amanogawa.core.ui.common.component.Message
@@ -138,7 +139,7 @@ class FavoritesScreen : Screen, ComponentActivity() {
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     start = 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + 8.dp
+                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
                 ),
                 modifier = Modifier.fillMaxSize(),
                 state = lazyGridState,

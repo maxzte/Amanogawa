@@ -56,6 +56,7 @@ import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeEpisodeUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.columnsInRow
@@ -232,7 +233,7 @@ class AnimeDetailsScreen(
                         start = 8.dp,
                         end = 8.dp,
                         top = 0.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 8.dp
+                        bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                     ),
                     modifier = Modifier.fillMaxSize()
                 ) {

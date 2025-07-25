@@ -2,6 +2,7 @@ package id.anison.amanogawa
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.navigator.Navigator
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.ConnectivityRepo
 import id.anison.amanogawa.core.data.settings.AppSettings
@@ -66,7 +67,6 @@ class MainScreenModel(
         )
 
     fun pushTabToHistory(newTab: AmanogawaTab) {
-
         if (tabHistory.contains(newTab)) {
             if (newTab != HomeTab || tabHistory.first() != HomeTab) {
                 tabHistory.remove(newTab)
