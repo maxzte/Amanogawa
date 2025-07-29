@@ -8,6 +8,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.data.search.SearchRepo
 import id.anison.amanogawa.core.domain.toAnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
@@ -16,6 +17,7 @@ import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -26,9 +28,12 @@ class RandomAnimeScreenModel(
     private val searchRepo: SearchRepo,
     private val log: Logger,
 ) : StateScreenModel<RandomTitleState>(RandomTitleState()) {
-
+    private val singleEventHandler = SingleEventHandler()
     private val _navEventState = MutableSharedFlow<RandomAnimeNavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
+
+    private val _isModalSheetVisible = MutableStateFlow(false)
+    val isModalSheetVisible = _isModalSheetVisible.asSharedFlow()
 
     init {
         getRandomTitles()
@@ -39,34 +44,44 @@ class RandomAnimeScreenModel(
         when (event) {
             is RandomScreenEvents.PopBack -> {
                 screenModelScope.launch {
-                    _navEventState.tryEmit(value = RandomAnimeNavigationEvent.NavigateToBack)
+                    _navEventState.emit(value = RandomAnimeNavigationEvent.NavigateToBack)
                 }
             }
 
             is RandomScreenEvents.PushAnimeDetailsScreen -> {
-                screenModelScope.launch {
-                    _navEventState.tryEmit(
-                        value = RandomAnimeNavigationEvent.NavigateToAnimeDetails(
-                            animeId = event.animeId
+                if (singleEventHandler.canTrigger()) {
+                    screenModelScope.launch {
+                        _navEventState.emit(
+                            value = RandomAnimeNavigationEvent.NavigateToAnimeDetails(
+                                animeId = event.animeId
+                            )
                         )
-                    )
+                    }
                 }
             }
 
             is RandomScreenEvents.OnLinkClick -> {
-                screenModelScope.launch {
-                    _navEventState.tryEmit(
-                        value = RandomAnimeNavigationEvent.NavigateToFilteredResult(
-                            filterId = event.filterId ?: -1,
-                            filterName = event.filterName,
-                            filterType = event.filterType
+                if (singleEventHandler.canTrigger()) {
+                    screenModelScope.launch {
+                        _navEventState.emit(
+                            value = RandomAnimeNavigationEvent.NavigateToFilteredResult(
+                                filterId = event.filterId ?: -1,
+                                filterName = event.filterName,
+                                filterType = event.filterType
+                            )
                         )
-                    )
+                    }
                 }
             }
 
+            is RandomScreenEvents.SetModalSheetVisibility -> {
+                _isModalSheetVisible.value = event.value
+            }
+
             is RandomScreenEvents.Refresh -> {
-                getRandomTitles()
+                if (singleEventHandler.canTrigger()) {
+                    getRandomTitles()
+                }
             }
 
         }
@@ -100,7 +115,7 @@ sealed interface RandomScreenEvents {
         val filterName: String,
         val filterType: FilterTypeUI
     ) : RandomScreenEvents
-
+    data class SetModalSheetVisibility(val value: Boolean) : RandomScreenEvents
     object Refresh : RandomScreenEvents
 }
 

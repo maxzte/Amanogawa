@@ -9,7 +9,6 @@ import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.settings.config
 import id.anison.amanogawa.core.data.withDispatcherBlock
 import id.anison.amanogawa.core.database.AmanogawaDatabase
-import id.anison.amanogawa.core.database.anime.entity.CurrentAnimeDbo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

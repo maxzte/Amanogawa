@@ -1,21 +1,14 @@
 package id.anison.amanogawa.feature.profile
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.data.settings.AppSettings
-import id.anison.amanogawa.core.data.settings.AppTheme
 import id.anison.amanogawa.core.data.settings.SettingsRepo
 import id.anison.amanogawa.feature.profile.screen.AboutUsScreen
 import id.anison.amanogawa.feature.profile.screen.AppearanceScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SettingsScreenModel(

@@ -3,7 +3,6 @@ package id.anison.amanogawa.core.ui.common.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +35,7 @@ fun CoilImageLoader(
     imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     radius: Int = 0,
-    showAnimatePlaceHolder: Boolean = false,
+    showAmanogawaSpinner: Boolean = false,
 ) {
     val imageUrl = stringResource(id = R.string.image_loader_link, titleImage)
     var isLoading by remember { mutableStateOf(true) }
@@ -59,9 +58,9 @@ fun CoilImageLoader(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-//        if (isLoading) {
-//            ProgressIndicator()
-//        }
+        if (showAmanogawaSpinner && isLoading) {
+            AmanogawaSpinner()
+        }
         Image(
             painter = painter,
             contentDescription = stringResource(R.string.image_loader),
@@ -77,6 +76,7 @@ fun AnimeImageLoader(
     titleImage: String,
     useCache: Boolean = false,
     radius: Int = 0,
+    showAmanogawaSpinner: Boolean = false,
 ) {
     val qualifier = if (useCache) qualifier("default") else qualifier("noCache")
     val imageLoader = koinInject<ImageLoader>(qualifier = qualifier)
@@ -85,14 +85,9 @@ fun AnimeImageLoader(
         titleImage = titleImage,
         imageLoader = imageLoader,
         radius = radius,
+        showAmanogawaSpinner = showAmanogawaSpinner,
         modifier = modifier,
     )
-}
-
-
-@Composable
-internal fun LoadingAnimation(modifier: Modifier = Modifier) {
-
 }
 
 @Composable

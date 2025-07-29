@@ -4,11 +4,8 @@ import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -19,18 +16,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -39,23 +34,19 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -64,6 +55,7 @@ import id.anison.amanogawa.core.data.settings.AppSettings
 import id.anison.amanogawa.core.data.settings.AppTheme
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.CustomListItemSwitch
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
@@ -75,7 +67,8 @@ import id.anison.amanogawa.feature.profile.AppearanceScreenModel
 import id.anison.amanogawa.feature.profile.AppearanceSettingsUIState
 
 class AppearanceScreen : Screen {
-    override val key: ScreenKey = uniqueScreenKey
+    override val key: ScreenKey
+        get() = "appearanceScreen"
 
     @Composable
     override fun Content() {
@@ -111,18 +104,12 @@ class AppearanceScreen : Screen {
         appSettings: AppSettings,
         onEvents: (AppearanceScreenEvent) -> Unit,
     ) {
-        val configuration = LocalConfiguration.current
         val isLandscape = isLandscape()
-        val columns =
-            if (isLandscape) appSettings.countColumnsInRowLandscape else appSettings.countColumnsInRow
-        val episodes =
-            if (isLandscape) appSettings.countEpisodesInRowLandscape else appSettings.countEpisodesInRow
+        val columns = if (isLandscape) appSettings.countColumnsInRowLandscape
+        else appSettings.countColumnsInRow
+        val episodes = if (isLandscape) appSettings.countEpisodesInRowLandscape
+        else appSettings.countEpisodesInRow
 
-        val widthDp = configuration.screenWidthDp.dp
-        val itemWidth = (widthDp - if (isLandscape) 64.dp else 16.dp) / columns
-        val itemHeight = itemWidth * (10f / 7f)
-
-        val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
@@ -130,7 +117,6 @@ class AppearanceScreen : Screen {
                     navigationIconContent = {
                         ArrowBackButton(onClick = { onEvents(AppearanceScreenEvent.PopBack) })
                     },
-                    scrollBehavior = scrollBehavior,
                 )
             },
             modifier = Modifier.fillMaxSize()
@@ -141,7 +127,8 @@ class AppearanceScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
+                    bottom = if (!isLandscape) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                    else paddingValues.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -174,10 +161,10 @@ class AppearanceScreen : Screen {
                         options = if (isLandscape) listOf(5, 6) else listOf(2, 3),
                         selected = columns,
                         onSelect = { value ->
-                            val event = if (isLandscape)
+                            val event = if (isLandscape) {
                                 AppearanceScreenEvent.SaveColumnsInRowLandscape(value)
-                            else
-                                AppearanceScreenEvent.SaveColumnsInRow(value)
+                            } else AppearanceScreenEvent.SaveColumnsInRow(value)
+
                             onEvents(event)
                         }
                     )
@@ -193,9 +180,10 @@ class AppearanceScreen : Screen {
                                 slideInHorizontally { it } togetherWith (slideOutHorizontally { -it } + fadeOut())
                             }
                         },
-                        label = "cardAnimation"
+                        label = "cardAnimation",
+                        modifier = Modifier.fillMaxWidth()
                     ) { target ->
-                        ExampleCardView(target, itemWidth, itemHeight)
+                        ExampleCardView(target)
                     }
                 }
 
@@ -207,9 +195,8 @@ class AppearanceScreen : Screen {
                         onSelect = { value ->
                             val event = if (isLandscape) {
                                 AppearanceScreenEvent.SaveEpisodesInRowLandscape(value)
-                            } else {
-                                AppearanceScreenEvent.SaveEpisodesInRow(value)
-                            }
+                            } else AppearanceScreenEvent.SaveEpisodesInRow(value)
+
                             onEvents(event)
                         }
                     )
@@ -226,11 +213,17 @@ class AppearanceScreen : Screen {
         onSelect: (Int) -> Unit
     ) {
         Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp))
+
         Spacer(Modifier.height(8.dp))
+
         Column(
             modifier = Modifier
                 .padding(bottom = 16.dp)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12))
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = RoundedCornerShape(12)
+                )
         ) {
             options.forEachIndexed { index, option ->
                 if (index > 0) HorizontalDivider()
@@ -248,17 +241,15 @@ class AppearanceScreen : Screen {
                         )
                     },
                     trailingContent = {
-                        if (selected == option) {
-                            Icon(imageVector = Icons.Default.Check, contentDescription = null)
-                        } else null
+                        AnimatedVisibility(visible = selected == option) {
+                            Icon(imageVector = AmanogawaIcon.check, contentDescription = null)
+                        }
                     },
                     modifier = Modifier
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = {
-                                onSelect(option)
-                            }
+                            onClick = { onSelect(option) }
                         )
                 )
             }
@@ -270,20 +261,30 @@ class AppearanceScreen : Screen {
         theme: AppTheme,
         onEvents: (AppearanceScreenEvent) -> Unit,
     ) {
+        val themes = listOf(
+            ThemeOption(
+                theme = AppTheme.LIGHT,
+                labelId = R.string.light,
+                iconId = R.drawable.ic_rounded_light_mode_24
+            ),
+            ThemeOption(
+                theme = AppTheme.DARK,
+                labelId = R.string.dark,
+                iconId = R.drawable.ic_rounded_dark_mode_24
+            ),
+            ThemeOption(
+                theme = AppTheme.FOLLOW_SYSTEM,
+                labelId = R.string.dynamic,
+                iconId = R.drawable.ic_rounded_brightness_medium_24
+            ),
+        )
+
         Text(
             text = stringResource(id = R.string.app_theme),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
+
         Spacer(Modifier.height(8.dp))
-        val themes = listOf(
-            ThemeOption(AppTheme.LIGHT, R.string.light, R.drawable.ic_rounded_light_mode_24),
-            ThemeOption(AppTheme.DARK, R.string.dark, R.drawable.ic_rounded_dark_mode_24),
-            ThemeOption(
-                AppTheme.FOLLOW_SYSTEM,
-                R.string.dynamic,
-                R.drawable.ic_rounded_brightness_medium_24
-            ),
-        )
 
         Column(
             modifier = Modifier
@@ -300,9 +301,9 @@ class AppearanceScreen : Screen {
                         Icon(painter = painterResource(id = iconId), contentDescription = null)
                     },
                     trailingContent = {
-                        if (theme == themeObj) {
-                            Icon(imageVector = Icons.Default.Check, contentDescription = null)
-                        } else null
+                        AnimatedVisibility(visible = theme == themeObj) {
+                            Icon(imageVector = AmanogawaIcon.check, contentDescription = null)
+                        }
                     },
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -317,33 +318,39 @@ class AppearanceScreen : Screen {
     }
 
     @Composable
-    private fun ExampleCardView(
-        count: Int,
-        itemWidth: Dp,
-        itemHeight: Dp,
-    ) {
-        LazyRow(
-            modifier = Modifier.fillMaxSize(),
-            userScrollEnabled = false
+    private fun ExampleCardView(count: Int) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(
-                count = count
-            ) {
+            val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+            val horizontalPadding = if (!isLandscape()) {
+                16.dp   // horizontal padding of parent container * 2
+            } else {
+                16.dp + AmanogawaConst.barHeight + AmanogawaConst.bottomBarPaddings
+            }
+            val spacing = 8 * (count - 1)
+            val available = screenWidth - horizontalPadding - spacing.dp
+            val itemWidthDp = available / count
+
+            repeat(count) {
                 Column(
-                    modifier = Modifier
-                        .width(itemWidth)
-                        .padding(horizontal = 4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.width(itemWidthDp)
                 ) {
-                    Card(Modifier.size(itemWidth, itemHeight)) {}
-                    repeat(2) {
+                    Card(
+                        modifier = Modifier
+                            .aspectRatio(7f / 10f),
+                    ) {}
+
+                    repeat(2) { spacerInd ->
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(if (it == 0) 16.dp else 12.dp)
                                 .background(MaterialTheme.colorScheme.surfaceContainer)
                                 .clip(RoundedCornerShape(8))
+                                .height(if (spacerInd == 0) 16.dp else 12.dp)
                         )
                     }
                 }
@@ -352,27 +359,7 @@ class AppearanceScreen : Screen {
     }
 }
 
-private fun horizontalSlideAndScale(
-    targetState: Int,
-    initialState: Int
-): ContentTransform {
-    val slideInOffset = { size: Int -> if (targetState > initialState) size else -size }
-    val slideOutOffset = { size: Int -> if (targetState > initialState) -size else size }
-
-    return (slideInHorizontally(
-        initialOffsetX = slideInOffset,
-        animationSpec = tween(700, easing = LinearOutSlowInEasing)
-    ) + scaleIn(animationSpec = tween(720, easing = LinearOutSlowInEasing)))
-        .togetherWith(
-            slideOutHorizontally(
-                targetOffsetX = slideOutOffset,
-                animationSpec = tween(700, easing = LinearOutSlowInEasing)
-            )
-        )
-}
-
-
-data class ThemeOption(
+private data class ThemeOption(
     val theme: AppTheme,
     @StringRes val labelId: Int,
     @DrawableRes val iconId: Int,

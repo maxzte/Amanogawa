@@ -31,55 +31,6 @@ data class AnimeDetails(
     val rating: Int = 0,
 )
 
-internal fun AnimeDetails.isSame(other: AnimeDetails): Boolean {
-    return this.anime.animeId == other.anime.animeId &&
-            this.anime.name == other.anime.name &&
-            this.anime.enJpName == other.anime.enJpName &&
-            this.anime.season == other.anime.season &&
-            this.anime.isCurrent == other.anime.isCurrent &&
-            this.anime.year == other.anime.year &&
-            this.anime.season == other.anime.season &&
-            this.anime.part == other.anime.part &&
-            this.anime.views == other.anime.views &&
-            this.anime.isOva == other.anime.isOva &&
-            this.anime.isExtra == other.anime.isExtra &&
-            this.anime.ovaTotal == other.anime.ovaTotal &&
-            this.anime.extraTotal == other.anime.extraTotal &&
-            this.anime.dubedEpisodes == other.anime.dubedEpisodes &&
-            this.anime.episodesCustom == other.anime.episodesCustom &&
-            this.anime.dubedEpisodes == other.anime.dubedEpisodes &&
-            this.anime.episodesTotal == other.anime.episodesTotal &&
-            this.anime.posterThumb == other.anime.posterThumb &&
-            this.anime.posterThumb == other.anime.posterThumb &&
-            this.anime.posterMini == other.anime.posterMini &&
-            this.anime.schedule == other.anime.schedule &&
-            this.anime.episodeCount == other.anime.episodeCount &&
-            this.anime.newEpisode == other.anime.newEpisode &&
-            this.anime.time == other.anime.time &&
-            this.anime.timeStr == other.anime.timeStr &&
-            this.description == other.description &&
-            this.rating == other.rating &&
-            this.isMovie == other.isMovie &&
-            this.duration == other.duration &&
-            this.company == other.company &&
-            this.botId == other.botId &&
-            this.botUrl == other.botUrl &&
-            this.liked == other.liked &&
-            this.disliked == other.disliked &&
-            this.isMovie == other.isMovie &&
-            this.isDubbed == other.isDubbed &&
-            this.isHaveSubs == other.isHaveSubs &&
-            this.torrentUrl == other.torrentUrl &&
-            this.torrentUrl == other.torrentUrl &&
-            this.posterMaker == other.posterMaker &&
-            this.poster == other.poster &&
-            this.poster == other.poster &&
-            this.screensF == other.screensF &&
-            this.genres == other.genres &&
-            this.teamMembers == other.teamMembers &&
-            this.groupF == other.groupF
-}
-
 internal fun AnimeDetailsDto.toAnimeDetails(): AnimeDetails {
     val anime = this.toAnime()
     val dubers = mutableListOf<TeamMember>()

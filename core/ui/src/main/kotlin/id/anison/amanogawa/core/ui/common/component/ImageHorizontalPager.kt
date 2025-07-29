@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -19,9 +18,9 @@ import id.anison.amanogawa.core.ui.common.isLandscape
 @Composable
 fun ImageHorizontalPager(
     images: List<List<String>>,
+    onImageClick: (Int, List<String>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isActivePhoto by rememberSaveable { mutableStateOf<String?>(null) }
     val isLandscape = isLandscape()
     val countColumnsInRow = if (!isLandscape) 2 else 3 // TODO replace to app settings
 
@@ -49,7 +48,7 @@ fun ImageHorizontalPager(
             ElevatedCard(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { isActivePhoto = image },
+                    .clickable { onImageClick(thumbs.indexOf(image), fullSize) },
             ) {
                 AnimeImageLoader(
                     titleImage = image,
@@ -61,16 +60,4 @@ fun ImageHorizontalPager(
         modifier = modifier,
     )
 
-    isActivePhoto?.let { thumb ->
-        val index = thumbs.indexOf(thumb)
-        val fullImage = fullSize.getOrNull(index)
-
-        fullImage?.let {
-            FullScreenImage(
-                photo = it,
-                onDismiss = { isActivePhoto = null },
-                modifier = Modifier.aspectRatio(16f / 9f)
-            )
-        }
-    }
 }

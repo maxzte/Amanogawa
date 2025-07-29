@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +38,6 @@ fun AnimeHeader(
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
-    val isLandscape = isLandscape()
     val screenHeight = configuration.screenHeightDp.dp
     var imageSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -57,7 +55,7 @@ fun AnimeHeader(
         contentAlignment = Alignment.BottomCenter,
         modifier = modifier
     ) {
-        if (isLandscape) {
+        if (isLandscape()) {
             PosterImage(
                 modifier = Modifier
                     .height(screenHeight + 24.dp)
@@ -122,7 +120,6 @@ private fun LandscapeContent(
     onEvents: (AnimeDetailsScreenEvents) -> Unit
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp - 96.dp
-    var isActivePhoto by rememberSaveable { mutableStateOf<String?>(null) }
 
     Row(
         modifier = Modifier
@@ -140,7 +137,7 @@ private fun LandscapeContent(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     onClick = {
-                        isActivePhoto = anime.poster
+                       onEvents(AnimeDetailsScreenEvents.OnImageClick(0, listOf(anime.poster)))
                     }
                 )
         ) {

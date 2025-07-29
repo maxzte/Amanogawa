@@ -5,7 +5,9 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.core.registry.ScreenRegistry
 import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.data.filter.FilterRepo
 import id.anison.amanogawa.core.data.filter.FilterType
 import id.anison.amanogawa.core.data.search.SearchRepo
@@ -13,12 +15,14 @@ import id.anison.amanogawa.core.domain.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.PagingEvent
+import id.anison.amanogawa.core.navigation.SharedScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -35,8 +39,13 @@ class FilterResultScreenModel(
     private val filterRepo: FilterRepo,
     private val log: Logger,
 ) : StateScreenModel<FilterResultState>(FilterResultState()) {
+    private val singleEventHandler = SingleEventHandler()
     private val _pagingEvent = MutableSharedFlow<PagingEvent>()
     val pagingEvent: SharedFlow<PagingEvent> = _pagingEvent
+
+    private val _navigationEventState = MutableSharedFlow<FilterResultNavigationState>()
+    val navigationEventState = _navigationEventState.asSharedFlow()
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
@@ -45,6 +54,38 @@ class FilterResultScreenModel(
             searchByFilterName()
         } else {
             searchByFilter()
+        }
+    }
+
+    fun onEvents(event: FilterResultScreenEvents) {
+        when (event) {
+            is FilterResultScreenEvents.PopBack -> {
+                if (singleEventHandler.canTrigger()) {
+                    screenModelScope.launch {
+                        _navigationEventState.emit(
+                            value = FilterResultNavigationState.NavigateToBack
+                        )
+                    }
+                }
+            }
+
+            is FilterResultScreenEvents.PushTitle -> {
+                if (singleEventHandler.canTrigger()) {
+                    screenModelScope.launch {
+                        _navigationEventState.emit(
+                            value = FilterResultNavigationState.NavigateToDetails(
+                                animeId = event.animeId
+                            )
+                        )
+                    }
+                }
+            }
+
+            is FilterResultScreenEvents.Refresh -> {
+                if (singleEventHandler.canTrigger()) {
+                    refresh()
+                }
+            }
         }
     }
 
@@ -91,7 +132,7 @@ class FilterResultScreenModel(
         _isRefreshing.value = isRefreshing
     }
 
-    fun refresh() = screenModelScope.launch {
+    private fun refresh() = screenModelScope.launch {
         _isRefreshing.value = true
         if (filterName != "") {
             searchByFilterName()
@@ -114,6 +155,18 @@ data class FilterResultState(
 
 sealed interface FilterResultScreenEvents {
     object PopBack : FilterResultScreenEvents
-    data class PushTitle(val id: Long) : FilterResultScreenEvents
+    data class PushTitle(val animeId: Long) : FilterResultScreenEvents
     object Refresh : FilterResultScreenEvents
+}
+
+sealed interface FilterResultNavigationState {
+    object NavigateToBack : FilterResultNavigationState
+    data class NavigateToDetails(val animeId: Long) : FilterResultNavigationState
+}
+
+internal fun FilterResultNavigationState.toScreen() = when (this) {
+    FilterResultNavigationState.NavigateToBack -> null
+    is FilterResultNavigationState.NavigateToDetails -> ScreenRegistry.get(
+        SharedScreen.AnimeDetails(animeId = this.animeId)
+    )
 }

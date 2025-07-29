@@ -4,10 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import android.view.WindowInsets
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -15,11 +12,8 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -336,51 +330,35 @@ fun dynamicBlackColorScheme(context: Context): ColorScheme {
 
 @Composable
 fun AmanogawaTheme(
-    darkTheme: Boolean = false,// isSystemInDarkTheme(),
+    isDarkTheme: Boolean = false,// isSystemInDarkTheme(),
     isBlackTheme: Boolean = false,
-    dynamicColors: Boolean = false,
+    isDynamicColors: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Log.d(
         "ATheme",
-        "isBlackTheme: $isBlackTheme,\n darkTheme: $darkTheme,\n dynamicColors: $dynamicColors"
+        "isBlackTheme: $isBlackTheme, isDarkTheme: $isDarkTheme, isDynamicColors: $isDynamicColors"
     )
     val context = LocalContext.current
     val isDynamicColorsSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val colorScheme = when {
-        dynamicColors && isDynamicColorsSupported -> {
+        isDynamicColors && isDynamicColorsSupported -> {
             when {
                 // IF DARK + BLACK
-                darkTheme && isBlackTheme -> dynamicBlackColorScheme(context)
+                isDarkTheme && isBlackTheme -> dynamicBlackColorScheme(context)
                 // IF LIGHT + BLACK
-                !darkTheme && isBlackTheme -> dynamicLightColorScheme(context)
+                !isDarkTheme && isBlackTheme -> dynamicLightColorScheme(context)
                 // IF DARK
-                darkTheme -> dynamicDarkColorScheme(context)
+                isDarkTheme -> dynamicDarkColorScheme(context)
                 // IF LIGHT
                 else -> dynamicLightColorScheme(context)
             }
         }
 
-        darkTheme && isBlackTheme -> blackColorScheme
-        !darkTheme && isBlackTheme -> lightScheme
-        darkTheme -> darkScheme
+        isDarkTheme && isBlackTheme -> blackColorScheme
+        !isDarkTheme && isBlackTheme -> lightScheme
+        isDarkTheme -> darkScheme
         else -> lightScheme
-    }
-
-    val defaultGradientColors = GradientColors(
-        top = colorScheme.inverseOnSurface,
-        container = colorScheme.surface,
-        bottom = colorScheme.primaryContainer,
-    )
-    val gradientColors = when {
-        ((!dynamicColors || !isDynamicColorsSupported) || (dynamicColors && isDynamicColorsSupported && darkTheme && isBlackTheme)) ->
-            GradientColors(
-                top = Color.Unspecified,
-                container = Color.Unspecified,
-                bottom = Color.Unspecified
-            )
-
-        else -> defaultGradientColors
     }
 
     val view = LocalView.current
@@ -388,26 +366,18 @@ fun AmanogawaTheme(
         val window = (view.context as Activity).window
         SideEffect {
 
-            // 1. Прозорий статус-бар із альфою (0.5f = 50%)
-//            window.statusBarColor = statusBarColor.toArgb ()
-//                if (!isBlackTheme) Color.Black.copy(alpha = 0.5f).toArgb()
-//            else Color.White.copy(alpha = 0.5f).toArgb()
-
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
             val insetsController = WindowCompat.getInsetsController(window, view)
-            insetsController.isAppearanceLightStatusBars = !darkTheme
+            insetsController.isAppearanceLightStatusBars = !isDarkTheme
             insetsController.isAppearanceLightNavigationBars = false
 
         }
     }
-    CompositionLocalProvider(
-        LocalGradientColors provides gradientColors,
-    ) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = AmanogawaTypography,
-            content = content
-        )
-    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = AmanogawaTypography,
+        content = content
+    )
 }

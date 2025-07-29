@@ -5,7 +5,6 @@ import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.data.anime.Anime
 import id.anison.amanogawa.core.data.anime.AnimeDetails
 import id.anison.amanogawa.core.data.filter.FilterType
-import id.anison.amanogawa.core.data.settings.Team
 import kotlinx.coroutines.flow.Flow
 
 interface SearchRepo {

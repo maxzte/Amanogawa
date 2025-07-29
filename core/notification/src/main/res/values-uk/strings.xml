@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="new_episode_notification_title">Новий епізод</string>
+    <string name="new_episode_notification_text">Доступний новий епізод для %1$s.</string>
+
+</resources>

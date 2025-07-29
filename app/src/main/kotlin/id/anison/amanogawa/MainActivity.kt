@@ -2,7 +2,6 @@ package id.anison.amanogawa
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,8 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import cafe.adriel.voyager.core.registry.ScreenRegistry
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.data.settings.AppTheme
 import id.anison.amanogawa.core.model.AppSettingsUI
 import id.anison.amanogawa.core.ui.AmanogawaTheme
@@ -21,7 +18,6 @@ import id.anison.amanogawa.core.ui.common.LocalAppSettings
 import id.anison.amanogawa.feature.anime.animeDetailsScreenModule
 import id.anison.amanogawa.feature.favorite.favoriteScreenModule
 import id.anison.amanogawa.feature.search.navigation.searchScreenModule
-import id.anison.amanogawa.tab.HomeTab
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -59,9 +55,9 @@ class MainActivity : ComponentActivity() {
                     }
 
                     AmanogawaTheme(
-                        darkTheme = darkTheme,
+                        isDarkTheme = darkTheme,
                         isBlackTheme = state.settings.isBlackTheme,
-                        dynamicColors = state.settings.isDynamicColors
+                        isDynamicColors = state.settings.isDynamicColors
                     ) {
                         CompositionLocalProvider(
                             value = LocalAppSettings provides AppSettingsUI(

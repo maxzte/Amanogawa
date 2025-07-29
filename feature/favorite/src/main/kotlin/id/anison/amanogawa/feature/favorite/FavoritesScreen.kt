@@ -17,24 +17,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.FavoriteUI
+import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.DataStateContent
@@ -42,37 +36,22 @@ import id.anison.amanogawa.core.ui.common.columnsInRow
 import id.anison.amanogawa.core.ui.common.component.Message
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.favorite.ui.FavoriteCard
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 
 class FavoritesScreen : Screen, ComponentActivity() {
     override val key: ScreenKey = uniqueScreenKey
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<FavoriteScreenModel>()
         val favoriteState by screenModel.favoriteState.collectAsState()
         val lazyGridState = screenModel.lazyGridState
-        val isNavigating = remember { mutableStateOf(false) }
 
-        LaunchedEffect(Unit) {
-            screenModel.navigationEvent.collectLatest { event ->
-                if (isNavigating.value) return@collectLatest
-                isNavigating.value = true
-
-                val target = event.toScreen()
-                if (target != null) {
-                    navigator.push(target)
-                } else {
-                    navigator.pop()
-                }
-
-                delay(250)
-                isNavigating.value = false
-            }
-        }
+        NavigationHandler(
+            navigationState = screenModel.navigationEvent,
+            toScreen = { toScreen() }
+        )
 
         DataStateContent(
             state = favoriteState,
@@ -96,7 +75,6 @@ class FavoritesScreen : Screen, ComponentActivity() {
         favorites: List<FavoriteUI>,
         onEvents: (FavoritesScreenEvents) -> Unit,
     ) {
-        val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
         val count = columnsInRow()
 
         Scaffold(
@@ -118,12 +96,9 @@ class FavoritesScreen : Screen, ComponentActivity() {
                             )
                         }
                     },
-                    scrollBehavior = scrollBehavior,
                 )
             },
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(connection = scrollBehavior.nestedScrollConnection)
+            modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
             AnimatedVisibility(
                 visible = favorites.isEmpty(),
@@ -139,7 +114,8 @@ class FavoritesScreen : Screen, ComponentActivity() {
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     start = 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
+                    bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                    else  paddingValues.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize(),
                 state = lazyGridState,

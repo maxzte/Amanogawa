@@ -13,6 +13,7 @@ dependencies {
     implementation(projects.core.common)
 
     implementation(libs.androidx.core.ktx)
+
     //COROUTINES
     implementation(libs.kotlinx.coroutines.android)
 
@@ -27,21 +28,29 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material3.adaptive.navigation.suite)
+
     //LIFECYCLE
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
     //NAVIGATION
     implementation(libs.voyager.navigator)
     implementation(libs.voyager.tabNavigator)
     implementation(libs.voyager.transitions)
     implementation(libs.voyager.screenModel)
     implementation(libs.voyager.koin)
+
     //PAGING
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.paging.common)
+
     //KOIN
     runtimeOnly(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
     //WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
+
+    //ZOOM
+    implementation(libs.zoomable)
 }

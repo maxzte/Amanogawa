@@ -1,6 +1,5 @@
 package id.anison.amanogawa.core.network
 
-import id.anison.amanogawa.core.network.model.AnimeIDsDto
 import id.anison.amanogawa.core.network.model.FilterDto
 import id.anison.amanogawa.core.network.model.TeamDto
 import id.anison.amanogawa.core.network.model.anime.AnimeDetailsDto
@@ -256,42 +255,6 @@ open class AmanogawaApiImpl() : AmanogawaApi {
             Result.failure(e)
         }
     }
-
-    override suspend fun getCountAnimeAndTheirIDs(): Result<AnimeIDsDto> {
-        return try {
-            fun buildCountAnimeUrl(page: Int = 1): HttpUrl {
-                return baseUrl()
-                    .addPathSegment(Constants.TITLES.url)
-                    .apply {
-                        if (page > 1) addQueryParameter("page", page.toString())
-                    }
-                    .build()
-            }
-
-            val firstRequest = Request.Builder().url(buildCountAnimeUrl()).build()
-            val firstResponse = executeRequest(firstRequest)
-            if (!firstResponse.isSuccessful) {
-                return Result.failure(Exception("Request failed: ${firstResponse.code}"))
-            }
-
-            val firstPageData = parseResponse<AnimeTitlesDto<AnimeDto>>(firstResponse)
-            val ids = mutableListOf<Long>()
-            ids.addAll(firstPageData.data.map { it.animeId })
-            for (page in 2..firstPageData.pages) {
-                val pagedResponse = getTitlesByPage(page)
-                if (!pagedResponse.isSuccess) {
-                    return Result.failure(Exception("Failed to load page $page: ${pagedResponse.getOrThrow()}"))
-                }
-                val pagedData = pagedResponse.getOrThrow().data
-
-                ids.addAll(pagedData.map { it.animeId })
-            }
-            Result.success(AnimeIDsDto(ids, ids.size))
-        } catch (e: IOException) {
-            Result.failure(e)
-        }
-    }
-
 
     override suspend fun searchAnimeByName(name: String): Result<List<SearchResultDto>> {
         return try {

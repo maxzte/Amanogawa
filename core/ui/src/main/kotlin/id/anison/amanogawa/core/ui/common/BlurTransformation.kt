@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import androidx.core.graphics.scale
 
 class BlurTransformation(
     private val radius: Int = 25,
@@ -36,7 +37,7 @@ private suspend fun Bitmap.blur(
     var sentBitmap = this@blur
     val width = (sentBitmap.width * scale).roundToInt()
     val height = (sentBitmap.height * scale).roundToInt()
-    sentBitmap = Bitmap.createScaledBitmap(sentBitmap, width, height, false)
+    sentBitmap = sentBitmap.scale(width, height, false)
     val bitmap = sentBitmap.copy(sentBitmap.config!!, true)
     if (radius < 1) {
         return@withContext null
@@ -71,7 +72,7 @@ private suspend fun Bitmap.blur(
         i++
     }
     yi = 0
-    var yw: Int = yi
+    var yw = 0
     val stack = Array(div) {
         IntArray(
             3
@@ -91,14 +92,14 @@ private suspend fun Bitmap.blur(
     y = 0
     while (y < h) {
         bsum = 0
-        gsum = bsum
-        rsum = gsum
-        boutsum = rsum
-        goutsum = boutsum
-        routsum = goutsum
-        binsum = routsum
-        ginsum = binsum
-        rinsum = ginsum
+        gsum = 0
+        rsum = 0
+        boutsum = 0
+        goutsum = 0
+        routsum = 0
+        binsum = 0
+        ginsum = 0
+        rinsum = 0
         i = -radius
         while (i <= radius) {
             p = pix[yi + wm.coerceAtMost(i.coerceAtLeast(0))]
@@ -165,14 +166,14 @@ private suspend fun Bitmap.blur(
     x = 0
     while (x < w) {
         bsum = 0
-        gsum = bsum
-        rsum = gsum
-        boutsum = rsum
-        goutsum = boutsum
-        routsum = goutsum
-        binsum = routsum
-        ginsum = binsum
-        rinsum = ginsum
+        gsum = 0
+        rsum = 0
+        boutsum = 0
+        goutsum = 0
+        routsum = 0
+        binsum = 0
+        ginsum = 0
+        rinsum = 0
         yp = -radius * w
         i = -radius
         while (i <= radius) {

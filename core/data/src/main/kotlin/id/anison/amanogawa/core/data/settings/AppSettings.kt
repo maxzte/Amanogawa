@@ -27,4 +27,5 @@ object PageConfig {
 val config: PagingConfig = PagingConfig(
     pageSize = PageConfig.PAGE_SIZE,
     prefetchDistance = PageConfig.PREFETCH_DISTANCE,
+    maxSize = PageConfig.MAX_SIZE
 )

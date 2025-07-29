@@ -10,14 +10,14 @@ android {
     defaultConfig {
         applicationId = "id.anison.amanogawa"
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFile(getDefaultProguardFile("proguard-android-optimize.txt"),)
+            proguardFile(getDefaultProguardFile("proguard-android-optimize.txt"))
             proguardFile(file("proguard/"))
         }
     }
@@ -41,27 +41,20 @@ dependencies {
     implementation(projects.feature.profile)
     implementation(projects.feature.anime)
 
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
     //COMPOSE
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material3.adaptive.navigation.suite)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
 
     //NAVIGATION
     implementation(libs.voyager.navigator)
     implementation(libs.voyager.tabNavigator)
     implementation(libs.voyager.transitions)
     implementation(libs.voyager.koin)
-
-    //KOIN
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
 
     //WORK_MANAGER
     implementation(libs.koin.workmanager)

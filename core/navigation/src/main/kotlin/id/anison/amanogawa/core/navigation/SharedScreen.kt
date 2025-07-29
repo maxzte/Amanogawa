@@ -17,6 +17,6 @@ sealed class SharedScreen : ScreenProvider {
         val filterType: FilterTypeUI
     ) : SharedScreen()
 
-    data object Favorite : SharedScreen()
+    object Favorites : SharedScreen()
 
 }

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.amanogawa.android.lib)
+    alias(libs.plugins.amanogawa.android.lib.compose)
 }
 
 android {

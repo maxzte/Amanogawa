@@ -1,11 +1,8 @@
 package id.anison.amanogawa.core.database.anime.entity
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import id.anison.amanogawa.core.database.teammember.DubberDbo
 import id.anison.amanogawa.core.database.genre.GenreDbo
-import id.anison.amanogawa.core.database.teammember.TeamMemberWithRoles
 import kotlin.math.round
 
 @Entity(tableName = "anime_details")

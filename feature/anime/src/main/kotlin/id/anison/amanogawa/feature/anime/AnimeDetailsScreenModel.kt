@@ -87,7 +87,6 @@ class AnimeDetailsScreenModel(
             }
 
             is AnimeDetailsScreenEvents.OnLinkClick -> {
-                log.d(TAG, "$event")
                 if (singleEventHandler.canTrigger()) {
                     screenModelScope.launch {
                         _navEventState.emit(
@@ -95,6 +94,19 @@ class AnimeDetailsScreenModel(
                                 filterId = event.filterId ?: -1,
                                 filterName = event.filterName,
                                 filterType = event.filterType
+                            )
+                        )
+                    }
+                }
+            }
+
+            is AnimeDetailsScreenEvents.OnImageClick -> {
+                if (singleEventHandler.canTrigger()) {
+                    screenModelScope.launch {
+                        _navEventState.emit(
+                            value = NavigationEvent.NavigateToImagesView(
+                                index = event.index,
+                                images = event.images
                             )
                         )
                     }
@@ -176,6 +188,23 @@ data class AnimeDetailsFull(
     val episodes: AnimeEpisodesUI,
 )
 
+sealed interface AnimeDetailsScreenEvents {
+    object PopBack : AnimeDetailsScreenEvents
+    object ScrollToTop : AnimeDetailsScreenEvents
+    data class PushAnimeDetailsScreen(val animeId: Long) : AnimeDetailsScreenEvents
+    data class ToggleFavorite(val anime: AnimeDetailsUI) : AnimeDetailsScreenEvents
+    data class OnLinkClick(
+        val filterId: Long?,
+        val filterName: String,
+        val filterType: FilterTypeUI
+    ) : AnimeDetailsScreenEvents
+    data class OnImageClick(
+        val index: Int,
+        val images: List<String>
+    ) : AnimeDetailsScreenEvents
+    object Refresh : AnimeDetailsScreenEvents
+}
+
 sealed interface NavigationEvent {
     data class NavigateToAnimeDetails(val animeId: Long) : NavigationEvent
     data class NavigateToFilteredResult(
@@ -183,8 +212,11 @@ sealed interface NavigationEvent {
         val filterName: String,
         val filterType: FilterTypeUI
     ) : NavigationEvent
-
-    data object NavigateToBack : NavigationEvent
+    data class NavigateToImagesView(
+        val index: Int,
+        val images: List<String>
+    ) : NavigationEvent
+    object NavigateToBack : NavigationEvent
 }
 
 internal fun NavigationEvent.toScreen(): Screen? = when (this) {
@@ -196,5 +228,9 @@ internal fun NavigationEvent.toScreen(): Screen? = when (this) {
             filterName = this.filterName,
             filterType = this.filterType
         )
+    )
+    is NavigationEvent.NavigateToImagesView -> ImageScreen(
+        index = this.index,
+        images = this.images
     )
 }

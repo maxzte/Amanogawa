@@ -23,4 +23,4 @@ data class SearchResultDto(
     @SerialName("poster_mini")
     val posterMini: String,
 
-    )
+)

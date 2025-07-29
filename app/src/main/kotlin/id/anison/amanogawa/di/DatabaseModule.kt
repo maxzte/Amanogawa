@@ -3,14 +3,13 @@ package id.anison.amanogawa.di
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.database.anime.AnimeDao
 import id.anison.amanogawa.core.database.anime.AnimeDetailsDao
-import id.anison.amanogawa.core.database.anime.AnimeIdsDao
 import id.anison.amanogawa.core.database.anime.CurrentAnimeDao
 import id.anison.amanogawa.core.database.anime.RemoteKeyDao
-import id.anison.amanogawa.core.database.teammember.TeamMemberDao
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
-import id.anison.amanogawa.core.database.search.SearchResultDao
 import id.anison.amanogawa.core.database.filter.FilterDao
 import id.anison.amanogawa.core.database.genre.GenreDao
+import id.anison.amanogawa.core.database.search.SearchResultDao
+import id.anison.amanogawa.core.database.teammember.TeamMemberDao
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -37,10 +36,6 @@ val databaseModule = module {
 
     single<RemoteKeyDao> {
         get<AmanogawaDatabase>().remoteKeyDao()
-    }
-
-    single<AnimeIdsDao> {
-        get<AmanogawaDatabase>().animeIdsDao()
     }
 
     single<FavoriteDao> {

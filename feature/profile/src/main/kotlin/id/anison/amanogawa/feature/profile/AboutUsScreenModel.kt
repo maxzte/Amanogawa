@@ -1,7 +1,6 @@
 package id.anison.amanogawa.feature.profile
 
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -10,16 +9,12 @@ import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.search.SearchRepo
 import id.anison.amanogawa.core.data.settings.SettingsRepo
 import id.anison.amanogawa.core.domain.toTeamUI
 import id.anison.amanogawa.core.model.FilterTypeUI
-import id.anison.amanogawa.core.model.TeamMemberTypeUI
-import id.anison.amanogawa.core.model.TeamMemberUI
 import id.anison.amanogawa.core.model.TeamUI
 import id.anison.amanogawa.core.navigation.SharedScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
@@ -36,10 +31,6 @@ class AboutUsScreenModel(
 
     init {
         getTeam()
-    }
-
-    fun getTeam() = screenModelScope.launch {
-        _teamState.value = settingsRepo.getTeam().mapDataState { it.map { team -> team.toTeamUI() } }
     }
 
     fun onEvents(event: AboutUsScreenEvents) {
@@ -69,16 +60,15 @@ class AboutUsScreenModel(
         }
     }
 
+    private fun getTeam() = screenModelScope.launch {
+        _teamState.value = settingsRepo.getTeam().mapDataState { it.map { team -> team.toTeamUI() } }
+    }
+
     companion object {
         private const val TAG = "AboutUsSM"
     }
 
 }
-
-data class AboutUsState(
-    val team: DataState<List<TeamMemberUI>> = DataState.Loading,
-    val isLoading: Boolean = true,
-)
 
 sealed interface AboutUsScreenEvents {
     object PopBack : AboutUsScreenEvents

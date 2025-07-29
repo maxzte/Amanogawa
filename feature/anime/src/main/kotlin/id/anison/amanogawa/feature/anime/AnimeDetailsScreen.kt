@@ -35,7 +35,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -50,17 +49,15 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeEpisodeUI
 import id.anison.amanogawa.core.model.FilterTypeUI
+import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.columnsInRow
-import id.anison.amanogawa.core.ui.common.episodesInRow
 import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
@@ -72,10 +69,10 @@ import id.anison.amanogawa.core.ui.common.component.ExpandedText
 import id.anison.amanogawa.core.ui.common.component.ImageHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.episodesInRow
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
+import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.anime.ui.AnimeHeader
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import org.koin.core.parameter.parametersOf
 
@@ -86,12 +83,10 @@ class AnimeDetailsScreen(
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<AnimeDetailsScreenModel>(
             parameters = { parametersOf(animeId) }
         )
         val state by screenModel.state.collectAsState()
-        val isNavigating = remember { mutableStateOf(false) }
         val lazyGridState = screenModel.lazyGridState
 
         LaunchedEffect(Unit) {
@@ -103,22 +98,10 @@ class AnimeDetailsScreen(
             }
         }
 
-        LaunchedEffect(Unit) {
-            screenModel.navEventState.collectLatest { event ->
-                if (isNavigating.value) return@collectLatest
-                isNavigating.value = true
-
-                val target = event.toScreen()
-                if (target != null) {
-                    navigator.push(target)
-                } else {
-                    navigator.pop()
-                }
-
-                delay(250)
-                isNavigating.value = false
-            }
-        }
+        NavigationHandler(
+            navigationState = screenModel.navEventState,
+            toScreen = { toScreen() }
+        )
 
         DataStateContent(
             state = state.anime,
@@ -233,7 +216,8 @@ class AnimeDetailsScreen(
                         start = 8.dp,
                         end = 8.dp,
                         top = 0.dp,
-                        bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                        bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                        else  paddingValues.calculateBottomPadding()
                     ),
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -263,6 +247,9 @@ class AnimeDetailsScreen(
                     ) {
                         ImageHorizontalPager(
                             images = anime.screensF,
+                            onImageClick = { index: Int, images: List<String> ->
+                                onEvents(AnimeDetailsScreenEvents.OnImageClick(index, images))
+                            },
                             modifier = Modifier.ignoreHorizontalParentPadding(8.dp),
                         )
                     }

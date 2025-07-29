@@ -7,12 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import id.anison.amanogawa.core.database.anime.AnimeDao
 import id.anison.amanogawa.core.database.anime.AnimeDetailsDao
-import id.anison.amanogawa.core.database.anime.AnimeIdsDao
 import id.anison.amanogawa.core.database.anime.CurrentAnimeDao
 import id.anison.amanogawa.core.database.anime.RemoteKeyDao
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import id.anison.amanogawa.core.database.anime.entity.AnimeDetailsDbo
-import id.anison.amanogawa.core.database.anime.entity.AnimeIdsDbo
 import id.anison.amanogawa.core.database.anime.entity.CurrentAnimeDbo
 import id.anison.amanogawa.core.database.anime.entity.RemoteKeyDbo
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
@@ -44,7 +42,6 @@ import id.anison.amanogawa.core.database.util.EnumConverter
         CurrentAnimeDbo::class,
         RemoteKeyDbo::class,
         AnimeDetailsDbo::class,
-        AnimeIdsDbo::class,
         FavoriteDbo::class,
         SearchResultDbo::class,
         FilterDbo::class,
@@ -64,7 +61,6 @@ import id.anison.amanogawa.core.database.util.EnumConverter
 abstract class AmanogawaDatabase : RoomDatabase() {
     abstract fun animeDao(): AnimeDao
     abstract fun currentAnimeDao(): CurrentAnimeDao
-    abstract fun animeIdsDao(): AnimeIdsDao
     abstract fun remoteKeyDao(): RemoteKeyDao
     abstract fun animeDetailsDao(): AnimeDetailsDao
     abstract fun filterDao(): FilterDao

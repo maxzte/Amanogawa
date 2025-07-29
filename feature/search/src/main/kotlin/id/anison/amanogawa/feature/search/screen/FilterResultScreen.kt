@@ -24,18 +24,14 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.PagingEvent
-import id.anison.amanogawa.core.navigation.SharedScreen
+import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.columnsInRow
@@ -44,8 +40,10 @@ import id.anison.amanogawa.core.ui.common.component.AnimeCard
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.search.screenmodel.FilterResultScreenEvents
 import id.anison.amanogawa.feature.search.screenmodel.FilterResultScreenModel
+import id.anison.amanogawa.feature.search.screenmodel.toScreen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
@@ -62,28 +60,32 @@ class FilterResultScreen(
 
     @Composable
     override fun Content() {
-        val navigator: Navigator = LocalNavigator.currentOrThrow
-        val filterResultScreenModel = koinScreenModel<FilterResultScreenModel>(
+        val screenModel = koinScreenModel<FilterResultScreenModel>(
             parameters = { parametersOf(filterId, filterName, filterType) }
         )
-        val filterResultState by filterResultScreenModel.state.collectAsState()
+        val filterResultState by screenModel.state.collectAsState()
         val pagingItems = if (filterName == "") {
             filterResultState.filteredTitles.collectAsLazyPagingItems()
         } else {
             filterResultState.titlesByLink.collectAsLazyPagingItems()
         }
 
-        val isRefreshing by filterResultScreenModel.isRefreshing.collectAsState()
+        NavigationHandler(
+            navigationState = screenModel.navigationEventState,
+            toScreen = { toScreen() }
+        )
+
+        val isRefreshing by screenModel.isRefreshing.collectAsState()
 
         LaunchedEffect(pagingItems.loadState.refresh) {
             val refresh = pagingItems.loadState.refresh
             if (refresh is LoadState.NotLoading && isRefreshing) {
-                filterResultScreenModel.setRefreshing(false)
+                screenModel.setRefreshing(false)
             }
         }
 
         LaunchedEffect(Unit) {
-            filterResultScreenModel.pagingEvent.collectLatest { event ->
+            screenModel.pagingEvent.collectLatest { event ->
                 when (event) {
                     PagingEvent.RELOAD -> {}
                     PagingEvent.REFRESH -> pagingItems.refresh()
@@ -93,30 +95,14 @@ class FilterResultScreen(
         }
 
         FilterResultContent(
-            topBarTitle = filterName,
             pagingItems = pagingItems,
-            onEvents = { event ->
-                when (event) {
-                    is FilterResultScreenEvents.PopBack -> {
-                        navigator.pop()
-                    }
-
-                    is FilterResultScreenEvents.PushTitle -> {
-                        navigator.push(ScreenRegistry.get(SharedScreen.AnimeDetails(event.id)))
-                    }
-
-                    is FilterResultScreenEvents.Refresh -> {
-                        filterResultScreenModel.refresh()
-                    }
-                }
-            },
+            onEvents = { screenModel.onEvents(it) },
         )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun FilterResultContent(
-        topBarTitle: String = "",
         pagingItems: LazyPagingItems<AnimeUI>,
         onEvents: (FilterResultScreenEvents) -> Unit,
     ) {
@@ -127,7 +113,7 @@ class FilterResultScreen(
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
-                    title = if (topBarTitle == "") stringResource(R.string.found_titles) else topBarTitle,
+                    title = if (filterName == "") stringResource(R.string.found_titles) else filterName,
                     navigationIconContent = {
                         ArrowBackButton(onClick = { onEvents(FilterResultScreenEvents.PopBack) })
                     },
@@ -163,7 +149,8 @@ class FilterResultScreen(
                             start = 8.dp,
                             top = paddingValues.calculateTopPadding() + 8.dp,
                             end = 8.dp,
-                            bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
+                            bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                            else paddingValues.calculateBottomPadding()
                         ),
                         state = lazyGridState,
                         verticalArrangement = Arrangement.spacedBy(8.dp),

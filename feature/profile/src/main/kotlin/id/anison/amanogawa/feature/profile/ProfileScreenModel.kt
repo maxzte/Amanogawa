@@ -18,8 +18,9 @@ class ProfileScreenModel(
     private val _navEventState = MutableSharedFlow<ProfileNavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
 
-    fun onEvents(profileNavigationEvent: ProfileNavigationEvent) {
-        when(profileNavigationEvent) {
+    fun onEvents(event: ProfileNavigationEvent) {
+        log.d(TAG, "current event is: $event")
+        when(event) {
             ProfileNavigationEvent.NavigateToFavorites -> {
                 screenModelScope.launch {
                     _navEventState.emit(value = ProfileNavigationEvent.NavigateToFavorites)
@@ -46,6 +47,6 @@ sealed interface ProfileNavigationEvent {
 }
 
 internal fun ProfileNavigationEvent.toScreen() = when(this) {
-    ProfileNavigationEvent.NavigateToFavorites -> ScreenRegistry.get(SharedScreen.Favorite)
+    ProfileNavigationEvent.NavigateToFavorites -> ScreenRegistry.get(SharedScreen.Favorites)
     ProfileNavigationEvent.NavigateToSettings -> SettingsScreen()
 }

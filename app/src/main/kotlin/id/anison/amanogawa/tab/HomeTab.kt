@@ -17,6 +17,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import id.anison.amanogawa.MainScreenModel
 import id.anison.amanogawa.MainUIEvent
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.feature.anime.ImageScreen
 import id.anison.amanogawa.feature.home.HomeScreen
 import id.anison.amanogawa.feature.home.HomeScreenModel
 
@@ -54,6 +55,11 @@ object HomeTab : AmanogawaTab {
 
             LaunchedEffect(navigator.lastItem) {
                 screenModel.setIsRoot(navigator.lastItem is HomeScreen)
+                if (navigator.lastItem is ImageScreen) {
+                    screenModel.setBottomBarVisible(false)
+                } else {
+                    screenModel.setBottomBarVisible(true)
+                }
             }
 
             LaunchedEffect(Unit) {

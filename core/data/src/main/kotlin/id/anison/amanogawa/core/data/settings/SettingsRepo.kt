@@ -12,12 +12,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.withDispatcherBlock
 import id.anison.amanogawa.core.network.AmanogawaApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 val Context.createDataStore: DataStore<Preferences> by preferencesDataStore(name = "amanogawaSettings")
 

@@ -51,6 +51,7 @@ class HomeScreenModel(
     }
 
     fun onEvent(event: HomeScreenEvents) {
+        log.d(TAG, "curr event is: $event")
         when (event) {
             is HomeScreenEvents.PushAnime -> {
                 if (singleEventHandler.canTrigger()) {
@@ -61,12 +62,6 @@ class HomeScreenModel(
                             )
                         )
                     }
-                }
-            }
-
-            is HomeScreenEvents.SetChipFilter -> {
-                if (singleEventHandler.canTrigger()) {
-                    setSelectedFilterChip(event.chipTitle)
                 }
             }
 
@@ -97,10 +92,6 @@ class HomeScreenModel(
         _pagingEvent.emit(PagingEvent.REFRESH)
     }
 
-    private fun setSelectedFilterChip(value: String) {
-        mutableState.update { state -> state.copy(selectedChipFilter = value) }
-    }
-
     private fun refresh() {
         getCurrentAnimeList()
     }
@@ -122,8 +113,12 @@ class HomeScreenModel(
 
 data class HomeState(
     val currentAnimeState: DataState<List<AnimeUI>> = DataState.Loading,
-    val selectedChipFilter: String = Chip.ALL.title,
 )
+
+sealed interface HomeScreenEvents {
+    data class PushAnime(val animeId: Long) : HomeScreenEvents
+    object OnRefresh : HomeScreenEvents
+}
 
 sealed interface HomeNavigationEvent {
     data class NavigateToAnimeDetails(val animeId: Long) : HomeNavigationEvent

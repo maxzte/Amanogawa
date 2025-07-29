@@ -22,6 +22,7 @@ fun <T> AmanogawaHorizontalPager(
     key: ((Int) -> Any)? = null,
     contentPadding: PaddingValues = PaddingValues(8.dp),
     pageSpacing: Dp = 8.dp,
+    userScrollEnabled: Boolean = true,
 ) {
 
     val state = pagerState ?: rememberPagerState(pageCount = { list.size })
@@ -45,6 +46,7 @@ fun <T> AmanogawaHorizontalPager(
         pageSpacing = pageSpacing,
         verticalAlignment = Alignment.Top,
         beyondViewportPageCount = 1,
+        userScrollEnabled = userScrollEnabled,
         modifier = modifier,
         pageContent = {
             pageContent(list[it])

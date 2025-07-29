@@ -2,7 +2,6 @@ package id.anison.amanogawa.core.data.favorite
 
 import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.withDispatcherBlock
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -14,13 +13,6 @@ class FavoriteRepoImpl(
     private val favoriteDao: FavoriteDao,
     private val log: Logger,
 ) : FavoriteRepo {
-
-    override suspend fun getFavoriteById(id: Long): DataState<Favorite> {
-        return withDispatcherBlock {
-            favoriteDao.getFavoriteById(id)?.toFavorite()
-                ?: throw NoSuchElementException("Favorite with id=$id not found")
-        }
-    }
 
     override fun getFavorites(): Flow<DataState<List<Favorite>>> = flow {
         emit(DataState.Loading)

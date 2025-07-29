@@ -37,9 +37,7 @@ fun CustomListItemSwitch(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = {
-                    onClick()
-                }
+                onClick = { onClick() }
             )
     ) {
         Row(
@@ -67,52 +65,5 @@ fun CustomListItemSwitch(
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
-    }
-}
-
-@Composable
-fun CustomListItem(
-    modifier: Modifier = Modifier,
-    leadingIcon: Painter? = null,
-    leadingIconDesc: String? = null,
-    text: String,
-    supportingContent: String? = null,
-    trailingIcon: ImageVector? = null,
-    trailingIconDesc: String? = null,
-    onClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12))
-            .clickable { onClick() }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (leadingIcon != null) Icon(
-                    painter = leadingIcon,
-                    contentDescription = leadingIconDesc,
-                )
-                Text(text = text, style = MaterialTheme.typography.bodyLarge)
-            }
-            if (trailingIcon != null) {
-                Icon(
-                    imageVector = trailingIcon,
-                    contentDescription = trailingIconDesc,
-                )
-            }
-        }
-        if (supportingContent != null)
-            Text(
-                text = supportingContent,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
     }
 }

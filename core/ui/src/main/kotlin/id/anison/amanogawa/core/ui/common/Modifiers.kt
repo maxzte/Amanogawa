@@ -55,7 +55,8 @@ enum class LineSide {
 fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
     return this.layout { measurable, constraints ->
         val overriddenWidth = constraints.maxWidth + 2 * horizontal.roundToPx()
-        val placeable = measurable.measure(constraints = constraints.copy(maxWidth = overriddenWidth))
+        val placeable =
+            measurable.measure(constraints = constraints.copy(maxWidth = overriddenWidth))
         layout(width = placeable.width, height = placeable.height) {
             placeable.place(x = 0, y = 0)
         }

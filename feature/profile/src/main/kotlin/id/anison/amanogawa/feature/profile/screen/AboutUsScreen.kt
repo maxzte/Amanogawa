@@ -4,25 +4,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
@@ -39,22 +40,18 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.TeamUI
+import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.component.DetailText
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.profile.AboutUsScreenEvents
 import id.anison.amanogawa.feature.profile.AboutUsScreenModel
 import id.anison.amanogawa.feature.profile.toScreen
-import id.anison.amanogawa.feature.profile.ui.SocialRow
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 
 
 class AboutUsScreen : Screen {
@@ -62,28 +59,14 @@ class AboutUsScreen : Screen {
 
     @Composable
     override fun Content() {
-        val navigator: Navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<AboutUsScreenModel>()
         val state by screenModel.teamState
         val lazyListState = screenModel.lazyListState
-        val isNavigating = remember { mutableStateOf(false) }
 
-        LaunchedEffect(Unit) {
-            screenModel.navigationEventState.collectLatest { event ->
-                if (isNavigating.value) return@collectLatest
-                isNavigating.value = true
-
-                val target = event.toScreen()
-                if (target != null) {
-                    navigator.push(target)
-                } else {
-                    navigator.pop()
-                }
-
-                delay(250)
-                isNavigating.value = false
-            }
-        }
+        NavigationHandler(
+            navigationState = screenModel.navigationEventState,
+            toScreen = { toScreen() }
+        )
 
         DataStateContent(
             state = state,
@@ -129,7 +112,8 @@ class AboutUsScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
+                    bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                    else paddingValues.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -428,6 +412,28 @@ class AboutUsScreen : Screen {
                     modifier = Modifier.clickable { onTeamMemberClick(teammate.name) }
                 )
             }
+        }
+    }
+
+    @Composable
+    private fun SocialRow(
+        icon: Int,
+        desc: String,
+        label: String,
+        modifier: Modifier = Modifier
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = desc,
+                modifier = modifier.size(24.dp),
+            )
+            Text(text = label)
         }
     }
 }

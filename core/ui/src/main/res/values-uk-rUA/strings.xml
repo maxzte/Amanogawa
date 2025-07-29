@@ -133,7 +133,6 @@
     <string name="episodes_in_row">ЕПІЗОДІВ В РЯДКУ</string>
     <string name="one">Один</string>
     <string name="two">Дві</string>
-    <string translatable="false" name="two1">Два</string>
     <string name="three">Три</string>
     <string name="four">Чотири</string>
     <string name="five">П\'ять</string>

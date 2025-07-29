@@ -22,7 +22,6 @@ import id.anison.amanogawa.core.network.AmanogawaApi
 import id.anison.amanogawa.core.network.AmanogawaApiImpl
 import id.anison.amanogawa.core.notification.NewEpisodesNotifier
 import id.anison.amanogawa.core.notification.Notifier
-import id.anison.amanogawa.core.ui.common.BlurTransformation
 import id.anison.amanogawa.feature.anime.AnimeDetailsScreenModel
 import id.anison.amanogawa.feature.favorite.FavoriteScreenModel
 import id.anison.amanogawa.feature.home.HomeScreenModel
@@ -89,7 +88,6 @@ val appModule = module {
         SearchRepoImpl(
             api = get(),
             database = get(),
-            animeRepo = get(),
             log = get(),
         )
     }

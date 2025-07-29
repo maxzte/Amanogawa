@@ -4,14 +4,12 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import id.anison.amanogawa.core.common.AndroidLogcatLogger
 import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.anime.Anime
 import id.anison.amanogawa.core.data.anime.AnimeDetails
 import id.anison.amanogawa.core.data.anime.AnimeListType
 import id.anison.amanogawa.core.data.anime.AnimeRemoteMediator
-import id.anison.amanogawa.core.data.anime.AnimeRepo
 import id.anison.amanogawa.core.data.anime.toAnime
 import id.anison.amanogawa.core.data.filter.Filter
 import id.anison.amanogawa.core.data.filter.FilterType
@@ -19,9 +17,7 @@ import id.anison.amanogawa.core.data.filter.TeamMember
 import id.anison.amanogawa.core.data.filter.TeamMemberType
 import id.anison.amanogawa.core.data.filter.toGenre
 import id.anison.amanogawa.core.data.settings.config
-import id.anison.amanogawa.core.data.withDispatcherBlock
 import id.anison.amanogawa.core.database.AmanogawaDatabase
-import id.anison.amanogawa.core.database.anime.entity.AnimeIdsDbo
 import id.anison.amanogawa.core.database.filter.FilterTypeDbo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
@@ -31,17 +27,14 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 class SearchRepoImpl(
     private val api: AmanogawaApi,
     private val database: AmanogawaDatabase,
-    private val animeRepo: AnimeRepo,
     private val log: Logger,
 ) : SearchRepo {
     private val searchResultDao = database.searchResultDao()
-    private val animeIdsDao = database.animeIdsDao()
 
     override fun searchTitle(query: String): Flow<DataState<List<SearchResult>>> = flow {
         try {
@@ -233,69 +226,6 @@ class SearchRepoImpl(
             log = log,
         )
     }.flow
-
-    fun getRandomAnime(
-        ids: List<Long>,
-        count: Int = 0
-    ): Flow<DataState<AnimeDetails>> = flow {
-        log.d(TAG, "count is: $count")
-        emit(DataState.Loading)
-
-        if (ids.isEmpty()) {
-            emit(DataState.Error(Exception("IDs list is empty")))
-            return@flow
-        }
-
-        val existingIds = animeIdsDao.getAll().map { it.id }.toSet()
-        var unusedIds = ids.filterNot { it in existingIds }
-
-        if (unusedIds.isEmpty()) {
-            animeIdsDao.deleteAllIDs()
-            unusedIds = ids
-        }
-
-        val randomId = unusedIds.random()
-        animeIdsDao.insertAnimeIds(AnimeIdsDbo(id = randomId))
-
-        emit(animeRepo.getAnimeDetailsById(randomId))
-    }.catch { e ->
-        log.d(TAG, "EXCEPTION while getRandomAnime: $e")
-        emit(DataState.Error(e))
-    }.flowOn(Dispatchers.IO)
-
-    private var totalPages: Int = -1
-    private val usedPages = mutableSetOf<Int>()
-
-    suspend fun getTotalPages(): Int {
-        if (totalPages != -1) return totalPages
-        val response = api.getTitlesByPage(1).getOrThrow()
-        totalPages = response.pages
-        return totalPages
-    }
-
-//    suspend fun getRandomPage(): List<AnimeDetails> {
-//        val total = getTotalPages()
-//        val availablePages = (1..total).filterNot { usedPages.contains(it) }
-//        val randomPage = availablePages.randomOrNull()
-//            ?: return emptyList()
-//
-//        return try {
-//            val response = api.getTitlesByPage(randomPage).getOrThrow()
-//            usedPages += randomPage
-//            response.data.map { it.toAnime().toAnimeUI() }.shuffled()
-//        } catch (e: Exception) {
-//            log.e("SearchRepo", "Error loading page $randomPage: ${e.message}")
-//            emptyList()
-//        }
-//    }
-
-    fun clearUsedPages() {
-        usedPages.clear()
-    }
-
-//    suspend fun getTeam(): DataState<List<TeamMember>> = withDispatcherBlock {
-//        api.getTeam().getOrThrow().map { it.toTeamMember() }
-//    }
 
     companion object Companion {
         private const val TAG: String = "SearchRepo"

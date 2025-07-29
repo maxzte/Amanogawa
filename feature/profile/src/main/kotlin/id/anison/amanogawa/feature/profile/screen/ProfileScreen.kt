@@ -2,12 +2,8 @@ package id.anison.amanogawa.feature.profile.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
@@ -22,9 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -34,17 +27,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.profile.ProfileNavigationEvent
 import id.anison.amanogawa.feature.profile.ProfileScreenModel
 import id.anison.amanogawa.feature.profile.toScreen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 
 class ProfileScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
@@ -52,20 +42,13 @@ class ProfileScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val navigator: Navigator = LocalNavigator.currentOrThrow
         val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
         val screenModel = koinScreenModel<ProfileScreenModel>()
-        val isNavigating = remember { mutableStateOf(false) }
 
-        LaunchedEffect(Unit) {
-            screenModel.navEventState.collectLatest { event ->
-                if (isNavigating.value) return@collectLatest
-                isNavigating.value = true
-                navigator.push(event.toScreen())
-                delay(250)
-                isNavigating.value = false
-            }
-        }
+        NavigationHandler(
+            navigationState = screenModel.navEventState,
+            toScreen = { toScreen() }
+        )
 
         Scaffold(
             topBar = {
@@ -97,7 +80,8 @@ class ProfileScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets,
+                    bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                    else paddingValues.calculateBottomPadding()
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)

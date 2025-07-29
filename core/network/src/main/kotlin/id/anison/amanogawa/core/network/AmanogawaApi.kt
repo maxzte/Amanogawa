@@ -1,6 +1,5 @@
 package id.anison.amanogawa.core.network
 
-import id.anison.amanogawa.core.network.model.AnimeIDsDto
 import id.anison.amanogawa.core.network.model.FilterDto
 import id.anison.amanogawa.core.network.model.TeamDto
 import id.anison.amanogawa.core.network.model.anime.AnimeDetailsDto
@@ -36,8 +35,6 @@ interface AmanogawaApi {
     ): Result<AnimeTitlesDto<AnimeDto>>
 
     suspend fun getRandomAnime(): Result<Long>
-
-    suspend fun getCountAnimeAndTheirIDs(): Result<AnimeIDsDto>
 
     suspend fun searchAnimeByName(name: String): Result<List<SearchResultDto>>
 

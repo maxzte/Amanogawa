@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.registry.screenModule
 import id.anison.amanogawa.core.navigation.SharedScreen
 
 val favoriteScreenModule = screenModule {
-    register<SharedScreen.Favorite> { provider ->
+    register<SharedScreen.Favorites> { provider ->
         FavoritesScreen()
     }
 }

@@ -21,8 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -38,10 +36,9 @@ import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.PagingEvent
+import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
@@ -53,8 +50,6 @@ import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.core.ui.common.isLandscape
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 
 class HomeScreen : Screen {
@@ -62,22 +57,15 @@ class HomeScreen : Screen {
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         val screenModel = koinScreenModel<HomeScreenModel>()
         val state by screenModel.state.collectAsState()
         val animeTitles = screenModel.titlesPagingData.collectAsLazyPagingItems()
         val lazyGridState = screenModel.lazyGridState
-        val isNavigating = remember { mutableStateOf(false) }
 
-        LaunchedEffect(Unit) {
-            screenModel.navEventState.collectLatest { event ->
-                if (isNavigating.value) return@collectLatest
-                isNavigating.value = true
-                navigator.push(event.toScreen())
-                delay(250)
-                isNavigating.value = false
-            }
-        }
+        NavigationHandler(
+            navigationState = screenModel.navEventState,
+            toScreen = { toScreen() }
+        )
 
         LaunchedEffect(Unit) {
             screenModel.pagingEvent.collect { action ->
@@ -175,7 +163,8 @@ class HomeScreen : Screen {
                                                 top = if (isLandscape) paddingValues.calculateTopPadding() else 0.dp,
                                                 start = 8.dp,
                                                 end = 8.dp,
-                                                bottom = paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                                                bottom = if (!isLandscape) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                                                else paddingValues.calculateBottomPadding()
                                             ),
                                             state = lazyGridState,
                                             verticalArrangement = Arrangement.spacedBy(8.dp),

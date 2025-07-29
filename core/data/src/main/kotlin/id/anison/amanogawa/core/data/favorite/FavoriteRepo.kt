@@ -5,8 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface FavoriteRepo {
 
-    suspend fun getFavoriteById(id: Long): DataState<Favorite>
-
     fun getFavorites(): Flow<DataState<List<Favorite>>>
 
     fun isFavorite(id: Long): Flow<Boolean>

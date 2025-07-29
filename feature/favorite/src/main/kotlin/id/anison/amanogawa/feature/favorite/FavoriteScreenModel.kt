@@ -13,7 +13,6 @@ import id.anison.amanogawa.core.data.favorite.FavoriteRepo
 import id.anison.amanogawa.core.domain.toFavorite
 import id.anison.amanogawa.core.domain.toFavoriteUI
 import id.anison.amanogawa.core.model.FavoriteUI
-import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,13 +39,12 @@ class FavoriteScreenModel(
 
     private val _uiNavigationEvent = MutableSharedFlow<FavoriteNavigationEvent>()
     val navigationEvent = _uiNavigationEvent.asSharedFlow()
-    private var lastNavigationTime = 0L
 
     fun onEvent(event: FavoritesScreenEvents) {
         log.d(TAG, "event is: $event")
         when (event) {
             is FavoritesScreenEvents.OnFavoriteClick -> {
-                if (singleEventHandler.canTrigger()){
+                if (singleEventHandler.canTrigger()) {
                     screenModelScope.launch {
                         _uiNavigationEvent.emit(
                             value = FavoriteNavigationEvent.NavigateToDetails(
@@ -94,10 +92,10 @@ class FavoriteScreenModel(
 }
 
 sealed interface FavoritesScreenEvents {
-    data object PopBack: FavoritesScreenEvents
-    data class RemoveFromFavorite(val favorite: FavoriteUI): FavoritesScreenEvents
-    data object ClearFavorite: FavoritesScreenEvents
-    data class OnFavoriteClick(val favoriteId: Long): FavoritesScreenEvents
+    object PopBack : FavoritesScreenEvents
+    data class RemoveFromFavorite(val favorite: FavoriteUI) : FavoritesScreenEvents
+    object ClearFavorite : FavoritesScreenEvents
+    data class OnFavoriteClick(val favoriteId: Long) : FavoritesScreenEvents
 }
 
 sealed interface FavoriteNavigationEvent {

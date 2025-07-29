@@ -17,6 +17,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import id.anison.amanogawa.MainScreenModel
 import id.anison.amanogawa.MainUIEvent
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.feature.anime.ImageScreen
 import id.anison.amanogawa.feature.search.screen.RandomAnimeCarouselScreen
 import id.anison.amanogawa.feature.search.screen.SearchScreen
 
@@ -55,15 +56,19 @@ object SearchTab : AmanogawaTab {
 
             LaunchedEffect(navigator.lastItem) {
                 screenModel.setIsRoot(navigator.lastItem is SearchScreen)
-                if (navigator.lastItem is RandomAnimeCarouselScreen) {
-                    screenModel.setBottomBarVisible(false)
-                } else {
-                    screenModel.setBottomBarVisible(true)
+                when (navigator.lastItem) {
+                    is RandomAnimeCarouselScreen -> {
+                        screenModel.setBottomBarVisible(false)
+                    }
+
+                    is ImageScreen -> {
+                        screenModel.setBottomBarVisible(false)
+                    }
+
+                    else -> {
+                        screenModel.setBottomBarVisible(true)
+                    }
                 }
-            }
-
-            LaunchedEffect(navigator.lastItem is RandomAnimeCarouselScreen) {
-
             }
 
             LaunchedEffect(Unit) {
