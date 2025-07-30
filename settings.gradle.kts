@@ -1,6 +1,7 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -23,8 +24,19 @@ dependencyResolutionManagement {
 
 rootProject.name = "Amanogawa"
 include(":app")
-include(":api")
-include(":database")
-include(":common")
-include(":data")
-include(":feature")
+include(":core:network")
+include(":core:database")
+include(":core:common")
+include(":core:data")
+include(":core:domain")
+include(":core:model")
+include(":core:ui")
+include(":core:notification")
+include(":core:navigation")
+include(":core:work")
+
+include(":feature:home")
+include(":feature:search")
+include(":feature:favorite")
+include(":feature:profile")
+include(":feature:anime")

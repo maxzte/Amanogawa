@@ -4,6 +4,7 @@
         <item name="windowSplashScreenBackground">@color/white</item>
         <item name="postSplashScreenTheme">@android:style/Theme.Material.Light.NoActionBar</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/amanogawa_main_logo</item>
+<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/amanogawa_load_gif</item>-->
         <item name="windowSplashScreenAnimationDuration">1000</item>
     </style>
 

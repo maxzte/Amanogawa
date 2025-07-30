@@ -1,0 +1,1025 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "8171565e0af89b53ed680c3206011a59",
+    "entities": [
+      {
+        "tableName": "anime",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`animeId` INTEGER NOT NULL, `name` TEXT NOT NULL, `isCurrent` INTEGER NOT NULL, `enJpName` TEXT NOT NULL, `dubbedEpisodes` INTEGER NOT NULL, `episodesCustom` TEXT, `episodesTotal` TEXT, `extraTotal` INTEGER NOT NULL, `ovaTotal` INTEGER NOT NULL, `year` INTEGER NOT NULL, `season` INTEGER NOT NULL, `part` INTEGER NOT NULL, `views` INTEGER NOT NULL, `posterThumb` TEXT NOT NULL, `posterMini` TEXT NOT NULL, `schedule` TEXT, `episodeCount` TEXT, `newEpisode` INTEGER NOT NULL, `isExtra` INTEGER NOT NULL, `isOva` INTEGER NOT NULL, `time` REAL NOT NULL, `timeStr` TEXT NOT NULL, `listKey` TEXT, PRIMARY KEY(`animeId`))",
+        "fields": [
+          {
+            "fieldPath": "animeId",
+            "columnName": "animeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrent",
+            "columnName": "isCurrent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enJpName",
+            "columnName": "enJpName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dubbedEpisodes",
+            "columnName": "dubbedEpisodes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "episodesCustom",
+            "columnName": "episodesCustom",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "episodesTotal",
+            "columnName": "episodesTotal",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "extraTotal",
+            "columnName": "extraTotal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ovaTotal",
+            "columnName": "ovaTotal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "season",
+            "columnName": "season",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "part",
+            "columnName": "part",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "views",
+            "columnName": "views",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "posterThumb",
+            "columnName": "posterThumb",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "posterMini",
+            "columnName": "posterMini",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schedule",
+            "columnName": "schedule",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "episodeCount",
+            "columnName": "episodeCount",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "newEpisode",
+            "columnName": "newEpisode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isExtra",
+            "columnName": "isExtra",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isOva",
+            "columnName": "isOva",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeStr",
+            "columnName": "timeStr",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listKey",
+            "columnName": "listKey",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "animeId"
+          ]
+        }
+      },
+      {
+        "tableName": "current_anime",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`currentAnimeId` INTEGER NOT NULL, `name` TEXT NOT NULL, `enJpName` TEXT NOT NULL, `episodesCustom` TEXT, `episodesTotal` TEXT, `extraTotal` INTEGER NOT NULL, `ovaTotal` INTEGER NOT NULL, `episodeCount` TEXT, `newEpisode` INTEGER NOT NULL, `schedule` TEXT, `time` REAL NOT NULL, `timeStr` TEXT NOT NULL, `isCurrent` INTEGER NOT NULL, `isExtra` INTEGER NOT NULL, `isOva` INTEGER NOT NULL, PRIMARY KEY(`currentAnimeId`))",
+        "fields": [
+          {
+            "fieldPath": "currentAnimeId",
+            "columnName": "currentAnimeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enJpName",
+            "columnName": "enJpName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "episodesCustom",
+            "columnName": "episodesCustom",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "episodesTotal",
+            "columnName": "episodesTotal",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "extraTotal",
+            "columnName": "extraTotal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ovaTotal",
+            "columnName": "ovaTotal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "episodeCount",
+            "columnName": "episodeCount",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "newEpisode",
+            "columnName": "newEpisode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schedule",
+            "columnName": "schedule",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeStr",
+            "columnName": "timeStr",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrent",
+            "columnName": "isCurrent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isExtra",
+            "columnName": "isExtra",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isOva",
+            "columnName": "isOva",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "currentAnimeId"
+          ]
+        }
+      },
+      {
+        "tableName": "remote_key",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `currentPage` INTEGER NOT NULL, `nextPage` INTEGER, `lastUpdated` INTEGER NOT NULL, PRIMARY KEY(`key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentPage",
+            "columnName": "currentPage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextPage",
+            "columnName": "nextPage",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastUpdated",
+            "columnName": "lastUpdated",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        }
+      },
+      {
+        "tableName": "anime_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`animeId` INTEGER NOT NULL, `duration` TEXT NOT NULL, `company` TEXT NOT NULL, `director` TEXT NOT NULL, `description` TEXT NOT NULL, `botId` INTEGER NOT NULL, `liked` INTEGER NOT NULL, `disliked` INTEGER NOT NULL, `isMovie` INTEGER NOT NULL, `isDubbed` INTEGER NOT NULL, `isHaveSubs` INTEGER NOT NULL, `torrentUrl` TEXT, `torrent4kUrl` TEXT, `posterMaker` TEXT NOT NULL, `poster` TEXT NOT NULL, `botUrl` TEXT NOT NULL, `rating` INTEGER NOT NULL, `screensF` TEXT NOT NULL, `genres` TEXT NOT NULL, `groupF` TEXT, PRIMARY KEY(`animeId`))",
+        "fields": [
+          {
+            "fieldPath": "animeId",
+            "columnName": "animeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "company",
+            "columnName": "company",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "director",
+            "columnName": "director",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "botId",
+            "columnName": "botId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "liked",
+            "columnName": "liked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "disliked",
+            "columnName": "disliked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isMovie",
+            "columnName": "isMovie",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDubbed",
+            "columnName": "isDubbed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isHaveSubs",
+            "columnName": "isHaveSubs",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "torrentUrl",
+            "columnName": "torrentUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "torrent4kUrl",
+            "columnName": "torrent4kUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "posterMaker",
+            "columnName": "posterMaker",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poster",
+            "columnName": "poster",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "botUrl",
+            "columnName": "botUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "screensF",
+            "columnName": "screensF",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genres",
+            "columnName": "genres",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupF",
+            "columnName": "groupF",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "animeId"
+          ]
+        }
+      },
+      {
+        "tableName": "favorite",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`favoriteId` INTEGER NOT NULL, `isFavorite` INTEGER NOT NULL, `isCurrent` INTEGER NOT NULL, `name` TEXT NOT NULL, `enJpName` TEXT NOT NULL, `season` INTEGER NOT NULL, `part` INTEGER NOT NULL, `year` INTEGER NOT NULL, `poster` TEXT NOT NULL, `posterThumb` TEXT NOT NULL, `views` INTEGER NOT NULL, `liked` INTEGER NOT NULL, `disliked` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `episodes` INTEGER NOT NULL, `isNewEpisode` INTEGER NOT NULL, `schedule` TEXT NOT NULL, PRIMARY KEY(`favoriteId`))",
+        "fields": [
+          {
+            "fieldPath": "favoriteId",
+            "columnName": "favoriteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrent",
+            "columnName": "isCurrent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enJpName",
+            "columnName": "enJpName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "season",
+            "columnName": "season",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "part",
+            "columnName": "part",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poster",
+            "columnName": "poster",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "posterThumb",
+            "columnName": "posterThumb",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "views",
+            "columnName": "views",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "liked",
+            "columnName": "liked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "disliked",
+            "columnName": "disliked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "episodes",
+            "columnName": "episodes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isNewEpisode",
+            "columnName": "isNewEpisode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schedule",
+            "columnName": "schedule",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "favoriteId"
+          ]
+        }
+      },
+      {
+        "tableName": "search_result",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`animeId` INTEGER NOT NULL, `name` TEXT NOT NULL, `enJpName` TEXT NOT NULL, `year` INTEGER NOT NULL, `season` INTEGER NOT NULL, `part` INTEGER NOT NULL, `posterMini` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`animeId`))",
+        "fields": [
+          {
+            "fieldPath": "animeId",
+            "columnName": "animeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enJpName",
+            "columnName": "enJpName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "season",
+            "columnName": "season",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "part",
+            "columnName": "part",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "posterMini",
+            "columnName": "posterMini",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "animeId"
+          ]
+        }
+      },
+      {
+        "tableName": "filter",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filterType` TEXT NOT NULL, PRIMARY KEY(`filterType`))",
+        "fields": [
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "filterType"
+          ]
+        }
+      },
+      {
+        "tableName": "genre",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`genreId` INTEGER NOT NULL, `name` TEXT NOT NULL, `botIdName` TEXT NOT NULL, PRIMARY KEY(`genreId`))",
+        "fields": [
+          {
+            "fieldPath": "genreId",
+            "columnName": "genreId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "botIdName",
+            "columnName": "botIdName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "genreId"
+          ]
+        }
+      },
+      {
+        "tableName": "team_member",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`teamMemberId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "teamMemberId",
+            "columnName": "teamMemberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "teamMemberId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_team_member_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_team_member_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "dubber",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dubberId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`dubberId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "dubberId",
+            "columnName": "dubberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "teamMemberId",
+            "columnName": "teamMemberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "dubberId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "team_member",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "teamMemberId"
+            ],
+            "referencedColumns": [
+              "teamMemberId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "translator",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`translatorId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`translatorId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "translatorId",
+            "columnName": "translatorId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "teamMemberId",
+            "columnName": "teamMemberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "translatorId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "team_member",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "teamMemberId"
+            ],
+            "referencedColumns": [
+              "teamMemberId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "sound_engineer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`soundEngineerId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`soundEngineerId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "soundEngineerId",
+            "columnName": "soundEngineerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "teamMemberId",
+            "columnName": "teamMemberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "soundEngineerId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "team_member",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "teamMemberId"
+            ],
+            "referencedColumns": [
+              "teamMemberId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "filter_year",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `filterType` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "filter_genre_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filterType` TEXT NOT NULL, `genreId` INTEGER NOT NULL, PRIMARY KEY(`filterType`, `genreId`), FOREIGN KEY(`filterType`) REFERENCES `filter`(`filterType`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`genreId`) REFERENCES `genre`(`genreId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genreId",
+            "columnName": "genreId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "filterType",
+            "genreId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_filter_genre_cross_ref_genreId",
+            "unique": false,
+            "columnNames": [
+              "genreId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_genre_cross_ref_genreId` ON `${TABLE_NAME}` (`genreId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "filter",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterType"
+            ],
+            "referencedColumns": [
+              "filterType"
+            ]
+          },
+          {
+            "table": "genre",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "genreId"
+            ],
+            "referencedColumns": [
+              "genreId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "filter_dubber_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filterType` TEXT NOT NULL, `dubberId` INTEGER NOT NULL, PRIMARY KEY(`filterType`, `dubberId`), FOREIGN KEY(`filterType`) REFERENCES `filter`(`filterType`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`dubberId`) REFERENCES `dubber`(`dubberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dubberId",
+            "columnName": "dubberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "filterType",
+            "dubberId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "filter",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterType"
+            ],
+            "referencedColumns": [
+              "filterType"
+            ]
+          },
+          {
+            "table": "dubber",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dubberId"
+            ],
+            "referencedColumns": [
+              "dubberId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "filter_translator_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filterType` TEXT NOT NULL, `translatorId` INTEGER NOT NULL, PRIMARY KEY(`filterType`, `translatorId`), FOREIGN KEY(`filterType`) REFERENCES `filter`(`filterType`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`translatorId`) REFERENCES `translator`(`translatorId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "translatorId",
+            "columnName": "translatorId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "filterType",
+            "translatorId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "filter",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterType"
+            ],
+            "referencedColumns": [
+              "filterType"
+            ]
+          },
+          {
+            "table": "translator",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "translatorId"
+            ],
+            "referencedColumns": [
+              "translatorId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "filter_sound_engineer_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filterType` TEXT NOT NULL, `soundEngineerId` INTEGER NOT NULL, PRIMARY KEY(`filterType`, `soundEngineerId`), FOREIGN KEY(`filterType`) REFERENCES `filter`(`filterType`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`soundEngineerId`) REFERENCES `sound_engineer`(`soundEngineerId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "filterType",
+            "columnName": "filterType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "soundEngineerId",
+            "columnName": "soundEngineerId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "filterType",
+            "soundEngineerId"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "filter",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filterType"
+            ],
+            "referencedColumns": [
+              "filterType"
+            ]
+          },
+          {
+            "table": "sound_engineer",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "soundEngineerId"
+            ],
+            "referencedColumns": [
+              "soundEngineerId"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8171565e0af89b53ed680c3206011a59')"
+    ]
+  }
+}
