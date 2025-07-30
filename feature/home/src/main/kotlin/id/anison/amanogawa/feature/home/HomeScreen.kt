@@ -1,9 +1,13 @@
 package id.anison.amanogawa.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -45,6 +49,7 @@ import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.columnsInRow
 import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
+import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
@@ -67,19 +72,29 @@ class HomeScreen : Screen {
             toScreen = { toScreen() }
         )
 
+        val isRefreshing by screenModel.isRefreshing.collectAsState()
+
+        LaunchedEffect(animeTitles.loadState.refresh) {
+            val refresh = animeTitles.loadState.refresh
+            if (refresh is LoadState.NotLoading && isRefreshing) {
+                screenModel.setRefreshing(false)
+            }
+        }
+
         LaunchedEffect(Unit) {
             screenModel.pagingEvent.collect { action ->
                 when (action) {
                     PagingEvent.RELOAD -> {
-//                        animeTitles.refresh()
+                        animeTitles.refresh()
                     }
 
                     PagingEvent.REFRESH -> {
+                        screenModel.setRefreshing(true)
                         animeTitles.refresh()
                     }
 
                     PagingEvent.RETRY -> {
-                        // TODO: handle retry event
+                        animeTitles.retry()
                     }
                 }
             }
@@ -89,13 +104,14 @@ class HomeScreen : Screen {
             screenModel.scrollToTopEvent.collect {
                 snapshotFlow { lazyGridState.layoutInfo.totalItemsCount }.first { it > 0 }
 
-                if (lazyGridState.firstVisibleItemIndex > 0 || lazyGridState.firstVisibleItemScrollOffset > 0) {
+                if (lazyGridState.firstVisibleItemIndex > 0) {
                     lazyGridState.scrollToItem(0)
                 }
             }
         }
 
         HomeScreenContent(
+            isRefreshing = isRefreshing,
             animeTitles = animeTitles,
             state = state,
             lazyGridState = lazyGridState,
@@ -110,139 +126,116 @@ class HomeScreen : Screen {
         state: HomeState,
         lazyGridState: LazyGridState,
         onEvents: (HomeScreenEvents) -> Unit,
+        isRefreshing: Boolean,
     ) {
         val isLandscape = isLandscape()
         val countColumnsInRow = columnsInRow()
 
         Box(contentAlignment = Alignment.TopCenter) {
             Scaffold { paddingValues ->
-                DataStateContent(
-                    state = state.currentAnimeState,
-                    errorContent = {
-                        ErrorMessage(
-                            onUpdate = {
-                                onEvents(HomeScreenEvents.OnRefresh)
-                            }
-                        )
-                    },
-                    loadingContent = {},
-                    content = { currentList ->
-                        var currentPage by rememberSaveable { mutableIntStateOf(0) }
-                        val pagerState = rememberPagerState(
-                            initialPage = currentPage,
-                            pageCount = { currentList.size }
-                        )
-
-                        LaunchedEffect(pagerState) {
-                            snapshotFlow { pagerState.currentPage }.collect { page ->
-                                currentPage = page
-                            }
-                        }
-
-                        PullToRefreshBox(
-                            isRefreshing = animeTitles.loadState.refresh is LoadState.Loading,
-                            onRefresh = {
-                                onEvents(HomeScreenEvents.OnRefresh)
-                            },
-                        ) {
-                            when (animeTitles.loadState.refresh) {
-                                is LoadState.Loading -> {
-//                                    AmanogawaSpinner()
-                                }
-
-                                is LoadState.Error -> {
-//                                    animeTitles.retry()
-                                }
-
-                                is LoadState.NotLoading -> {
-                                    if (animeTitles.itemCount > 0) {
-                                        LazyVerticalGrid(
-                                            columns = GridCells.Fixed(count = countColumnsInRow),
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentPadding = PaddingValues(
-                                                top = if (isLandscape) paddingValues.calculateTopPadding() else 0.dp,
-                                                start = 8.dp,
-                                                end = 8.dp,
-                                                bottom = if (!isLandscape) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
-                                                else paddingValues.calculateBottomPadding()
-                                            ),
-                                            state = lazyGridState,
-                                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        ) {
-                                            if (!isLandscape) {
-                                                item(span = { GridItemSpan(maxLineSpan) }) {
-                                                    AmanogawaTopBar(
-                                                        title = stringResource(id = R.string.amanogawa),
-                                                        navigationIconContent = {
-                                                            IconButton(
-                                                                onClick = {},
-                                                                content = {
-                                                                    Icon(
-                                                                        painter = AmanogawaIcon.amanogawaLogo,
-                                                                        contentDescription = stringResource(
-                                                                            id = R.string.amanogawa
-                                                                        ),
-                                                                        tint = MaterialTheme.colorScheme.primary,
-                                                                    )
-                                                                }
-                                                            )
-                                                        },
-                                                        containerColor = Color.Transparent,
-                                                        modifier = Modifier.ignoreHorizontalParentPadding(
-                                                            8.dp
+                val refresh = animeTitles.loadState.refresh
+                if (refresh is LoadState.Loading && !isRefreshing) {
+                    Log.d("HOME", "SPINNER")
+                    AmanogawaSpinner()
+                } else if (refresh is LoadState.Error && !isRefreshing) {
+                    Log.d("HOME", "ERROR")
+                    ErrorMessage(onUpdate = { onEvents(HomeScreenEvents.OnRefresh) })
+                } else {
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing && animeTitles.loadState.refresh is LoadState.Loading,
+                        onRefresh = {
+                            onEvents(HomeScreenEvents.OnRefresh)
+                        },
+                    ) {
+                        if (animeTitles.itemCount > 0) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(count = countColumnsInRow),
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(
+                                    top = 0.dp,
+                                    start = 8.dp,
+                                    end = 8.dp,
+                                    bottom = if (!isLandscape) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                                    else paddingValues.calculateBottomPadding()
+                                ),
+                                state = lazyGridState,
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                if (!isLandscape) {
+                                    item(span = { GridItemSpan(maxLineSpan) }) {
+                                        AmanogawaTopBar(
+                                            title = stringResource(id = R.string.amanogawa),
+                                            navigationIconContent = {
+                                                IconButton(
+                                                    onClick = {},
+                                                    content = {
+                                                        Icon(
+                                                            painter = AmanogawaIcon.amanogawaLogo,
+                                                            contentDescription = stringResource(
+                                                                id = R.string.amanogawa
+                                                            ),
+                                                            tint = MaterialTheme.colorScheme.primary,
                                                         )
-                                                    )
+                                                    }
+                                                )
+                                            },
+                                            containerColor = Color.Transparent,
+                                            modifier = Modifier.ignoreHorizontalParentPadding(
+                                                8.dp
+                                            )
+                                        )
+                                    }
+                                }
+
+                                if (isLandscape) {
+                                    item(span = { GridItemSpan(maxLineSpan) }) {
+                                        Spacer(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(paddingValues.calculateTopPadding())
+                                        )
+                                    }
+                                }
+
+                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                    Text(
+                                        text = "Current titles",
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                }
+
+                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                    DataStateContent(
+                                        state = state.currentAnimeState,
+                                        errorContent = {
+                                            ErrorMessage(onUpdate = { onEvents(HomeScreenEvents.OnRefresh) })
+                                        },
+                                        loadingContent = {},
+                                        content = { currentList ->
+                                            var currentPage by rememberSaveable {
+                                                mutableIntStateOf(0)
+                                            }
+                                            val pagerState = rememberPagerState(
+                                                initialPage = currentPage,
+                                                pageCount = { currentList.size }
+                                            )
+
+                                            LaunchedEffect(pagerState) {
+                                                snapshotFlow { pagerState.currentPage }.collect { page ->
+                                                    currentPage = page
                                                 }
                                             }
 
-                                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                                Text(
-                                                    text = "Current titles",
-                                                    style = MaterialTheme.typography.titleLarge,
-                                                )
-                                            }
-
-                                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                                AmanogawaHorizontalPager(
-                                                    pagerState = pagerState,
-                                                    list = currentList,
-                                                    countColumnsInRow = countColumnsInRow,
-                                                    key = { currentList[it].animeId },
-                                                    pageContent = { anime ->
-                                                        AnimeCard(
-                                                            anime = anime,
-                                                            isCurrent = anime.isCurrent,
-                                                            onClick = {
-                                                                onEvents(
-                                                                    HomeScreenEvents.PushAnime(
-                                                                        animeId = anime.animeId
-                                                                    )
-                                                                )
-                                                            },
-                                                        )
-                                                    },
-                                                    modifier = Modifier.ignoreHorizontalParentPadding(
-                                                        8.dp
-                                                    )
-                                                )
-                                            }
-
-                                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                                Text(
-                                                    text = "All titles",
-                                                    style = MaterialTheme.typography.titleLarge,
-                                                )
-                                            }
-
-                                            items(
-                                                count = animeTitles.itemCount,
-                                                key = animeTitles.itemKey { it.animeId }
-                                            ) { index ->
-                                                val anime = animeTitles[index]
-                                                if (anime != null) {
+                                            AmanogawaHorizontalPager(
+                                                pagerState = pagerState,
+                                                list = currentList,
+                                                countColumnsInRow = countColumnsInRow,
+                                                key = { currentList[it].animeId },
+                                                pageContent = { anime ->
                                                     AnimeCard(
                                                         anime = anime,
+                                                        isCurrent = anime.isCurrent,
                                                         onClick = {
                                                             onEvents(
                                                                 HomeScreenEvents.PushAnime(
@@ -250,18 +243,49 @@ class HomeScreen : Screen {
                                                                 )
                                                             )
                                                         },
-                                                        isCurrent = false,
                                                     )
-                                                }
-                                            }
+                                                },
+                                                modifier = Modifier.ignoreHorizontalParentPadding(
+                                                    8.dp
+                                                )
+                                            )
                                         }
+                                    )
+
+                                }
+
+                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                    Text(
+                                        text = "All titles",
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                }
+
+                                items(
+                                    count = animeTitles.itemCount,
+                                    key = animeTitles.itemKey { it.animeId }
+                                ) { index ->
+                                    val anime = animeTitles[index]
+                                    if (anime != null) {
+                                        AnimeCard(
+                                            anime = anime,
+                                            onClick = {
+                                                onEvents(
+                                                    HomeScreenEvents.PushAnime(
+                                                        animeId = anime.animeId
+                                                    )
+                                                )
+                                            },
+                                            isCurrent = false,
+                                        )
                                     }
                                 }
                             }
                         }
                     }
-                )
+                }
             }
         }
     }
 }
+

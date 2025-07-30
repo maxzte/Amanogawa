@@ -25,7 +25,8 @@ object PageConfig {
 }
 
 val config: PagingConfig = PagingConfig(
+    enablePlaceholders = true,
     pageSize = PageConfig.PAGE_SIZE,
     prefetchDistance = PageConfig.PREFETCH_DISTANCE,
-    maxSize = PageConfig.MAX_SIZE
+//    maxSize = PageConfig.MAX_SIZE,
 )

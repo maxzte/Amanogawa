@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -23,6 +24,7 @@ import id.anison.amanogawa.core.ui.R
 @Composable
 fun AmanogawaSpinner(
     modifier: Modifier = Modifier,
+    spinnerSize: Dp = 100.dp,
 ) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
@@ -47,7 +49,7 @@ fun AmanogawaSpinner(
                 filterQuality = FilterQuality.High
             ),
             contentDescription = "amanogawa load gif",
-            modifier = modifier.size(100.dp),
+            modifier = Modifier.size(spinnerSize),
         )
     }
 }

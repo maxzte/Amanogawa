@@ -31,18 +31,24 @@ class HomeScreenModel(
     private val log: Logger,
 ) : StateScreenModel<HomeState>(HomeState()) {
     private val singleEventHandler = SingleEventHandler()
+
     private val _scrollToTopEvent = MutableSharedFlow<Unit>()
     val scrollToTopEvent = _scrollToTopEvent.asSharedFlow()
+
     private val _navEventState = MutableSharedFlow<HomeNavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     private val _pagingEvent = MutableSharedFlow<PagingEvent>()
     val pagingEvent: SharedFlow<PagingEvent> = _pagingEvent
+
     val titlesPagingData = animeRepo.getAllWithPagination()
         .map { pagingData -> pagingData.map { it.toAnimeUI() } }
         .distinctUntilChanged()
         .cachedIn(screenModelScope)
+
     val lazyGridState = LazyGridState()
 
     init {
@@ -66,10 +72,10 @@ class HomeScreenModel(
             }
 
             is HomeScreenEvents.OnRefresh -> {
-                if (singleEventHandler.canTrigger()) {
-                    onPullToRefresh()
-                    refresh()
-                }
+//                if (singleEventHandler.canTrigger()) {
+                onPullToRefresh()
+                refresh()
+//                }
             }
         }
     }

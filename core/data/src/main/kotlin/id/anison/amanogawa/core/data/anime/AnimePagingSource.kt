@@ -3,6 +3,7 @@ package id.anison.amanogawa.core.data.anime
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import id.anison.amanogawa.core.common.AndroidLogcatLogger
+import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 class AnimePagingSource(
     private val api: AmanogawaApi,
-    private val log: AndroidLogcatLogger,
+    private val log: Logger,
 ) : PagingSource<Int, AnimeDbo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AnimeDbo> =
