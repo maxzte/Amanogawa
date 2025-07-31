@@ -6,9 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -31,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.model.SearchResultUI
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.search.screenmodel.SearchScreenEvents
 
 @Composable
@@ -46,9 +52,7 @@ internal fun SearchHistory(
         state = lazyListState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-//            start = 8.dp,
-//            end = 8.dp,
-            bottom = AmanogawaConst.bottomBarInsets
+            bottom = if (!isLandscape()) AmanogawaConst.bottomBarInsets else AmanogawaConst.bottomBarPaddings
         ),
     ) {
         item(

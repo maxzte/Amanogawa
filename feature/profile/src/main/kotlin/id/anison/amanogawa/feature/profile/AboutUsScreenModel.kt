@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
-import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.settings.SettingsRepo
+import id.anison.amanogawa.core.domain.repository.TeamMemberRepo
 import id.anison.amanogawa.core.domain.toTeamUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.TeamUI
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class AboutUsScreenModel(
-    private val settingsRepo: SettingsRepo,
+    private val teamMemberRepo: TeamMemberRepo,
     private val log: Logger,
 ) : ScreenModel {
     private val singleEventHandler = SingleEventHandler()
@@ -61,7 +61,7 @@ class AboutUsScreenModel(
     }
 
     private fun getTeam() = screenModelScope.launch {
-        _teamState.value = settingsRepo.getTeam().mapDataState { it.map { team -> team.toTeamUI() } }
+        _teamState.value = teamMemberRepo.getTeam().mapDataState { it.map { team -> team.toTeamUI() } }
     }
 
     companion object {

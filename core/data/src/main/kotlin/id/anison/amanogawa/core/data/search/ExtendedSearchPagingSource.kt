@@ -2,11 +2,11 @@ package id.anison.amanogawa.core.data.search
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import id.anison.amanogawa.core.network.AmanogawaApi
-import id.anison.amanogawa.core.data.anime.toAnimeDbo
 import id.anison.amanogawa.core.data.anime.toAnime
-import id.anison.amanogawa.core.data.filter.TeamMemberType
-import id.anison.amanogawa.core.data.filter.Filter
+import id.anison.amanogawa.core.data.anime.toAnimeDbo
+import id.anison.amanogawa.core.network.AmanogawaApi
+import id.anison.amanogawa.core.domain.model.TeamMemberType
+import id.anison.amanogawa.core.domain.model.Filter
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

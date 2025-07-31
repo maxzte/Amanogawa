@@ -1,6 +1,6 @@
 package id.anison.amanogawa.core.domain
 
-import id.anison.amanogawa.core.data.search.SearchResult
+import id.anison.amanogawa.core.domain.model.SearchResult
 import id.anison.amanogawa.core.model.SearchResultUI
 
 fun SearchResult.toSearchResultUI() = SearchResultUI(

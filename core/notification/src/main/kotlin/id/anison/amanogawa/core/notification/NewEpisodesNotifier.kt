@@ -6,7 +6,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.anime.Anime
+import id.anison.amanogawa.core.domain.model.Anime
 
 class NewEpisodesNotifier(
     private val context: Context,

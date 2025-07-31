@@ -3,6 +3,8 @@ package id.anison.amanogawa.core.data.favorite
 import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
+import id.anison.amanogawa.core.domain.model.Favorite
+import id.anison.amanogawa.core.domain.repository.FavoriteRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll

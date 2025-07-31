@@ -330,7 +330,7 @@ fun dynamicBlackColorScheme(context: Context): ColorScheme {
 
 @Composable
 fun AmanogawaTheme(
-    isDarkTheme: Boolean = false,// isSystemInDarkTheme(),
+    isDarkTheme: Boolean = false,
     isBlackTheme: Boolean = false,
     isDynamicColors: Boolean = false,
     content: @Composable () -> Unit

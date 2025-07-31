@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.anime.RemoteKeyRepo
+import id.anison.amanogawa.core.domain.repository.RemoteKeyRepo
 import java.util.concurrent.TimeUnit
 
 

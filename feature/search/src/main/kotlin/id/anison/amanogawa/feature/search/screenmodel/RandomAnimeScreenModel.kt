@@ -9,7 +9,7 @@ import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.data.search.SearchRepo
+import id.anison.amanogawa.core.domain.repository.SearchRepo
 import id.anison.amanogawa.core.domain.toAnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.FilterTypeUI

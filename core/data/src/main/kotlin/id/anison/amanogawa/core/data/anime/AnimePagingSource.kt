@@ -2,7 +2,6 @@ package id.anison.amanogawa.core.data.anime
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import id.anison.amanogawa.core.common.AndroidLogcatLogger
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import id.anison.amanogawa.core.network.AmanogawaApi

@@ -6,12 +6,11 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.filter.Filter
-import id.anison.amanogawa.core.data.filter.TeamMemberType
-import id.anison.amanogawa.core.data.filter.generateCacheKey
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import id.anison.amanogawa.core.database.anime.entity.RemoteKeyDbo
+import id.anison.amanogawa.core.domain.model.Filter
+import id.anison.amanogawa.core.domain.model.TeamMemberType
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -146,6 +145,16 @@ class AnimeRemoteMediator(
             log.e(TAG, "Error during data loading: ${e.message}")
             MediatorResult.Error(e)
         }
+    }
+
+    private fun Filter.generateCacheKey(): String {
+        val genreIds = genres.map { it.genreId }.sorted().joinToString("_")
+        val voiceIds = teamMembers.filter { it.teamMemberType == TeamMemberType.VOICE }.map { it.teamMemberId }.sorted().joinToString("_")
+        val soundIds = teamMembers.filter { it.teamMemberType == TeamMemberType.SOUND }.map { it.teamMemberId }.sorted().joinToString("_")
+        val transIds = teamMembers.filter { it.teamMemberType == TeamMemberType.TRANSLATOR }.map { it.teamMemberId }.sorted().joinToString("_")
+        val yearIds = years.sorted().joinToString("_")
+
+        return "g=$genreIds&y=$yearIds&v=$voiceIds&s=$soundIds&t=$transIds"
     }
 
     companion object {

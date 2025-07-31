@@ -51,8 +51,8 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import id.anison.amanogawa.core.data.settings.AppSettings
-import id.anison.amanogawa.core.data.settings.AppTheme
+import id.anison.amanogawa.core.datastore.AppSettings
+import id.anison.amanogawa.core.datastore.AppTheme
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon

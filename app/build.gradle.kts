@@ -27,6 +27,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.database)
     implementation(projects.core.data)
+    implementation(projects.core.datastore)
     implementation(projects.core.domain)
     implementation(projects.core.model)
     implementation(projects.core.navigation)
@@ -34,6 +35,8 @@ dependencies {
     implementation(projects.core.notification)
     implementation(projects.core.work)
     implementation(projects.core.common)
+    implementation(projects.core.commonAndroid)
+
 
     implementation(projects.feature.home)
     implementation(projects.feature.search)

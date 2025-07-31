@@ -9,8 +9,8 @@ import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.anime.AnimeRepo
-import id.anison.amanogawa.core.data.favorite.FavoriteRepo
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
+import id.anison.amanogawa.core.domain.repository.FavoriteRepo
 import id.anison.amanogawa.core.domain.toAnimeDetailsUI
 import id.anison.amanogawa.core.domain.toAnimeEpisodesUI
 import id.anison.amanogawa.core.domain.toFavorite

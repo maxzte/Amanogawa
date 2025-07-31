@@ -332,12 +332,14 @@ class RandomAnimeCarouselScreen : Screen {
                 if (isPortrait) {
                     VerticalPager(
                         state = pagerState,
+                        beyondViewportPageCount = 1,
                         modifier = Modifier.fillMaxSize(),
                         pageContent = { pager(it) }
                     )
                 } else {
                     HorizontalPager(
                         state = pagerState,
+                        beyondViewportPageCount = 1,
                         modifier = Modifier.fillMaxSize(),
                         pageContent = { pager(it) }
                     )
@@ -354,18 +356,15 @@ class RandomAnimeCarouselScreen : Screen {
         onEvents: (RandomScreenEvents) -> Unit,
         showBottomSheet: Boolean,
     ) {
-        val seasonText =
-            animeDetails.animeUI.season.takeIf { it != 0.toByte() }?.let { "Season $it" }
-        val partText = animeDetails.animeUI.part.takeIf { it != 0.toByte() }?.let { "Part $it" }
-
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingValues = PaddingValues(
-                    top = paddingValues.calculateTopPadding() + AmanogawaConst.barHeight
-                )
+                .padding(
+                    paddingValues = PaddingValues(
+                        top = paddingValues.calculateTopPadding() + AmanogawaConst.barHeight
+                    )
                 )
         ) {
             // Tags Row
@@ -374,8 +373,8 @@ class RandomAnimeCarouselScreen : Screen {
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
-                seasonText?.let { InfoTag(text = it) }
-                partText?.let { InfoTag(text = it) }
+                if (animeDetails.animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeDetails.animeUI.season)
+                if (animeDetails.animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeDetails.animeUI.part)
             }
 
             // Poster
@@ -476,7 +475,7 @@ class RandomAnimeCarouselScreen : Screen {
                             onEvents(
                                 RandomScreenEvents.OnLinkClick(
                                     filterId = -1L,
-                                    filterName = animeDetails.animeUI.year.toString(),
+                                    filterName = animeDetails.animeUI.year,
                                     filterType = FilterTypeUI.YEAR
                                 )
                             )
@@ -533,9 +532,6 @@ class RandomAnimeCarouselScreen : Screen {
         onEvents: (RandomScreenEvents) -> Unit,
         pagerState: PagerState,
     ) {
-        val seasonText =
-            animeDetails.animeUI.season.takeIf { it != 0.toByte() }?.let { "Season $it" }
-        val partText = animeDetails.animeUI.part.takeIf { it != 0.toByte() }?.let { "Part $it" }
         val scrollToBack = remember { mutableStateOf(false) }
         val scrollToForward = remember { mutableStateOf(false) }
 
@@ -621,8 +617,8 @@ class RandomAnimeCarouselScreen : Screen {
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
-                            seasonText?.let { InfoTag(text = it) }
-                            partText?.let { InfoTag(text = it) }
+                            if (animeDetails.animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeDetails.animeUI.season)
+                            if (animeDetails.animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeDetails.animeUI.part)
                         }
 
                         Text(
@@ -782,12 +778,12 @@ class RandomAnimeCarouselScreen : Screen {
 
     @Composable
     private fun YearTag(
-        year: Short,
+        year: String,
         onYearClick: () -> Unit,
     ) {
         OutlinedButton(onClick = { onYearClick() }) {
             Text(
-                text = year.toString(),
+                text = year,
                 style = MaterialTheme.typography.labelLarge,
                 color = Color.White
             )

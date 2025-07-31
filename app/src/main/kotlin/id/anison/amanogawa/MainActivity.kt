@@ -11,9 +11,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import cafe.adriel.voyager.core.registry.ScreenRegistry
-import id.anison.amanogawa.core.data.settings.AppTheme
-import id.anison.amanogawa.core.model.AppSettingsUI
+import id.anison.amanogawa.core.datastore.AppTheme
 import id.anison.amanogawa.core.ui.AmanogawaTheme
+import id.anison.amanogawa.core.ui.common.AppSettingsUI
 import id.anison.amanogawa.core.ui.common.LocalAppSettings
 import id.anison.amanogawa.feature.anime.animeDetailsScreenModule
 import id.anison.amanogawa.feature.favorite.favoriteScreenModule

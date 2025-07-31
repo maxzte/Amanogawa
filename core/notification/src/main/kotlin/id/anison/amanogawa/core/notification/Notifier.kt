@@ -1,6 +1,6 @@
 package id.anison.amanogawa.core.notification
 
-import id.anison.amanogawa.core.data.anime.Anime
+import id.anison.amanogawa.core.domain.model.Anime
 
 interface Notifier {
 

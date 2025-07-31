@@ -9,7 +9,7 @@ import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.favorite.FavoriteRepo
+import id.anison.amanogawa.core.domain.repository.FavoriteRepo
 import id.anison.amanogawa.core.domain.toFavorite
 import id.anison.amanogawa.core.domain.toFavoriteUI
 import id.anison.amanogawa.core.model.FavoriteUI

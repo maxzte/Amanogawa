@@ -6,9 +6,13 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.settings.config
+import id.anison.amanogawa.core.data.config
 import id.anison.amanogawa.core.data.withDispatcherBlock
 import id.anison.amanogawa.core.database.AmanogawaDatabase
+import id.anison.amanogawa.core.domain.model.Anime
+import id.anison.amanogawa.core.domain.model.AnimeDetails
+import id.anison.amanogawa.core.domain.model.AnimeEpisodes
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

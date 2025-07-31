@@ -4,8 +4,8 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.ConnectivityRepo
-import id.anison.amanogawa.core.data.settings.AppSettings
-import id.anison.amanogawa.core.data.settings.SettingsRepo
+import id.anison.amanogawa.core.datastore.AppSettings
+import id.anison.amanogawa.core.datastore.SettingsRepo
 import id.anison.amanogawa.tab.AmanogawaTab
 import id.anison.amanogawa.tab.HomeTab
 import kotlinx.coroutines.flow.MutableSharedFlow

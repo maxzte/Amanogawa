@@ -23,16 +23,13 @@ import id.anison.amanogawa.core.ui.common.bounceClick
 fun AnimeCardContent(
     title: String,
     poster: String,
-    year: Short,
-    season: Byte,
-    part: Byte,
+    year: String,
+    season: String,
+    part: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     extraContent: @Composable (BoxScope.() -> Unit)? = null
 ) {
-    val seasonText = if (season != 0.toByte()) "Season $season" else ""
-    val partText = if (part != 0.toByte()) "Part $part" else ""
-
     Column(modifier = modifier.fillMaxWidth()) {
         ElevatedCard(
             onClick = { onClick() },
@@ -47,39 +44,45 @@ fun AnimeCardContent(
                 extraContent?.invoke(this)
             }
         }
+
         Spacer(
             modifier = Modifier
             .fillMaxWidth()
             .height(4.dp)
         )
+
         Text(
             text = title,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.titleSmall,
         )
+
         Spacer(
             modifier = Modifier
             .fillMaxWidth()
             .height(4.dp)
         )
+
         Row {
-            if (seasonText.isNotBlank()) {
+            if (season.isNotBlank()) {
                 Text(
-                    text = "$seasonText · ",
+                    text = "Season $season · ",
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray,
                 )
             }
-            if (partText.isNotBlank()) {
+
+            if (part.isNotBlank()) {
                 Text(
-                    text = "$partText · ",
+                    text = "Part $part · ",
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray,
                 )
             }
+
             Text(
-                text = year.toString(),
+                text = year,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,

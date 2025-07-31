@@ -19,6 +19,12 @@ import id.anison.amanogawa.core.database.teammember.SoundEngineerDbo
 import id.anison.amanogawa.core.database.teammember.TeamMemberDao
 import id.anison.amanogawa.core.database.teammember.TeamMemberDbo
 import id.anison.amanogawa.core.database.teammember.TranslatorDbo
+import id.anison.amanogawa.core.domain.model.Filter
+import id.anison.amanogawa.core.domain.model.FilterType
+import id.anison.amanogawa.core.domain.model.Genre
+import id.anison.amanogawa.core.domain.model.TeamMember
+import id.anison.amanogawa.core.domain.model.TeamMemberType
+import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

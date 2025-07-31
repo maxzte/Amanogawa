@@ -1,6 +1,6 @@
 package id.anison.amanogawa.core.domain
 
-import id.anison.amanogawa.core.data.settings.Team
+import id.anison.amanogawa.core.domain.model.Team
 import id.anison.amanogawa.core.model.TeamUI
 
 fun Team.toTeamUI() = TeamUI(

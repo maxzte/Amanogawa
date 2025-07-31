@@ -8,9 +8,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.data.filter.FilterRepo
-import id.anison.amanogawa.core.data.filter.FilterType
-import id.anison.amanogawa.core.data.search.SearchRepo
+import id.anison.amanogawa.core.domain.repository.FilterRepo
+import id.anison.amanogawa.core.domain.model.FilterType
+import id.anison.amanogawa.core.domain.repository.SearchRepo
 import id.anison.amanogawa.core.domain.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.FilterTypeUI

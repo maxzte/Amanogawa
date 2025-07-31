@@ -6,7 +6,7 @@ plugins {
 dependencies {
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.jetbrains.kotlinx.coroutines.core)
+    implementation(libs.coroutines.core)
 
 
     testImplementation(libs.junit)

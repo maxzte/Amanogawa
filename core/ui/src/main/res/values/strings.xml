@@ -185,6 +185,7 @@
     <string name="patreon" translatable="false">Patreon</string>
     <string name="mono_icon" translatable="false">Mono icon</string>
     <string name="monobank" translatable="false">Monobank</string>
+    <string name="base_by_monobank" translatable="false">Base By Monobank</string>
     <string name="duration_icon" translatable="false">Duration icon</string>
 
     <!-- APPEARANCE SCREEN -->
