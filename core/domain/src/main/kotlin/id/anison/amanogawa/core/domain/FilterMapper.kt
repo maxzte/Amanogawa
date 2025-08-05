@@ -1,10 +1,10 @@
 package id.anison.amanogawa.core.domain
 
-import id.anison.amanogawa.core.data.filter.Filter
-import id.anison.amanogawa.core.data.filter.FilterType
-import id.anison.amanogawa.core.data.filter.Genre
-import id.anison.amanogawa.core.data.filter.TeamMember
-import id.anison.amanogawa.core.data.filter.TeamMemberType
+import id.anison.amanogawa.core.domain.model.Filter
+import id.anison.amanogawa.core.domain.model.FilterType
+import id.anison.amanogawa.core.domain.model.Genre
+import id.anison.amanogawa.core.domain.model.TeamMember
+import id.anison.amanogawa.core.domain.model.TeamMemberType
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.FilterUI
 import id.anison.amanogawa.core.model.GenreUI

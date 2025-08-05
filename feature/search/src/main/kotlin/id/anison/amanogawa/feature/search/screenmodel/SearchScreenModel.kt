@@ -9,7 +9,7 @@ import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.search.SearchRepo
+import id.anison.amanogawa.core.domain.repository.SearchRepo
 import id.anison.amanogawa.core.domain.toSearchResult
 import id.anison.amanogawa.core.domain.toSearchResultUI
 import id.anison.amanogawa.core.model.SearchResultUI

@@ -20,23 +20,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.ui.R
 
 
 @Composable
 fun AnimeCard(
-    anime: AnimeUI,
+    title: String,
+    poster: String,
+    year: String,
+    season: String,
+    part: String,
+    views: String,
+    timeStr: String,
+    schedule: String?,
     isCurrent: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimeCardContent(
-        title = anime.name,
-        poster = anime.posterThumb,
-        year = anime.year,
-        season = anime.season,
-        part = anime.part,
+        title = title,
+        poster = poster,
+        year = year,
+        season = season,
+        part = part,
         modifier = modifier,
         onClick = onClick,
         extraContent = {
@@ -49,18 +55,20 @@ fun AnimeCard(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = anime.views.toString(),
+                    text = views,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(start = 4.dp)
                 )
+
                 Icon(
                     painter = painterResource(R.drawable.ic_watch_eye),
                     contentDescription = stringResource(id = R.string.views_icon),
                     modifier = Modifier.size(16.dp).padding(end = 4.dp)
                 )
             }
+
             if (isCurrent) {
                 Column(
                     modifier = Modifier
@@ -70,9 +78,9 @@ fun AnimeCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    if (anime.timeStr.isNotBlank()) {
+                    if (timeStr.isNotBlank()) {
                         Text(
-                            text = "${anime.timeStr} ${stringResource(id = R.string.ago)}",
+                            text = "$timeStr ${stringResource(id = R.string.ago)}",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelMedium,
@@ -80,9 +88,10 @@ fun AnimeCard(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    if (!anime.schedule.isNullOrBlank()) {
+
+                    if (!schedule.isNullOrBlank()) {
                         Text(
-                            text = anime.schedule!!,
+                            text = schedule,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelSmall,

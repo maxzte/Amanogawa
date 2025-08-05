@@ -6,7 +6,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.filter.FilterRepo
+import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.domain.toFilter
 import id.anison.amanogawa.core.domain.toFilterUI
 import id.anison.amanogawa.core.model.FilterUI

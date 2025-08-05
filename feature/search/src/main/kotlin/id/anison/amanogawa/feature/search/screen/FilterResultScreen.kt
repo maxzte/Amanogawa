@@ -160,14 +160,21 @@ class FilterResultScreen(
                             count = pagingItems.itemCount,
                             key = pagingItems.itemKey { it.animeId }
                         ) { index ->
-                            val item = pagingItems[index]
-                            if (item != null) {
+                            val anime = pagingItems[index]
+                            if (anime != null) {
                                 AnimeCard(
-                                    anime = item,
-                                    onClick = {
-                                        onEvents(FilterResultScreenEvents.PushTitle(item.animeId))
-                                    },
+                                    title = anime.name,
+                                    poster = anime.posterThumb,
+                                    year = anime.year,
+                                    season = anime.season,
+                                    part = anime.part,
+                                    views = anime.views,
+                                    timeStr = anime.timeStr,
+                                    schedule = anime.schedule,
                                     isCurrent = false,
+                                    onClick = {
+                                        onEvents(FilterResultScreenEvents.PushTitle(anime.animeId))
+                                    },
                                 )
                             }
                         }

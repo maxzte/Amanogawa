@@ -4,8 +4,8 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.anime.AnimeDetails
 import id.anison.amanogawa.core.data.anime.toAnimeDetails
+import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -57,6 +57,7 @@ fun ExpandedText(
             }
         }
     }
+
     Text(
         text = textToShow,
         maxLines = if (expanded) Int.MAX_VALUE else 3,

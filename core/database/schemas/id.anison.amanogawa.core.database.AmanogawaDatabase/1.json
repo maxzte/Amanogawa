@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8171565e0af89b53ed680c3206011a59",
+    "identityHash": "6848ee53646509dd50a41671ba83e33d",
     "entities": [
       {
         "tableName": "anime",
@@ -413,7 +413,7 @@
       },
       {
         "tableName": "favorite",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`favoriteId` INTEGER NOT NULL, `isFavorite` INTEGER NOT NULL, `isCurrent` INTEGER NOT NULL, `name` TEXT NOT NULL, `enJpName` TEXT NOT NULL, `season` INTEGER NOT NULL, `part` INTEGER NOT NULL, `year` INTEGER NOT NULL, `poster` TEXT NOT NULL, `posterThumb` TEXT NOT NULL, `views` INTEGER NOT NULL, `liked` INTEGER NOT NULL, `disliked` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `episodes` INTEGER NOT NULL, `isNewEpisode` INTEGER NOT NULL, `schedule` TEXT NOT NULL, PRIMARY KEY(`favoriteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`favoriteId` INTEGER NOT NULL, `isFavorite` INTEGER NOT NULL, `isCurrent` INTEGER NOT NULL, `name` TEXT NOT NULL, `enJpName` TEXT NOT NULL, `season` INTEGER NOT NULL, `part` INTEGER NOT NULL, `year` INTEGER NOT NULL, `poster` TEXT NOT NULL, `posterThumb` TEXT NOT NULL, `views` INTEGER NOT NULL, `liked` INTEGER NOT NULL, `disliked` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`favoriteId`))",
         "fields": [
           {
             "fieldPath": "favoriteId",
@@ -497,24 +497,6 @@
             "fieldPath": "timestamp",
             "columnName": "timestamp",
             "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "episodes",
-            "columnName": "episodes",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isNewEpisode",
-            "columnName": "isNewEpisode",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "schedule",
-            "columnName": "schedule",
-            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -1019,7 +1001,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8171565e0af89b53ed680c3206011a59')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6848ee53646509dd50a41671ba83e33d')"
     ]
   }
 }

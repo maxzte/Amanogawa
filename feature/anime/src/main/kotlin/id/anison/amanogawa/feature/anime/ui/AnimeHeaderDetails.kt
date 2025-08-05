@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,8 +31,10 @@ import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.component.UserRatingBar
+import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.feature.anime.AnimeDetailsScreenEvents
+import androidx.core.net.toUri
 
 @Composable
 fun AnimeHeaderDetails(
@@ -38,7 +42,9 @@ fun AnimeHeaderDetails(
     onEvents: (AnimeDetailsScreenEvents) -> Unit,
     isLandscape: Boolean = false,
 ) {
-    val uriHandler = LocalUriHandler.current
+//    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+    val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     Column(
         modifier = Modifier.padding(horizontal = 8.dp)
@@ -65,11 +71,11 @@ fun AnimeHeaderDetails(
             item(
                 key = "yearButton"
             ) {
-                GenreButton(text = anime.animeUI.year.toString()) {
+                GenreButton(text = anime.animeUI.year) {
                     onEvents(
                         AnimeDetailsScreenEvents.OnLinkClick(
                             filterId = null,
-                            filterName = anime.animeUI.year.toString(),
+                            filterName = anime.animeUI.year,
                             filterType = FilterTypeUI.YEAR
                         )
                     )
@@ -96,15 +102,20 @@ fun AnimeHeaderDetails(
         ) {
             FilledTonalButton(
                 onClick = {
-                    uriHandler.openUri("${anime.botUrl}?start=sttl_${anime.botId}")
+                    showWebPage(
+                        context = context,
+                        uri = "${anime.botUrl}?start=sttl_${anime.botId}".toUri(),
+                        toolbarColor = toolbarColor
+                    )
+//                    uriHandler.openUri("${anime.botUrl}?start=sttl_${anime.botId}")
                 },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.PlayArrow,
-                    contentDescription = stringResource(R.string.play_icon)
+                    contentDescription = stringResource(id = R.string.play_icon)
                 )
-                Text(text = stringResource(R.string.watch_btn))
+                Text(text = stringResource(id = R.string.watch_btn))
             }
 
             Row(
@@ -114,21 +125,26 @@ fun AnimeHeaderDetails(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 OutlinedIconButton(
-                    icon = painterResource(R.drawable.ic_download_24),
+                    icon = painterResource(id = R.drawable.ic_download_24),
                     text = if (isLandscape) {
-                        stringResource(R.string.download_btn)
+                        stringResource(id = R.string.download_btn)
                     } else null
                 ) {
-                    uriHandler.openUri(anime.torrentUrl.toString())
+                    showWebPage(
+                        context = context,
+                        uri = anime.torrentUrl.toString().toUri(),
+                        toolbarColor = toolbarColor
+                    )
+//                    uriHandler.openUri(anime.torrentUrl.toString())
                 }
 
                 if (anime.duration.isNotEmpty()) {
                     TextButton(onClick = {}, contentPadding = PaddingValues(0.dp)) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_access_time_24),
-                            contentDescription = stringResource(R.string.duration)
+                            painter = painterResource(id = R.drawable.ic_access_time_24),
+                            contentDescription = stringResource(id = R.string.duration)
                         )
-                        Text(" ${anime.duration}")
+                        Text(text = " ${anime.duration}")
                     }
                 }
             }

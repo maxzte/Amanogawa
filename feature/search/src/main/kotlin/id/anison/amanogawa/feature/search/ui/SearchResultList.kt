@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
@@ -28,6 +30,7 @@ import id.anison.amanogawa.core.model.SearchResultUI
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
+import id.anison.amanogawa.core.ui.common.isLandscape
 
 @Composable
 internal fun SearchResultList(
@@ -42,10 +45,8 @@ internal fun SearchResultList(
         state = lazyListState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            start = 8.dp,
             top = 8.dp,
-            end = 8.dp,
-            bottom = AmanogawaConst.bottomBarInsets,
+            bottom = if (!isLandscape()) AmanogawaConst.bottomBarInsets else AmanogawaConst.bottomBarPaddings
         ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -79,6 +80,8 @@ private fun SearchResultItem(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Spacer(modifier = Modifier.fillMaxHeight())
+
         ElevatedCard(
             modifier = Modifier
                 .widthIn(max = 50.dp)
@@ -90,6 +93,7 @@ private fun SearchResultItem(
                 )
             }
         )
+
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -100,6 +104,7 @@ private fun SearchResultItem(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleSmall,
             )
+
             Text(
                 text = anime.enJpName,
                 overflow = TextOverflow.Ellipsis,
@@ -107,6 +112,7 @@ private fun SearchResultItem(
                 maxLines = 1,
                 color = Color.Gray,
             )
+
             Row {
                 if (seasonText.isNotBlank()) {
                     Text(
@@ -115,6 +121,7 @@ private fun SearchResultItem(
                         color = Color.Gray,
                     )
                 }
+
                 if (partText.isNotBlank()) {
                     Text(
                         text = "$partText · ",
@@ -122,6 +129,7 @@ private fun SearchResultItem(
                         color = Color.Gray,
                     )
                 }
+
                 Text(
                     text = anime.year.toString(),
                     overflow = TextOverflow.Ellipsis,
@@ -131,9 +139,12 @@ private fun SearchResultItem(
                 )
             }
         }
+
         Icon(
             painter = painterResource(id = R.drawable.ic_rounded_arrow_outward_24),
             contentDescription = null,
         )
+
+        Spacer(modifier = Modifier.fillMaxHeight())
     }
 }

@@ -22,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -48,6 +51,7 @@ import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.component.DetailText
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
 import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.profile.AboutUsScreenEvents
 import id.anison.amanogawa.feature.profile.AboutUsScreenModel
@@ -94,7 +98,9 @@ class AboutUsScreen : Screen {
         lazyListState: LazyListState,
         onEvents: (AboutUsScreenEvents) -> Unit,
     ) {
-        val localUrlHandler = LocalUriHandler.current
+//        val localUrlHandler = LocalUriHandler.current
+        val context = LocalContext.current
+        val toolBArColor = MaterialTheme.colorScheme.surface.toArgb()
 
         Scaffold(
             topBar = {
@@ -151,7 +157,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://t.me/amanogawa_ua") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://t.me/amanogawa_ua")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://t.me/amanogawa_ua").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_telegram,
@@ -164,7 +177,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://www.instagram.com/amanogawa_ua") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://www.instagram.com/amanogawa_ua")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://www.instagram.com/amanogawa_ua").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_instagram,
@@ -177,7 +197,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://tiktok.com/@amanogawa_off") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://tiktok.com/@amanogawa_off")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://tiktok.com/@amanogawa_off").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_tiktok,
@@ -190,7 +217,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://youtube.com/@Amanogawa_UA") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://youtube.com/@Amanogawa_UA")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://youtube.com/@Amanogawa_UA").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_youtube,
@@ -203,7 +237,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://discord.gg/QPdbnzwjtM") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://discord.gg/QPdbnzwjtM")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://discord.gg/QPdbnzwjtM").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_discord,
@@ -223,7 +264,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://podcasts.apple.com/ua/podcast/amanokawa/id1706368748") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://podcasts.apple.com/ua/podcast/amanokawa/id1706368748")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://podcasts.apple.com/ua/podcast/amanokawa/id1706368748").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_apple_podcasts,
@@ -236,7 +284,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://open.spotify.com/show/4glnP22wmfTafqLBunifc7") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://open.spotify.com/show/4glnP22wmfTafqLBunifc7")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://open.spotify.com/show/4glnP22wmfTafqLBunifc7").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_spotify,
@@ -249,7 +304,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://soundcloud.com/amanokawa-anime") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://soundcloud.com/amanokawa-anime")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://soundcloud.com/amanokawa-anime").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_soundcloud,
@@ -269,7 +331,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://www.buymeacoffee.com/AmanogawaUA") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://www.buymeacoffee.com/AmanogawaUA")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://www.buymeacoffee.com/AmanogawaUA").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         content = {
                             SocialRow(
@@ -283,7 +352,14 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://www.patreon.com/amanogawa") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://www.patreon.com/amanogawa")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://www.patreon.com/amanogawa").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         content = {
                             SocialRow(
@@ -297,13 +373,41 @@ class AboutUsScreen : Screen {
 
                 item {
                     OutlinedButton(
-                        onClick = { localUrlHandler.openUri("https://send.monobank.ua/jar/87knhUx5i7") },
+                        onClick = {
+//                            localUrlHandler.openUri("https://send.monobank.ua/jar/87knhUx5i7")
+                            showWebPage(
+                                context = context,
+                                uri = ("https://send.monobank.ua/jar/87knhUx5i7").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         content = {
                             SocialRow(
                                 icon = R.drawable.ic_monobank,
                                 desc = stringResource(id = R.string.mono_icon),
                                 label = stringResource(id = R.string.monobank),
+                                modifier = Modifier.clip(CircleShape)
+                            )
+                        }
+                    )
+                }
+
+                item {
+                    OutlinedButton(
+                        onClick = {
+                            showWebPage(
+                                context = context,
+                                uri = ("https://base.monobank.ua/CyXpFgHdz8XH7u#subscriptions").toUri(),
+                                toolbarColor = toolBArColor
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        content = {
+                            SocialRow(
+                                icon = R.drawable.ic_base_by_mono,
+                                desc = stringResource(id = R.string.mono_icon),
+                                label = stringResource(id = R.string.base_by_monobank),
                                 modifier = Modifier.clip(CircleShape)
                             )
                         }

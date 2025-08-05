@@ -7,16 +7,18 @@ import id.anison.amanogawa.MainScreenModel
 import id.anison.amanogawa.core.common.AndroidLogcatLogger
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.ConnectivityRepo
-import id.anison.amanogawa.core.data.anime.AnimeRepo
+import id.anison.amanogawa.core.data.TeamMemberRepoImpl
 import id.anison.amanogawa.core.data.anime.AnimeRepoImpl
-import id.anison.amanogawa.core.data.anime.RemoteKeyRepo
-import id.anison.amanogawa.core.data.favorite.FavoriteRepo
+import id.anison.amanogawa.core.data.anime.RemoteKeyRepoImpl
 import id.anison.amanogawa.core.data.favorite.FavoriteRepoImpl
-import id.anison.amanogawa.core.data.filter.FilterRepo
 import id.anison.amanogawa.core.data.filter.FilterRepoImpl
-import id.anison.amanogawa.core.data.search.SearchRepo
 import id.anison.amanogawa.core.data.search.SearchRepoImpl
-import id.anison.amanogawa.core.data.settings.SettingsRepo
+import id.anison.amanogawa.core.datastore.SettingsRepo
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
+import id.anison.amanogawa.core.domain.repository.FavoriteRepo
+import id.anison.amanogawa.core.domain.repository.FilterRepo
+import id.anison.amanogawa.core.domain.repository.SearchRepo
+import id.anison.amanogawa.core.domain.repository.TeamMemberRepo
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.network.AmanogawaApi
 import id.anison.amanogawa.core.network.AmanogawaApiImpl
@@ -66,7 +68,7 @@ val appModule = module {
         )
     }
     single {
-        RemoteKeyRepo(
+        RemoteKeyRepoImpl(
             database = get(),
             log = get(),
         )
@@ -91,9 +93,10 @@ val appModule = module {
             log = get(),
         )
     }
+    single<TeamMemberRepo> { TeamMemberRepoImpl(api = get(), log = get()) }
 
     single { ConnectivityRepo(context = androidContext(), log = get()) }
-    single { SettingsRepo(context = androidContext(), api = get(), log = get()) }
+    single { SettingsRepo(context = androidContext(), log = get()) }
 
     single { HomeScreenModel(animeRepo = get(), log = get()) }
     factory { (animeId: Long) ->
@@ -126,7 +129,7 @@ val appModule = module {
     factory { ProfileScreenModel(log = get()) }
     factory { SettingsScreenModel(settingsRepo = get(), log = get()) }
     factory { AppearanceScreenModel(settingsRepo = get(), log = get()) }
-    factory { AboutUsScreenModel(settingsRepo = get(), log = get()) }
+    factory { AboutUsScreenModel(teamMemberRepo = get(), log = get()) }
     single { MainScreenModel(settingsRepo = get(), connectivityRepo = get(), log = get()) }
 
     single<Notifier> {

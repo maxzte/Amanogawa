@@ -11,7 +11,7 @@ import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
 import id.anison.amanogawa.core.common.mapDataState
-import id.anison.amanogawa.core.data.anime.AnimeRepo
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.PagingEvent

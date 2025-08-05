@@ -1,10 +1,10 @@
 [versions]
-agp = "8.11.1"
+agp = "8.12.0"
 kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "5.13.4"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.12.0"
 kotlinx-serialization-json = "1.9.0"
@@ -25,12 +25,14 @@ material3 = "1.3.2"
 voyager = "1.1.0-beta03"
 coil = "2.7.0"
 uiTextGoogleFonts = "1.8.3"
-workRuntimeKtx = "2.10.2"
+workRuntimeKtx = "2.10.3"
 koinBom = "4.1.0"
 koinAnnotations = "2.1.0"
 coreSplashscreen = "1.0.1"
 testng = "7.11.0"
 zoomable = "2.8.1"
+androidxBrowser = "1.9.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,8 +58,8 @@ room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 
 #COROUTINES
-jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 jetbrains-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 
 #PAGING
@@ -93,6 +95,9 @@ material3-adaptive-navigation-suite = { module = "androidx.compose.material3:mat
 
 #ZOOM
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
+
+#WEBVIEW
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
 
 #LIFECYCLE
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }

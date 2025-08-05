@@ -15,7 +15,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
 
     //COROUTINES
-    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.coroutines.android)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

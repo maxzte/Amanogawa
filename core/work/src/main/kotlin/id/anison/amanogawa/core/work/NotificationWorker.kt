@@ -9,7 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.data.anime.AnimeRepo
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.notification.Notifier
 import java.util.concurrent.TimeUnit
 

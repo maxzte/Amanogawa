@@ -4,9 +4,9 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.data.settings.AppSettings
-import id.anison.amanogawa.core.data.settings.AppTheme
-import id.anison.amanogawa.core.data.settings.SettingsRepo
+import id.anison.amanogawa.core.datastore.AppSettings
+import id.anison.amanogawa.core.datastore.AppTheme
+import id.anison.amanogawa.core.datastore.SettingsRepo
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

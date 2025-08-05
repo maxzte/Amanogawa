@@ -70,6 +70,7 @@ fun AnimeHeader(
                     )
                 }
             )
+
             LandscapeContent(anime, onEvents)
         } else {
             PosterImage(
@@ -84,6 +85,7 @@ fun AnimeHeader(
                 },
                 modifier = Modifier.aspectRatio(7f / 10f)
             )
+
             AnimeHeaderDetails(anime = anime, onEvents = onEvents)
         }
     }

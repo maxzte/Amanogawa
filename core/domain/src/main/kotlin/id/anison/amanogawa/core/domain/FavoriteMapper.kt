@@ -1,6 +1,6 @@
 package id.anison.amanogawa.core.domain
 
-import id.anison.amanogawa.core.data.favorite.Favorite
+import id.anison.amanogawa.core.domain.model.Favorite
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.FavoriteUI
 
@@ -10,17 +10,14 @@ fun FavoriteUI.toFavorite() = Favorite(
     favoriteId = favoriteId,
     name = name,
     enJpName = enJpName,
-    season = season,
-    part = part,
-    year = year,
+    season = if (season.isNotEmpty()) season.toByte() else 0,
+    part = if (part.isNotEmpty()) part.toByte() else 0,
+    year = year.toShort(),
     poster = poster,
     posterThumb = posterThumb,
-    views = views,
+    views = views.toInt(),
     liked = liked,
     disliked = disliked,
-    episodes = episodeCount,
-    isNewEpisode = isNewEpisode,
-    schedule = schedule,
     timestamp = timestamp,
 )
 
@@ -30,17 +27,14 @@ fun Favorite.toFavoriteUI() = FavoriteUI(
     favoriteId = favoriteId,
     name = name,
     enJpName = enJpName,
-    season = season,
-    part = part,
-    year = year,
+    season = if (season != 0.toByte()) season.toString() else "",
+    part = if (part != 0.toByte()) part.toString() else "",
+    year = year.toString(),
     poster = poster,
     posterThumb = posterThumb,
-    views = views,
+    views = views.toString(),
     liked = liked,
     disliked = disliked,
-    episodeCount = episodes,
-    isNewEpisode = isNewEpisode,
-    schedule = schedule,
     timestamp = timestamp,
 )
 
@@ -58,7 +52,5 @@ fun AnimeDetailsUI.toFavoriteUI() = FavoriteUI(
     views = animeUI.views,
     liked = liked,
     disliked = disliked,
-    episodeCount = animeUI.episodeCount?.toInt() ?: 0,
-    isNewEpisode = false,
     timestamp = System.currentTimeMillis(),
 )

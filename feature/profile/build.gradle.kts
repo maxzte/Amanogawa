@@ -9,12 +9,14 @@ android {
 
 dependencies {
     implementation(projects.core.domain)
+    implementation(projects.core.datastore)
     implementation(projects.core.navigation)
     implementation(projects.core.common)
 
     implementation(libs.androidx.core.ktx)
+
     //COROUTINES
-    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.coroutines.android)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

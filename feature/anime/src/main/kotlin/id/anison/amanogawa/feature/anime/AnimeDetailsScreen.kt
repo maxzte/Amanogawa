@@ -1,6 +1,7 @@
 package id.anison.amanogawa.feature.anime
 
 import android.app.Activity
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -42,6 +43,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,19 +65,21 @@ import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
-import id.anison.amanogawa.core.ui.common.component.AnimeTeam
+import id.anison.amanogawa.feature.anime.ui.AnimeTeam
 import id.anison.amanogawa.core.ui.common.component.DetailText
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.ExpandedText
 import id.anison.amanogawa.core.ui.common.component.ImageHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
+import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
 import id.anison.amanogawa.core.ui.common.episodesInRow
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.anime.ui.AnimeHeader
 import kotlinx.coroutines.flow.first
 import org.koin.core.parameter.parametersOf
+import androidx.core.net.toUri
 
 class AnimeDetailsScreen(
     private val animeId: Long,
@@ -217,7 +222,7 @@ class AnimeDetailsScreen(
                         end = 8.dp,
                         top = 0.dp,
                         bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
-                        else  paddingValues.calculateBottomPadding()
+                        else paddingValues.calculateBottomPadding()
                     ),
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -231,16 +236,18 @@ class AnimeDetailsScreen(
                             modifier = Modifier.ignoreHorizontalParentPadding(8.dp)
                         )
                     }
+
                     item(
                         key = "animeDetails",
                         span = { GridItemSpan(maxLineSpan) },
                     ) {
                         AnimeDetails(
-                            anime = anime,
+                            animeDetails = anime,
                             onEvents = onEvents,
                             modifier = Modifier.ignoreHorizontalParentPadding(8.dp),
                         )
                     }
+
                     item(
                         key = "imageHorizontalPager",
                         span = { GridItemSpan(maxLineSpan) },
@@ -253,6 +260,7 @@ class AnimeDetailsScreen(
                             modifier = Modifier.ignoreHorizontalParentPadding(8.dp),
                         )
                     }
+
                     if (!anime.groupF.isNullOrEmpty()) {
                         item(
                             key = "collectionHorizontalPager",
@@ -280,6 +288,7 @@ class AnimeDetailsScreen(
                                     style = MaterialTheme.typography.titleLarge,
                                     modifier = Modifier.padding(start = 8.dp)
                                 )
+
                                 AmanogawaHorizontalPager(
                                     pagerState = pagerState,
                                     list = anime.groupF!!,
@@ -289,7 +298,15 @@ class AnimeDetailsScreen(
                                     },
                                     pageContent = { anime ->
                                         AnimeCard(
-                                            anime = anime,
+                                            title = anime.name,
+                                            poster = anime.posterThumb,
+                                            year = anime.year,
+                                            season = anime.season,
+                                            part = anime.part,
+                                            views = anime.views,
+                                            timeStr = anime.timeStr,
+                                            schedule = anime.schedule,
+                                            isCurrent = false,
                                             onClick = {
                                                 onEvents(
                                                     AnimeDetailsScreenEvents.PushAnimeDetailsScreen(
@@ -297,7 +314,6 @@ class AnimeDetailsScreen(
                                                     )
                                                 )
                                             },
-                                            isCurrent = false,
                                         )
                                     },
                                 )
@@ -330,13 +346,10 @@ class AnimeDetailsScreen(
 
     @Composable
     private fun AnimeDetails(
-        anime: AnimeDetailsUI,
+        animeDetails: AnimeDetailsUI,
         onEvents: (AnimeDetailsScreenEvents) -> Unit,
         modifier: Modifier = Modifier,
     ) {
-        val season = if (anime.animeUI.season.toInt() != 0) "${anime.animeUI.season}" else ""
-        val part = if (anime.animeUI.part.toInt() != 0) "${anime.animeUI.part}" else ""
-        val extra = if (anime.animeUI.extraTotal != 0) "${anime.animeUI.extraTotal}" else ""
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -344,18 +357,37 @@ class AnimeDetailsScreen(
         ) {
             DetailText(
                 label = stringResource(id = R.string.type),
-                value = stringResource(id = if (anime.isMovie) R.string.movie else R.string.series)
+                value = stringResource(id = if (animeDetails.isMovie) R.string.movie else R.string.series)
             )
-            if (!anime.isMovie) {
-                DetailOptional(label = stringResource(id = R.string.season), value = season)
-                DetailOptional(label = stringResource(id = R.string.part_two_dots), value = part)
-                DetailEpisodes(anime = anime, extra = extra)
+
+            if (!animeDetails.isMovie) {
+                DetailOptional(
+                    label = stringResource(id = R.string.season),
+                    value = animeDetails.animeUI.season
+                )
+
+                DetailOptional(
+                    label = stringResource(id = R.string.part_two_dots),
+                    value = animeDetails.animeUI.part
+                )
+
+                DetailEpisodes(anime = animeDetails, extra = animeDetails.animeUI.extraTotal)
             }
-            DetailOptional(label = stringResource(id = R.string.company), value = anime.company)
-            DetailOptional(label = stringResource(id = R.string.director), value = anime.director)
+
+            DetailOptional(
+                label = stringResource(id = R.string.company),
+                value = animeDetails.company
+            )
+
+            DetailOptional(
+                label = stringResource(id = R.string.director),
+                value = animeDetails.director
+            )
+
             Spacer(modifier = modifier.height(16.dp))
+
             AnimeTeam(
-                teamMembers = anime.teamMembers,
+                teamMembers = animeDetails.teamMembers,
                 onWordClick = { filterId: Long, filterName: String, filterType: FilterTypeUI ->
                     onEvents(
                         AnimeDetailsScreenEvents.OnLinkClick(
@@ -366,12 +398,15 @@ class AnimeDetailsScreen(
                     )
                 },
             )
+
             Spacer(modifier = modifier.height(16.dp))
+
             Text(
                 text = stringResource(id = R.string.description),
                 style = MaterialTheme.typography.titleLarge,
             )
-            ExpandedText(description = anime.description)
+
+            ExpandedText(description = animeDetails.description)
         }
     }
 
@@ -395,7 +430,7 @@ class AnimeDetailsScreen(
                 extra
             )
 
-            anime.animeUI.ovaTotal > 0 -> stringResource(
+            anime.animeUI.ovaTotal.isNotEmpty() -> stringResource(
                 R.string.episodes_of,
                 anime.animeUI.episodeCount!!,
                 anime.animeUI.episodesTotal.toString() + " (+ ${anime.animeUI.ovaTotal} OVA)"
@@ -420,9 +455,19 @@ class AnimeDetailsScreen(
         modifier: Modifier = Modifier,
     ) {
         val uriHandler = LocalUriHandler.current
+        val context = LocalContext.current
+        val color = MaterialTheme.colorScheme.surface.toArgb()
+
         ElevatedCard(
             modifier = modifier
-                .clickable { uriHandler.openUri(botUrl + "?start=sep_${episode.botId}") }
+                .clickable {
+                    showWebPage(
+                        context = context,
+                        uri = (botUrl + "?start=sep_${episode.botId}").toUri(),
+                        toolbarColor = color
+                    )
+//                    uriHandler.openUri(botUrl + "?start=sep_${episode.botId}")
+                }
         ) {
             AnimeImageLoader(
                 modifier = Modifier.aspectRatio(16f / 9f),

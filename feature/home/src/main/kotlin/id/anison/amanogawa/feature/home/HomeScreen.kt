@@ -234,7 +234,14 @@ class HomeScreen : Screen {
                                                 key = { currentList[it].animeId },
                                                 pageContent = { anime ->
                                                     AnimeCard(
-                                                        anime = anime,
+                                                        title = anime.name,
+                                                        poster = anime.posterThumb,
+                                                        year = anime.year,
+                                                        season = anime.season,
+                                                        part = anime.part,
+                                                        views = anime.views,
+                                                        timeStr = anime.timeStr,
+                                                        schedule = anime.schedule,
                                                         isCurrent = anime.isCurrent,
                                                         onClick = {
                                                             onEvents(
@@ -268,7 +275,15 @@ class HomeScreen : Screen {
                                     val anime = animeTitles[index]
                                     if (anime != null) {
                                         AnimeCard(
-                                            anime = anime,
+                                            title = anime.name,
+                                            poster = anime.posterThumb,
+                                            year = anime.year,
+                                            season = anime.season,
+                                            part = anime.part,
+                                            views = anime.views,
+                                            timeStr = anime.timeStr,
+                                            schedule = anime.schedule,
+                                            isCurrent = false,
                                             onClick = {
                                                 onEvents(
                                                     HomeScreenEvents.PushAnime(
@@ -276,7 +291,6 @@ class HomeScreen : Screen {
                                                     )
                                                 )
                                             },
-                                            isCurrent = false,
                                         )
                                     }
                                 }
