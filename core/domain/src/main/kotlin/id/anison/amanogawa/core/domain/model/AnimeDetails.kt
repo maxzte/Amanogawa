@@ -23,5 +23,5 @@ data class AnimeDetails(
     val teamMembers: List<TeamMember>,
     val groupF: List<Anime>? = emptyList(),
     val botUrl: String,
-    val rating: Int = 0,
+    val rating: Int,
 )
