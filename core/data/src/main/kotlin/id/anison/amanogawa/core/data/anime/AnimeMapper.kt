@@ -13,6 +13,8 @@ import id.anison.amanogawa.core.network.model.anime.AnimeDetailsDto
 import id.anison.amanogawa.core.network.model.anime.AnimeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodesDto
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 internal fun AnimeDto.toAnime() = Anime(
     animeId = animeId,
@@ -94,15 +96,27 @@ internal fun AnimeDetailsDto.toAnimeDetails(): AnimeDetails {
     val anime = this.toAnime()
     val dubers = mutableListOf<TeamMember>()
     val s = soundsF.map { strings ->
-        TeamMember(teamMemberId = strings[0].toLong(), name = strings[1], teamMemberType = TeamMemberType.SOUND)
+        TeamMember(
+            teamMemberId = strings[0].toLong(),
+            name = strings[1],
+            teamMemberType = TeamMemberType.SOUND
+        )
     }
     dubers.addAll(s)
     val v = voicesF.map { strings ->
-        TeamMember(teamMemberId = strings[0].toLong(), name = strings[1], teamMemberType = TeamMemberType.VOICE)
+        TeamMember(
+            teamMemberId = strings[0].toLong(),
+            name = strings[1],
+            teamMemberType = TeamMemberType.VOICE
+        )
     }
     dubers.addAll(v)
     val t = translF.map { strings ->
-        TeamMember(teamMemberId = strings[0].toLong(), name = strings[1], teamMemberType = TeamMemberType.TRANSLATOR)
+        TeamMember(
+            teamMemberId = strings[0].toLong(),
+            name = strings[1],
+            teamMemberType = TeamMemberType.TRANSLATOR
+        )
     }
     dubers.addAll(t)
     return AnimeDetails(
@@ -114,6 +128,10 @@ internal fun AnimeDetailsDto.toAnimeDetails(): AnimeDetails {
         botId = botId,
         liked = liked,
         disliked = disliked,
+        rating = if (liked + disliked > 0) {
+            val rating = (liked.toDouble() / (liked + disliked)) * 5
+            round(rating).toInt()
+        } else 0,
         isMovie = isMovie,
         isDubbed = isDubbed,
         isHaveSubs = isHaveSubs,

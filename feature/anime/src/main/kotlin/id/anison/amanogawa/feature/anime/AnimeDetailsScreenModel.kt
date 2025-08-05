@@ -124,24 +124,29 @@ class AnimeDetailsScreenModel(
     private fun loadAnimeDetails() = screenModelScope.launch {
         mutableState.update { it.copy(anime = DataState.Loading) }
 
-        val anime = animeRepo.getAnimeDetailsById(animeId).mapDataState { it.toAnimeDetailsUI() }
+        val animeDetails = animeRepo.getAnimeDetailsById(animeId).mapDataState { it.toAnimeDetailsUI() }
         val episodes =
             animeRepo.getAnimeEpisodesById(animeId).mapDataState { it.toAnimeEpisodesUI() }
 
+
         mutableState.update { oldState ->
-            val newState = when (anime) {
-                is DataState.Error -> DataState.Error(anime.exception)
+            val newState = when (animeDetails) {
+                is DataState.Error -> DataState.Error(animeDetails.exception)
                 DataState.Loading -> DataState.Loading
                 is DataState.Success -> {
                     when (episodes) {
                         is DataState.Error -> DataState.Error(episodes.exception)
                         DataState.Loading -> DataState.Loading
-                        is DataState.Success -> DataState.Success(
-                            AnimeDetailsFull(
-                                anime = anime.data,
-                                episodes = episodes.data
+                        is DataState.Success -> {
+                            log.d(TAG, "animeDetails is ${animeDetails.data}")
+                            log.d(TAG, "episodes are ${episodes.data}")
+                            DataState.Success(
+                                AnimeDetailsFull(
+                                    anime = animeDetails.data,
+                                    episodes = episodes.data
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -198,10 +203,12 @@ sealed interface AnimeDetailsScreenEvents {
         val filterName: String,
         val filterType: FilterTypeUI
     ) : AnimeDetailsScreenEvents
+
     data class OnImageClick(
         val index: Int,
         val images: List<String>
     ) : AnimeDetailsScreenEvents
+
     object Refresh : AnimeDetailsScreenEvents
 }
 
@@ -212,10 +219,12 @@ sealed interface NavigationEvent {
         val filterName: String,
         val filterType: FilterTypeUI
     ) : NavigationEvent
+
     data class NavigateToImagesView(
         val index: Int,
         val images: List<String>
     ) : NavigationEvent
+
     object NavigateToBack : NavigationEvent
 }
 
@@ -229,6 +238,7 @@ internal fun NavigationEvent.toScreen(): Screen? = when (this) {
             filterType = this.filterType
         )
     )
+
     is NavigationEvent.NavigateToImagesView -> ImageScreen(
         index = this.index,
         images = this.images
