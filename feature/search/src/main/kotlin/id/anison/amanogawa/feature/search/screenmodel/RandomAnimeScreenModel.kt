@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -32,8 +33,8 @@ class RandomAnimeScreenModel(
     private val _navEventState = MutableSharedFlow<RandomAnimeNavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
 
-    private val _isModalSheetVisible = MutableStateFlow(false)
-    val isModalSheetVisible = _isModalSheetVisible.asSharedFlow()
+    private val _isModalSheetVisible = MutableStateFlow(ModalSheetState())
+    val isModalSheetVisible = _isModalSheetVisible.asStateFlow()
 
     init {
         getRandomTitles()
@@ -75,7 +76,12 @@ class RandomAnimeScreenModel(
             }
 
             is RandomScreenEvents.SetModalSheetVisibility -> {
-                _isModalSheetVisible.value = event.value
+                _isModalSheetVisible.update { oldState ->
+                    oldState.copy(
+                        pageIndex = event.pageIndex,
+                        isVisible = event.isVisible
+                    )
+                }
             }
 
             is RandomScreenEvents.Refresh -> {
@@ -107,6 +113,11 @@ data class RandomTitleState(
     val titles: Flow<PagingData<AnimeDetailsUI>> = flowOf(PagingData.empty()),
 )
 
+data class ModalSheetState(
+    val pageIndex: Int? = null,
+    val isVisible: Boolean = false
+)
+
 sealed interface RandomScreenEvents {
     object PopBack : RandomScreenEvents
     data class PushAnimeDetailsScreen(val animeId: Long) : RandomScreenEvents
@@ -115,7 +126,10 @@ sealed interface RandomScreenEvents {
         val filterName: String,
         val filterType: FilterTypeUI
     ) : RandomScreenEvents
-    data class SetModalSheetVisibility(val value: Boolean) : RandomScreenEvents
+
+    data class SetModalSheetVisibility(val pageIndex: Int?, val isVisible: Boolean) :
+        RandomScreenEvents
+
     object Refresh : RandomScreenEvents
 }
 

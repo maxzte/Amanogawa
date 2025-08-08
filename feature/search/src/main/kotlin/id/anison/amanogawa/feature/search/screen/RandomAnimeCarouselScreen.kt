@@ -89,6 +89,7 @@ import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.feature.search.screenmodel.ModalSheetState
 import id.anison.amanogawa.feature.search.screenmodel.RandomAnimeScreenModel
 import id.anison.amanogawa.feature.search.screenmodel.RandomScreenEvents
 import id.anison.amanogawa.feature.search.screenmodel.toScreen
@@ -108,7 +109,7 @@ class RandomAnimeCarouselScreen : Screen {
             initialPage = savedPageIndex.intValue,
             pageCount = { randomTitles.itemCount }
         )
-        val isModalSheetVisible by screenModel.isModalSheetVisible.collectAsState(initial = false)
+        val modalSheetState by screenModel.isModalSheetVisible.collectAsState()
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -136,7 +137,7 @@ class RandomAnimeCarouselScreen : Screen {
                 RandomAnimeScreenContent(
                     randomTitles = randomTitles,
                     pagerState = pagerState,
-                    isModalSheetVisible = isModalSheetVisible,
+                    modalSheetState = modalSheetState,
                     onEvents = { screenModel.onEvents(it) }
                 )
             }
@@ -149,14 +150,19 @@ class RandomAnimeCarouselScreen : Screen {
         randomTitles: LazyPagingItems<AnimeDetailsUI>,
         pagerState: PagerState,
         onEvents: (RandomScreenEvents) -> Unit,
-        isModalSheetVisible: Boolean,
+        modalSheetState: ModalSheetState,
     ) {
         val isLandscape = isLandscape()
         val isDataReady = remember { mutableStateOf(false) }
 
-        LaunchedEffect(pagerState.currentPage, pagerState.currentPageOffsetFraction) {
-            if (isModalSheetVisible) {
-                onEvents(RandomScreenEvents.SetModalSheetVisibility(false))
+        LaunchedEffect(pagerState.currentPage) {
+            if (modalSheetState.isVisible && modalSheetState.pageIndex != pagerState.currentPage) {
+                onEvents(
+                    RandomScreenEvents.SetModalSheetVisibility(
+                        pageIndex = null,
+                        isVisible = false
+                    )
+                )
             }
         }
 
@@ -214,13 +220,15 @@ class RandomAnimeCarouselScreen : Screen {
                             if (isPortrait) {
                                 VerticalPage(
                                     paddingValues = paddingValues,
+                                    pageIndex = index,
                                     animeDetails = animeDetailsUI,
                                     onEvents = onEvents,
-                                    showBottomSheet = isModalSheetVisible
+                                    modalSheetState = modalSheetState
                                 )
                             } else {
                                 HorizontalPage(
                                     paddingValues = paddingValues,
+                                    pageIndex = index,
                                     animeDetails = animeDetailsUI,
                                     onEvents = onEvents,
                                     pagerState = pagerState,
@@ -237,8 +245,7 @@ class RandomAnimeCarouselScreen : Screen {
                                 containerColor = Color.Transparent
                             )
 
-
-                            if (!isPortrait && isModalSheetVisible) {
+                            if (!isPortrait && modalSheetState.isVisible && modalSheetState.pageIndex == index) {
                                 val interactionSource =
                                     remember { MutableInteractionSource() }
                                 Box(
@@ -257,7 +264,8 @@ class RandomAnimeCarouselScreen : Screen {
                                 modifier = Modifier
                                     .fillMaxWidth(0.4f)
                                     .align(Alignment.CenterEnd),
-                                visible = !isPortrait && isModalSheetVisible,
+                                visible = !isPortrait && modalSheetState.isVisible
+                                        && modalSheetState.pageIndex == index,
                                 enter = slideInHorizontally { it },
                                 exit = slideOutHorizontally { it }
                             ) {
@@ -288,7 +296,8 @@ class RandomAnimeCarouselScreen : Screen {
                                             onClick = {
                                                 onEvents(
                                                     RandomScreenEvents.SetModalSheetVisibility(
-                                                        false
+                                                        pageIndex = pagerState.currentPage,
+                                                        isVisible = false
                                                     )
                                                 )
                                             },
@@ -354,7 +363,8 @@ class RandomAnimeCarouselScreen : Screen {
         paddingValues: PaddingValues,
         animeDetails: AnimeDetailsUI,
         onEvents: (RandomScreenEvents) -> Unit,
-        showBottomSheet: Boolean,
+        modalSheetState: ModalSheetState,
+        pageIndex: Int,
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -507,14 +517,28 @@ class RandomAnimeCarouselScreen : Screen {
             }
 
             TextButton(
-                onClick = { onEvents(RandomScreenEvents.SetModalSheetVisibility(true)) },
+                onClick = {
+                    onEvents(
+                        RandomScreenEvents.SetModalSheetVisibility(
+                            pageIndex = pageIndex,
+                            isVisible = true
+                        )
+                    )
+                },
                 content = { Text("More info") }
             )
         }
 
-        if (showBottomSheet) {
+        if (modalSheetState.isVisible && modalSheetState.pageIndex == pageIndex) {
             ModalBottomSheet(
-                onDismissRequest = { onEvents(RandomScreenEvents.SetModalSheetVisibility(false)) },
+                onDismissRequest = {
+                    onEvents(
+                        RandomScreenEvents.SetModalSheetVisibility(
+                            pageIndex = null,
+                            isVisible = false
+                        )
+                    )
+                },
             ) {
                 Text(
                     text = animeDetails.description,
@@ -531,6 +555,7 @@ class RandomAnimeCarouselScreen : Screen {
         animeDetails: AnimeDetailsUI,
         onEvents: (RandomScreenEvents) -> Unit,
         pagerState: PagerState,
+        pageIndex: Int,
     ) {
         val scrollToBack = remember { mutableStateOf(false) }
         val scrollToForward = remember { mutableStateOf(false) }
@@ -641,7 +666,6 @@ class RandomAnimeCarouselScreen : Screen {
 
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-//                            contentPadding = PaddingValues(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             OutlinedButton(onClick = {}) {
@@ -698,7 +722,7 @@ class RandomAnimeCarouselScreen : Screen {
                                     onEvents(
                                         RandomScreenEvents.OnLinkClick(
                                             filterId = -1L,
-                                            filterName = animeDetails.animeUI.year.toString(),
+                                            filterName = animeDetails.animeUI.year,
                                             filterType = FilterTypeUI.YEAR
                                         )
                                     )
@@ -731,7 +755,8 @@ class RandomAnimeCarouselScreen : Screen {
                             onClick = {
                                 onEvents(
                                     RandomScreenEvents.SetModalSheetVisibility(
-                                        true
+                                        pageIndex = pageIndex,
+                                        isVisible = true
                                     )
                                 )
                             },
