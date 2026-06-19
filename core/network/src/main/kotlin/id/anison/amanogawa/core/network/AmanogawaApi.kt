@@ -7,11 +7,8 @@ import id.anison.amanogawa.core.network.model.anime.AnimeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodesDto
 import id.anison.amanogawa.core.network.model.anime.AnimeTitlesDto
 import id.anison.amanogawa.core.network.model.anime.SearchResultDto
-import okhttp3.HttpUrl
 
 interface AmanogawaApi {
-
-    fun baseUrl(): HttpUrl.Builder
 
     suspend fun getAll(): Result<AnimeTitlesDto<AnimeDto>>
 
