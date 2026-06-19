@@ -2,12 +2,10 @@ package id.anison.amanogawa.convention
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.AbstractAppExtension
 import org.gradle.kotlin.dsl.dependencies
 
 internal fun Project.configureKoinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         dependencies {
@@ -18,30 +16,6 @@ internal fun Project.configureKoinAndroid(
             add("implementation", libs.findLibrary("koin.workmanager").get())
             add("compileOnly", libs.findLibrary("koin.annotations.core").get())
             add("ksp", libs.findLibrary("koin.annotations.compiler").get())
-        }
-    }
-}
-
-internal fun Project.configureGeneratedKoinApp(
-    commonExtension: AbstractAppExtension,
-) {
-    commonExtension.apply {
-        applicationVariants.forEach { variant ->
-            variant.sourceSets.forEach {
-                it.javaDirectories += files("build/generated/ksp/${variant.name}/kotlin")
-            }
-        }
-    }
-}
-
-internal fun Project.configureGeneratedKoinLibrary(
-    commonExtension: LibraryExtension,
-) {
-    commonExtension.apply {
-        libraryVariants.forEach { variant ->
-            variant.sourceSets.forEach {
-                it.javaDirectories += files("build/generated/ksp/${variant.name}/kotlin")
-            }
         }
     }
 }

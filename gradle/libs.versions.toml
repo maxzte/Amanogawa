@@ -1,37 +1,36 @@
 [versions]
-agp = "8.12.0"
-kotlin = "2.2.0"
-coreKtx = "1.16.0"
-junit = "5.13.4"
+agp = "9.2.1"
+kotlin = "2.4.0"
+coreKtx = "1.19.0"
+junit = "6.1.0"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
-material = "1.12.0"
-kotlinx-serialization-json = "1.9.0"
-okhttp = "5.1.0"
+material = "1.14.0"
+kotlinx-serialization-json = "1.11.0"
+okhttp = "5.4.0"
 
-ksp = "2.2.0-2.0.2"
+ksp = "2.3.4"
 palette = "1.0.0"
-room = "2.7.2"
+room = "2.8.4"
 
-kotlinxCoroutines = "1.10.2"
-paging = "3.3.6"
-dataStoreVersion = "1.1.7"
+kotlinxCoroutines = "1.11.0"
+paging = "3.5.0"
+dataStoreVersion = "1.2.1"
 
-compose-bom = "2025.07.00"
-activity-compose = "1.10.1"
-lifecycle-runtime-ktx = "2.9.2"
-material3 = "1.3.2"
-voyager = "1.1.0-beta03"
+compose-bom = "2026.06.00"
+activity-compose = "1.13.0"
+lifecycle-runtime-ktx = "2.11.0"
+material3 = "1.4.0"
+voyager = "2.2.21-1.10.3"
 coil = "2.7.0"
-uiTextGoogleFonts = "1.8.3"
-workRuntimeKtx = "2.10.3"
-koinBom = "4.1.0"
+uiTextGoogleFonts = "1.11.3"
+workRuntimeKtx = "2.11.2"
+koinBom = "4.2.2"
 koinAnnotations = "2.1.0"
-coreSplashscreen = "1.0.1"
-testng = "7.11.0"
-zoomable = "2.8.1"
-androidxBrowser = "1.9.0"
+coreSplashscreen = "1.2.0"
+zoomable = "2.12.0"
+androidxBrowser = "1.10.0"
 
 
 [libraries]
@@ -90,6 +89,8 @@ androidx-compose-ui-test-junit = { group = "androidx.compose.ui", name = "ui-tes
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-compose-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
+androidx-compose-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3" }
 
 
@@ -125,9 +126,6 @@ google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.re
 #SPLASHSCREEN
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 
-testng = { group = "org.testng", name = "testng", version.ref = "testng" }
-
-
 #BUILD-LOGIC
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
@@ -138,6 +136,8 @@ room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", vers
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
@@ -145,7 +145,6 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-android-library = { id = "com.android.library", version.ref = "agp" }
 
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }

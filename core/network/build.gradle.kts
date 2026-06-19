@@ -11,6 +11,5 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.jetbrains.kotlinx.coroutines.test)
-    testImplementation(libs.testng)
     testImplementation(libs.mockwebserver)
 }

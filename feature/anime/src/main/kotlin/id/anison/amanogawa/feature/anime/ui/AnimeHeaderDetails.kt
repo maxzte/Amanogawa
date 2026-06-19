@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -23,18 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.UserRatingBar
 import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.feature.anime.AnimeDetailsScreenEvents
-import androidx.core.net.toUri
 
 @Composable
 fun AnimeHeaderDetails(
@@ -112,7 +110,7 @@ fun AnimeHeaderDetails(
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.PlayArrow,
+                    imageVector = AmanogawaIcon.playArrow,
                     contentDescription = stringResource(id = R.string.play_icon)
                 )
                 Text(text = stringResource(id = R.string.watch_btn))
