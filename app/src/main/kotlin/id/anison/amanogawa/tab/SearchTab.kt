@@ -1,15 +1,11 @@
 package id.anison.amanogawa.tab
 
 import android.util.Log
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.Navigator
@@ -17,6 +13,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import id.anison.amanogawa.MainScreenModel
 import id.anison.amanogawa.MainUIEvent
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.feature.anime.ImageScreen
 import id.anison.amanogawa.feature.search.screen.RandomAnimeCarouselScreen
 import id.anison.amanogawa.feature.search.screen.SearchScreen
@@ -29,8 +26,8 @@ object SearchTab : AmanogawaTab {
         @Composable
         get() {
             val title = stringResource(id = R.string.search_tab)
-            val icon = rememberVectorPainter(image = Icons.Outlined.Search)
-            val selectedIcon = rememberVectorPainter(image = Icons.Filled.Search)
+            val icon = rememberVectorPainter(image = AmanogawaIcon.searchOutlined)
+            val selectedIcon = rememberVectorPainter(image = AmanogawaIcon.search)
 
             return remember {
                 AmanogawaTabOptions(
@@ -42,7 +39,6 @@ object SearchTab : AmanogawaTab {
             }
         }
 
-    @OptIn(InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<MainScreenModel>()

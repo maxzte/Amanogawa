@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.profile.screen
 
 import androidx.compose.foundation.clickable
@@ -5,9 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +29,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.profile.ProfileNavigationEvent
@@ -39,7 +39,6 @@ import id.anison.amanogawa.feature.profile.toScreen
 class ProfileScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -61,7 +60,7 @@ class ProfileScreen : Screen {
                             },
                             content = {
                                 Icon(
-                                    imageVector = Icons.Rounded.Settings,
+                                    imageVector = AmanogawaIcon.settings,
                                     contentDescription = stringResource(id = R.string.search_icon),
                                     tint = MaterialTheme.colorScheme.primary,
                                 )
@@ -93,7 +92,7 @@ class ProfileScreen : Screen {
                         },
                         trailingContent = {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                                imageVector = AmanogawaIcon.keyboardArrowRight,
                                 contentDescription = stringResource(R.string.keyboardarrowright)
                             )
                         },

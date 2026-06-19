@@ -6,19 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.model.SearchResultUI
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.search.screenmodel.SearchScreenEvents
 
@@ -182,7 +176,7 @@ private fun SearchHistoryItem(
             onClick = { onDeleteItemClick() },
             content = {
                 Icon(
-                    imageVector = Icons.Default.Clear,
+                    imageVector = AmanogawaIcon.clear,
                     contentDescription = stringResource(id = R.string.clear_icon),
                 )
             }

@@ -1,11 +1,11 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.profile.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -23,6 +23,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
@@ -49,7 +50,6 @@ class SettingsScreen : Screen {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun SettingsScreenContent(
         onEvents: (SettingsScreenEvent) -> Unit,
@@ -91,7 +91,7 @@ class SettingsScreen : Screen {
                         },
                         trailingContent = {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                imageVector = AmanogawaIcon.keyboardArrowRight,
                                 contentDescription = stringResource(id = R.string.keyboardarrowright),
                             )
                         },
@@ -119,7 +119,7 @@ class SettingsScreen : Screen {
                         },
                         trailingContent = {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                imageVector = AmanogawaIcon.keyboardArrowRight,
                                 contentDescription = stringResource(id = R.string.keyboardarrowright),
                             )
                         },

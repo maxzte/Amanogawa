@@ -1,7 +1,8 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.anime
 
 import android.app.Activity
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,8 +23,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,6 +48,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -65,7 +65,6 @@ import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
-import id.anison.amanogawa.feature.anime.ui.AnimeTeam
 import id.anison.amanogawa.core.ui.common.component.DetailText
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.ExpandedText
@@ -77,9 +76,9 @@ import id.anison.amanogawa.core.ui.common.episodesInRow
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.anime.ui.AnimeHeader
+import id.anison.amanogawa.feature.anime.ui.AnimeTeam
 import kotlinx.coroutines.flow.first
 import org.koin.core.parameter.parametersOf
-import androidx.core.net.toUri
 
 class AnimeDetailsScreen(
     private val animeId: Long,
@@ -128,7 +127,6 @@ class AnimeDetailsScreen(
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun AnimeDetailsScreenContent(
         anime: AnimeDetailsUI,
@@ -184,7 +182,7 @@ class AnimeDetailsScreen(
                                 } else Color.Transparent,
                                 content = {
                                     Icon(
-                                        imageVector = Icons.Filled.Favorite,
+                                        imageVector = AmanogawaIcon.favorite,
                                         tint = if (isFavorite) {
                                             MaterialTheme.colorScheme.error
                                         } else {

@@ -181,9 +181,7 @@ class HomeScreen : Screen {
                                                 )
                                             },
                                             containerColor = Color.Transparent,
-                                            modifier = Modifier.ignoreHorizontalParentPadding(
-                                                8.dp
-                                            )
+                                            modifier = Modifier.ignoreHorizontalParentPadding(8.dp)
                                         )
                                     }
                                 }
@@ -252,9 +250,7 @@ class HomeScreen : Screen {
                                                         },
                                                     )
                                                 },
-                                                modifier = Modifier.ignoreHorizontalParentPadding(
-                                                    8.dp
-                                                )
+                                                modifier = Modifier.ignoreHorizontalParentPadding(8.dp)
                                             )
                                         }
                                     )

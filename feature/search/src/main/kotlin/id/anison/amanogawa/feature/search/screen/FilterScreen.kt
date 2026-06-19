@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.search.screen
 
 import androidx.compose.foundation.layout.Arrangement
@@ -12,9 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -41,6 +40,7 @@ import id.anison.amanogawa.core.model.TeamMemberTypeUI
 import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.DataStateContent
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
@@ -83,7 +83,6 @@ class FilterScreen : Screen {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun FilterScreenContent(
         filter: FilterUI,
@@ -155,7 +154,7 @@ class FilterScreen : Screen {
                                 leadingIcon = {
                                     if (isSelected) {
                                         Icon(
-                                            imageVector = Icons.Filled.Done,
+                                            imageVector = AmanogawaIcon.done,
                                             contentDescription = "Localized Description",
                                             modifier = Modifier.size(FilterChipDefaults.IconSize),
                                         )
@@ -203,7 +202,7 @@ class FilterScreen : Screen {
                                     leadingIcon = {
                                         if (isSelected) {
                                             Icon(
-                                                imageVector = Icons.Filled.Done,
+                                                imageVector = AmanogawaIcon.done,
                                                 contentDescription = "Localized Description",
                                                 modifier = Modifier.size(FilterChipDefaults.IconSize),
                                             )
@@ -250,7 +249,7 @@ class FilterScreen : Screen {
                                 leadingIcon = {
                                     if (isSelected) {
                                         Icon(
-                                            imageVector = Icons.Filled.Done,
+                                            imageVector = AmanogawaIcon.done,
                                             contentDescription = "Localized Description",
                                             modifier = Modifier.size(FilterChipDefaults.IconSize),
                                         )
@@ -272,7 +271,7 @@ class FilterScreen : Screen {
                             onClick = { onEvents(FilterScreenEvents.Search) },
                             content = {
                                 Icon(
-                                    imageVector = Icons.Default.Search,
+                                    imageVector = AmanogawaIcon.search,
                                     contentDescription = stringResource(id = R.string.search_icon),
                                 )
 
