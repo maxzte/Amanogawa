@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPagingApi::class)
+
 package id.anison.amanogawa.core.data.anime
 
 import androidx.paging.ExperimentalPagingApi
@@ -5,22 +7,20 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import id.anison.amanogawa.core.database.anime.entity.RemoteKeyDbo
 import id.anison.amanogawa.core.domain.model.Filter
 import id.anison.amanogawa.core.domain.model.TeamMemberType
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-@OptIn(ExperimentalPagingApi::class)
 class AnimeRemoteMediator(
     private val database: AmanogawaDatabase,
     private val api: AmanogawaApi,
-    private val log: Logger,
     private val listType: AnimeListType,
     private val filter: Filter? = null,
 ) : RemoteMediator<Int, AnimeDbo>() {
@@ -38,16 +38,16 @@ class AnimeRemoteMediator(
         val now = System.currentTimeMillis()
         val cacheExpiryTimeMillis = TimeUnit.HOURS.toMillis(1)
 
-        log.d(TAG, "initialize: key = $listKey, remoteKey = $remoteKey, now = $now")
+        Log.d(tag = TAG) { "initialize: key = $listKey, remoteKey = $remoteKey, now = $now" }
 
         return if (listType == AnimeListType.FILTERED) {
             InitializeAction.LAUNCH_INITIAL_REFRESH
         } else {
             if (remoteKey == null || (now - remoteKey.lastUpdated) >= cacheExpiryTimeMillis) {
-                log.d(TAG, "initialize → LAUNCH_INITIAL_REFRESH")
+                Log.d(tag = TAG) { "initialize → LAUNCH_INITIAL_REFRESH" }
                 InitializeAction.LAUNCH_INITIAL_REFRESH
             } else {
-                log.d(TAG, "initialize → SKIP_INITIAL_REFRESH")
+                Log.d(tag = TAG) { "initialize → SKIP_INITIAL_REFRESH" }
                 InitializeAction.SKIP_INITIAL_REFRESH
             }
         }
@@ -64,7 +64,7 @@ class AnimeRemoteMediator(
                 }
 
                 LoadType.PREPEND -> {
-                    log.d(TAG, "LoadType.PREPEND received, ending pagination.")
+                    Log.d(tag = TAG) { "LoadType.PREPEND received, ending pagination." }
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
 
@@ -73,7 +73,7 @@ class AnimeRemoteMediator(
                     remoteKey?.nextPage ?: return MediatorResult.Success(true)
                 }
             }
-            log.d(TAG, "Loading page: $page for load type: $loadType")
+            Log.d(tag = TAG) { "Loading page: $page for load type: $loadType" }
 
             val response = withContext(Dispatchers.IO) {
                 when (listType) {
@@ -113,8 +113,8 @@ class AnimeRemoteMediator(
                 }
             }
 
-            log.d(TAG, "filter is $filter")
-            log.d(TAG, "response is ${response.getOrNull()}")
+            Log.d(tag = TAG) { "filter is $filter" }
+            Log.d(tag = TAG) { "response is ${response.getOrNull()}" }
 
             val titles = response.getOrThrow()
             val endOfPaginationReached = titles.data.isEmpty() || titles.currentPage >= titles.pages
@@ -137,21 +137,26 @@ class AnimeRemoteMediator(
                 }
 
                 animeDao.insert(titles.data.map { it.toAnime().toAnimeDbo(listKey) })
-                log.d(TAG, "Inserted ${titles.data.size} items for page $page.")
+                Log.d(tag = TAG) { "Inserted ${titles.data.size} items for page $page." }
             }
 
             MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (e: Exception) {
-            log.e(TAG, "Error during data loading: ${e.message}")
+            Log.e(tag = TAG) { "Error during data loading: ${e.message}" }
             MediatorResult.Error(e)
         }
     }
 
     private fun Filter.generateCacheKey(): String {
         val genreIds = genres.map { it.genreId }.sorted().joinToString("_")
-        val voiceIds = teamMembers.filter { it.teamMemberType == TeamMemberType.VOICE }.map { it.teamMemberId }.sorted().joinToString("_")
-        val soundIds = teamMembers.filter { it.teamMemberType == TeamMemberType.SOUND }.map { it.teamMemberId }.sorted().joinToString("_")
-        val transIds = teamMembers.filter { it.teamMemberType == TeamMemberType.TRANSLATOR }.map { it.teamMemberId }.sorted().joinToString("_")
+        val voiceIds =
+            teamMembers.filter { it.teamMemberType == TeamMemberType.VOICE }.map { it.teamMemberId }
+                .sorted().joinToString("_")
+        val soundIds =
+            teamMembers.filter { it.teamMemberType == TeamMemberType.SOUND }.map { it.teamMemberId }
+                .sorted().joinToString("_")
+        val transIds = teamMembers.filter { it.teamMemberType == TeamMemberType.TRANSLATOR }
+            .map { it.teamMemberId }.sorted().joinToString("_")
         val yearIds = years.sorted().joinToString("_")
 
         return "g=$genreIds&y=$yearIds&v=$voiceIds&s=$soundIds&t=$transIds"

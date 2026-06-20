@@ -4,8 +4,8 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.data.anime.AnimeListType
 import id.anison.amanogawa.core.data.anime.AnimeRemoteMediator
 import id.anison.amanogawa.core.data.anime.toAnime
@@ -30,11 +30,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
+@Single
 class SearchRepoImpl(
     private val api: AmanogawaApi,
     private val database: AmanogawaDatabase,
-    private val log: Logger,
 ) : SearchRepo {
     private val searchResultDao = database.searchResultDao()
 
@@ -48,7 +49,7 @@ class SearchRepoImpl(
                 onFailure = { e -> emit(DataState.Error(e)) }
             )
         } catch (e: Exception) {
-            log.d(TAG, "EXCEPTION while searchTitle $e")
+            Log.d(tag = TAG) { "EXCEPTION while searchTitle $e" }
             emit(DataState.Error(e))
         }
     }.flowOn(Dispatchers.IO)
@@ -65,7 +66,7 @@ class SearchRepoImpl(
             }
         )
     }.catch { e ->
-        log.d(TAG, "Error getting data from database. Cause = $e")
+        Log.d(tag = TAG) { "Error getting data from database. Cause = $e" }
         emit(DataState.Error(e))
     }.flowOn(Dispatchers.IO)
 
@@ -140,7 +141,7 @@ class SearchRepoImpl(
             FilterType.DUBBER -> {
                 val dubber =
                     database.teamMemberDao().getTeamMemberWithRoles(name = filterName)?.dubbers
-                log.d(TAG, "tm is $dubber")
+                Log.d(tag = TAG) { "tm is $dubber" }
                 val teamMember = TeamMember(
                     teamMemberId = dubber?.first()?.dubberId ?: filterParamId!!,
                     teamMemberType = TeamMemberType.VOICE
@@ -151,7 +152,7 @@ class SearchRepoImpl(
             FilterType.TRANSLATOR -> {
                 val translator =
                     database.teamMemberDao().getTeamMemberWithRoles(name = filterName)?.translators
-                log.d(TAG, "tm is $translator")
+                Log.d(tag = TAG) { "tm is $translator" }
                 val teamMember = TeamMember(
                     teamMemberId = translator?.first()?.translatorId ?: filterParamId!!,
                     teamMemberType = TeamMemberType.TRANSLATOR
@@ -163,7 +164,7 @@ class SearchRepoImpl(
                 val soundEngineer =
                     database.teamMemberDao()
                         .getTeamMemberWithRoles(name = filterName)?.soundEngineers
-                log.d(TAG, "tm is $soundEngineer")
+                Log.d(tag = TAG) { "tm is $soundEngineer" }
                 val teamMember = TeamMember(
                     teamMemberId = soundEngineer?.first()?.soundEngineerId ?: filterParamId!!,
                     teamMemberType = TeamMemberType.SOUND
@@ -213,7 +214,6 @@ class SearchRepoImpl(
         remoteMediator = AnimeRemoteMediator(
             api = api,
             database = database,
-            log = log,
             listType = AnimeListType.FILTERED,
             filter = filter
         ),
@@ -225,7 +225,6 @@ class SearchRepoImpl(
     ) {
         RandomAnimePagingSource(
             api = api,
-            log = log,
         )
     }.flow
 

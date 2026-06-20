@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.amanogawa.android.lib)
+    alias(libs.plugins.amanogawa.koin)
 }
 
 android {
@@ -12,9 +13,8 @@ dependencies {
     implementation(projects.core.notification)
 
     //KOIN
-    runtimeOnly(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.workmanager)
+
     //WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
 }

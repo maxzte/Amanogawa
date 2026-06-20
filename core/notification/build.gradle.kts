@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.amanogawa.android.lib)
+    alias(libs.plugins.amanogawa.koin)
 }
 
 android {
@@ -7,13 +8,9 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.domain)
     implementation(projects.core.common)
+    implementation(projects.core.domain)
 
-    //KOIN
-    runtimeOnly(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
     //WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
 }

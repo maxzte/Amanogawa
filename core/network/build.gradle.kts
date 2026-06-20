@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktorfit)
+    alias(libs.plugins.amanogawa.koin)
 }
 
 dependencies {
@@ -16,6 +17,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)
     implementation(libs.ktorfit.lib)
+    implementation(libs.koin.core)
 
 
     testImplementation(libs.junit)

@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.amanogawa.android.lib)
-    alias(libs.plugins.amanogawa.android.room)
+    alias(libs.plugins.amanogawa.room)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.amanogawa.koin)
 }
 
 android {

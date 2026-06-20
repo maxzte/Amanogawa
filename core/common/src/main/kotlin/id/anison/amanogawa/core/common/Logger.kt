@@ -1,11 +1,17 @@
 package id.anison.amanogawa.core.common
 
-interface Logger {
+import co.touchlab.kermit.Logger as KermitLogger
 
-    fun i(tag: String, message: String)
+object Log {
+    fun d(tag: String, message: () -> String) {
+        KermitLogger.d(tag = tag, message = message)
+    }
 
-    fun d(tag: String, message: String)
+    fun i(tag: String, message: () -> String) {
+        KermitLogger.i(tag = tag, message = message)
+    }
 
-    fun e(tag: String, message: String)
-
+    fun e(tag: String, message: () -> String) {
+        KermitLogger.e(tag = tag, message = message)
+    }
 }

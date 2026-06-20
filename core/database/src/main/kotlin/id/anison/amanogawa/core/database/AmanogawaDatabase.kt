@@ -36,8 +36,7 @@ import id.anison.amanogawa.core.database.util.EnumConverter
 
 
 @Database(
-    entities =
-    [
+    entities = [
         AnimeDbo::class,
         CurrentAnimeDbo::class,
         RemoteKeyDbo::class,
@@ -55,7 +54,8 @@ import id.anison.amanogawa.core.database.util.EnumConverter
         FilterDubberCrossRef::class,
         FilterTranslatorCrossRef::class,
         FilterSoundEngineerCrossRef::class,
-    ], version = 1
+    ],
+    version = 1
 )
 @TypeConverters(Converters::class, EnumConverter::class)
 abstract class AmanogawaDatabase : RoomDatabase() {
@@ -70,11 +70,10 @@ abstract class AmanogawaDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteDao
 }
 
-fun AmanogawaDatabase(applicationContext: Context): AmanogawaDatabase {
+fun amanogawaDatabase(applicationContext: Context): AmanogawaDatabase {
     return Room.databaseBuilder(
-        context = checkNotNull(applicationContext.applicationContext),
-        klass = AmanogawaDatabase::class.java,
-        name = "amanogawa"
+        applicationContext,
+        AmanogawaDatabase::class.java,
+        "amanogawa-database"
     ).build()
 }
-

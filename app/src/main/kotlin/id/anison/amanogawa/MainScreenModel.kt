@@ -2,10 +2,10 @@ package id.anison.amanogawa
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.ConnectivityRepo
-import id.anison.amanogawa.core.datastore.AppSettings
-import id.anison.amanogawa.core.datastore.SettingsRepo
+import id.anison.amanogawa.core.domain.model.AppSettings
+import id.anison.amanogawa.core.domain.repository.SettingsRepo
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.tab.AmanogawaTab
 import id.anison.amanogawa.tab.HomeTab
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,11 +17,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Single
 
+@Single
 class MainScreenModel(
     private val settingsRepo: SettingsRepo,
     private val connectivityRepo: ConnectivityRepo,
-    private val log: Logger,
 ) : StateScreenModel<MainUIState>(MainUIState.Loading) {
 
     val tabHistory = mutableListOf<AmanogawaTab>(HomeTab)
@@ -88,7 +89,7 @@ class MainScreenModel(
     fun popFromTabHistory(): AmanogawaTab? {
         if (tabHistory.size > 1) {
             tabHistory.removeAt(tabHistory.lastIndex)
-            log.d(TAG, "pop tabHistory = $tabHistory")
+            Log.d(tag = TAG) { "pop tabHistory = $tabHistory" }
             return tabHistory.last()
         }
         return null

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.home
 
 import android.util.Log
@@ -119,7 +121,6 @@ class HomeScreen : Screen {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun HomeScreenContent(
         animeTitles: LazyPagingItems<AnimeUI>,

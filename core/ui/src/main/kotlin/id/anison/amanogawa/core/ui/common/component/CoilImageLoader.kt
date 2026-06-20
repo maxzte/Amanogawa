@@ -79,7 +79,7 @@ fun AnimeImageLoader(
     showAmanogawaSpinner: Boolean = false,
 ) {
     val qualifier = if (useCache) qualifier("default") else qualifier("noCache")
-    val imageLoader = koinInject<ImageLoader>(qualifier = qualifier)
+    val imageLoader = koinInject<ImageLoader>()
 
     CoilImageLoader(
         titleImage = titleImage,

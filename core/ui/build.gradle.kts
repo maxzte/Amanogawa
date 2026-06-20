@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.common)
+    implementation(projects.core.model)
 
     //KOIN
     implementation(libs.koin.androidx.compose)

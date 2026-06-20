@@ -1,6 +1,5 @@
 package id.anison.amanogawa.core.datastore
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
@@ -8,22 +7,21 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.domain.model.AppSettings
+import id.anison.amanogawa.core.domain.model.AppTheme
+import id.anison.amanogawa.core.domain.repository.SettingsRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single
+class SettingsRepoImpl(
+    private val dataStore: DataStore<Preferences>,
+) : SettingsRepo {
 
-class SettingsRepo(
-    context: Context,
-    private val log: Logger,
-) {
-    private val Context.createDataStore: DataStore<Preferences> by preferencesDataStore(name = APP_SETTINGS)
-    private val dataStore = context.createDataStore
-
-    val settings: Flow<AppSettings> = dataStore.data
+    override val settings: Flow<AppSettings> = dataStore.data
         .catch {
             if (it is IOException) {
                 emit(emptyPreferences())
@@ -43,25 +41,25 @@ class SettingsRepo(
             )
         }.distinctUntilChanged()
 
-    suspend fun saveTheme(theme: AppTheme) {
+    override suspend fun saveTheme(theme: AppTheme) {
         dataStore.edit { preferences ->
             preferences[THEME_KEY] = theme.ordinal
         }
     }
 
-    suspend fun saveDynamicColor(isDynamic: Boolean) {
+    override suspend fun saveDynamicColor(isDynamic: Boolean) {
         dataStore.edit { preferences ->
             preferences[IS_DYNAMIC_COLOR_THEME] = isDynamic
         }
     }
 
-    suspend fun saveBlackTheme(isBlack: Boolean) {
+    override suspend fun saveBlackTheme(isBlack: Boolean) {
         dataStore.edit { preferences ->
             preferences[IS_BLACK_THEME_KEY] = isBlack
         }
     }
 
-    suspend fun saveCountColumnsInRow(count: Int) {
+    override suspend fun saveCountColumnsInRow(count: Int) {
         dataStore.edit { preferences ->
             if (preferences[COUNT_COLUMNS_IN_ROW_KEY] != count) {
                 preferences[COUNT_COLUMNS_IN_ROW_KEY] = count
@@ -69,7 +67,7 @@ class SettingsRepo(
         }
     }
 
-    suspend fun saveCountColumnsInRowLandscape(count: Int) {
+    override suspend fun saveCountColumnsInRowLandscape(count: Int) {
         dataStore.edit { preferences ->
             if (preferences[COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY] != count) {
                 preferences[COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY] = count
@@ -77,7 +75,7 @@ class SettingsRepo(
         }
     }
 
-    suspend fun saveCountEpisodesInRow(count: Int) {
+    override suspend fun saveCountEpisodesInRow(count: Int) {
         dataStore.edit { preferences ->
             if (preferences[COUNT_EPISODES_IN_ROW_KEY] != count) {
                 preferences[COUNT_EPISODES_IN_ROW_KEY] = count
@@ -85,7 +83,7 @@ class SettingsRepo(
         }
     }
 
-    suspend fun saveCountEpisodesInRowLandscape(count: Int) {
+    override suspend fun saveCountEpisodesInRowLandscape(count: Int) {
         dataStore.edit { preferences ->
             if (preferences[COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY] != count) {
                 preferences[COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY] = count
@@ -96,7 +94,6 @@ class SettingsRepo(
     companion object {
         private const val TAG = "SettingsRepo"
 
-        private const val APP_SETTINGS = "amanogawaSettings"
         private val THEME_KEY = intPreferencesKey("theme")
         private val IS_DYNAMIC_COLOR_THEME = booleanPreferencesKey("is_dynamic_theme")
         private val IS_BLACK_THEME_KEY = booleanPreferencesKey("is_black_theme")
@@ -104,7 +101,7 @@ class SettingsRepo(
         private val COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY =
             intPreferencesKey("count_columns_in_row_landscape")
         private val COUNT_EPISODES_IN_ROW_KEY = intPreferencesKey("count_episodes_in_row")
-        private val COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY = intPreferencesKey("count_episodes_in_row_landscape")
+        private val COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY =
+            intPreferencesKey("count_episodes_in_row_landscape")
     }
-
 }

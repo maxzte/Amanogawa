@@ -1,11 +1,11 @@
+@file:OptIn(ExperimentalPagingApi::class)
+
 package id.anison.amanogawa.core.data.anime
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.data.config
 import id.anison.amanogawa.core.data.withDispatcherBlock
 import id.anison.amanogawa.core.database.AmanogawaDatabase
@@ -13,29 +13,28 @@ import id.anison.amanogawa.core.domain.model.Anime
 import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.AnimeEpisodes
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
-
+@Single
 class AnimeRepoImpl(
     private val database: AmanogawaDatabase,
     private val api: AmanogawaApi,
-    private val log: Logger,
 ) : AnimeRepo {
     private val animeDao = database.animeDao()
     private val currentAnimeDao = database.currentAnimeDao()
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun getAllWithPagination(): Flow<PagingData<Anime>> = Pager(
         config = config,
         remoteMediator = AnimeRemoteMediator(
             api = api,
             database = database,
             listType = AnimeListType.DEFAULT,
-            log = log
         ),
         pagingSourceFactory = {
             animeDao.pagingAll()
@@ -97,7 +96,7 @@ class AnimeRepoImpl(
     }
 
     companion object {
-        private const val TAG: String = "Anime repo"
+        private const val TAG: String = "AnimeRepo"
     }
 
 }

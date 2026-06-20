@@ -6,8 +6,8 @@ import androidx.paging.map
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
+import id.anison.amanogawa.core.common.Log
+import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.domain.model.FilterType
 import id.anison.amanogawa.core.domain.repository.SearchRepo
@@ -29,15 +29,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.Provided
 
 
+@Factory
 class FilterResultScreenModel(
-    private val filterParamId: Long? = null,
-    private val filterName: String = "",
-    private val filterType: FilterTypeUI,
-    private val searchRepo: SearchRepo,
-    private val filterRepo: FilterRepo,
-    private val log: Logger,
+    @InjectedParam private val filterParamId: Long? = null,
+    @InjectedParam private val filterName: String = "",
+    @InjectedParam private val filterType: FilterTypeUI,
+    @Provided private val searchRepo: SearchRepo,
+    @Provided private val filterRepo: FilterRepo,
 ) : StateScreenModel<FilterResultState>(FilterResultState()) {
     private val singleEventHandler = SingleEventHandler()
     private val _pagingEvent = MutableSharedFlow<PagingEvent>()
@@ -107,7 +110,7 @@ class FilterResultScreenModel(
 
     fun searchByFilterName() = screenModelScope.launch {
         val isDisplayedFilterExist = filterRepo.isExist(FilterType.DISPLAYED)
-        log.d(TAG, "isExist: $isDisplayedFilterExist")
+        Log.d(tag = TAG) { "isExist: $isDisplayedFilterExist" }
         if (!isDisplayedFilterExist) filterRepo.updateFilter()
         val filteredTitles = searchRepo.getTitlesByFilterName(
             filterParamId,

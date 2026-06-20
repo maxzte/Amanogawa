@@ -1,19 +1,20 @@
 package id.anison.amanogawa.core.data
 
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.model.Team
 import id.anison.amanogawa.core.domain.repository.TeamMemberRepo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import id.anison.amanogawa.core.network.model.TeamDto
+import org.koin.core.annotation.Single
 
 
+@Single
 class TeamMemberRepoImpl(
     private val api: AmanogawaApi,
-    private val log: Logger,
 ) : TeamMemberRepo {
 
     override suspend fun getTeam() = withDispatcherBlock {
-        log.d(TAG, "getTeam")
+        Log.d(tag = TAG) { "getTeam" }
         api.getTeam().getOrThrow().map { it.toTeam() }
     }
 

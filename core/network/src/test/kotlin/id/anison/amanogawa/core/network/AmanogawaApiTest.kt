@@ -1,6 +1,12 @@
 package id.anison.amanogawa.core.network
 
+import de.jensklingenberg.ktorfit.Ktorfit
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
@@ -18,7 +24,23 @@ class AmanogawaApiTest {
     fun setup() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        api = AmanogawaApiImpl(baseUrl = mockWebServer.url("/").toString())
+
+        val client = HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                json(Json {
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                })
+            }
+        }
+
+        val testService = Ktorfit.Builder()
+            .baseUrl(mockWebServer.url("/").toString())
+            .httpClient(client)
+            .build()
+            .createAmanogawaService()
+
+        api = AmanogawaApiImpl(service = testService)
     }
 
     @AfterEach
@@ -84,7 +106,8 @@ class AmanogawaApiTest {
 
     @Test
     fun `getAnime should return anime details`() = runTest {
-        enqueueResponse("""{
+        enqueueResponse(
+            """{
             "id": 789, 
             "name": "Detailed Anime", 
             "en_jp_name": "EN Name",
@@ -104,7 +127,8 @@ class AmanogawaApiTest {
             "poster_mini": "mini",
             "episode_count": "12",
             "bot_url": "url"
-        }""")
+        }"""
+        )
 
         val result = api.getAnime(789)
 
@@ -115,7 +139,8 @@ class AmanogawaApiTest {
     @Test
     fun `getAnimeEpisodes should fetch all pages of episodes`() = runTest {
         // Page 1
-        enqueueResponse("""{
+        enqueueResponse(
+            """{
             "pages": 2, 
             "bot_url": "url", 
             "data": [{
@@ -126,9 +151,11 @@ class AmanogawaApiTest {
                 "screen": "s",
                 "screen_original": "so"
             }]
-        }""")
+        }"""
+        )
         // Page 2
-        enqueueResponse("""{
+        enqueueResponse(
+            """{
             "pages": 2, 
             "bot_url": "url", 
             "data": [{
@@ -139,7 +166,8 @@ class AmanogawaApiTest {
                 "screen": "s",
                 "screen_original": "so"
             }]
-        }""")
+        }"""
+        )
 
         val result = api.getAnimeEpisodes(123)
 
@@ -190,7 +218,8 @@ class AmanogawaApiTest {
 
     @Test
     fun `searchAnimeByName should return search results`() = runTest {
-        enqueueResponse("""[{
+        enqueueResponse(
+            """[{
             "id": 1, 
             "name": "Result",
             "en_jp_name": "EN",
@@ -198,13 +227,14 @@ class AmanogawaApiTest {
             "season": 1,
             "part": 1,
             "poster_mini": "mini"
-        }]""")
+        }]"""
+        )
 
         val result = api.searchAnimeByName("query")
 
         assertTrue(result.isSuccess)
         assertEquals(1, result.getOrNull()?.size)
-        
+
         val request = mockWebServer.takeRequest()
         assertTrue(request.path!!.contains("s=%22query%22"))
     }

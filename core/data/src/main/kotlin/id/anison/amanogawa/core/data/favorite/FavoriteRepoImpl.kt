@@ -1,7 +1,7 @@
 package id.anison.amanogawa.core.data.favorite
 
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
 import id.anison.amanogawa.core.domain.model.Favorite
 import id.anison.amanogawa.core.domain.repository.FavoriteRepo
@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.Single
 
+@Single
 class FavoriteRepoImpl(
     private val favoriteDao: FavoriteDao,
-    private val log: Logger,
 ) : FavoriteRepo {
 
     override fun getFavorites(): Flow<DataState<List<Favorite>>> = flow {
@@ -24,7 +25,7 @@ class FavoriteRepoImpl(
             }
         )
     }.catch { e ->
-        log.e(TAG, "Error getting data from database. Cause = $e")
+        Log.e(tag = TAG) { "Error getting data from database. Cause = $e" }
         emit(DataState.Error(e))
     }
 

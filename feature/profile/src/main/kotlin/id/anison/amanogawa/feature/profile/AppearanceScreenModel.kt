@@ -2,11 +2,11 @@ package id.anison.amanogawa.feature.profile
 
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.datastore.AppSettings
-import id.anison.amanogawa.core.datastore.AppTheme
-import id.anison.amanogawa.core.datastore.SettingsRepo
+import id.anison.amanogawa.core.common.Log
+import id.anison.amanogawa.core.domain.model.AppSettings
+import id.anison.amanogawa.core.domain.model.AppTheme
+import id.anison.amanogawa.core.domain.repository.SettingsRepo
+import id.anison.amanogawa.core.model.SingleEventHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,10 +14,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Provided
 
+@Factory
 class AppearanceScreenModel(
-    private val settingsRepo: SettingsRepo,
-    private val log: Logger,
+    @Provided private val settingsRepo: SettingsRepo,
 ) : StateScreenModel<AppearanceSettingsUIState>(AppearanceSettingsUIState.Loading) {
     private val singleEventHandler = SingleEventHandler()
     private val _navigationEvent = MutableSharedFlow<AppearanceNavigationEvent>()
@@ -43,7 +45,7 @@ class AppearanceScreenModel(
         )
 
     fun onEvents(event: AppearanceScreenEvent) {
-        log.d(TAG, "current event is: $event")
+        Log.d(tag = TAG) { "current event is: $event" }
         when (event) {
             is AppearanceScreenEvent.PopBack -> {
                 if (singleEventHandler.canTrigger()) {

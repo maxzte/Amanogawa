@@ -1,7 +1,7 @@
 package id.anison.amanogawa.core.domain.repository
 
-import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.domain.model.Favorite
+import id.anison.amanogawa.core.model.DataState
 import kotlinx.coroutines.flow.Flow
 
 interface FavoriteRepo {

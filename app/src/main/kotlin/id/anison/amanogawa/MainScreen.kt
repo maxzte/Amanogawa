@@ -1,7 +1,6 @@
 package id.anison.amanogawa
 
 import android.util.Log
-import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,13 +59,10 @@ import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
-import androidx.window.core.layout.WindowWidthSizeClass
-import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
@@ -84,18 +79,15 @@ import id.anison.amanogawa.tab.SearchTab
 class MainScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalMaterial3Api::class, InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<MainScreenModel>()
         val isOnline by screenModel.isOnline.collectAsState()
         val snackbarHostState = remember { SnackbarHostState() }
 
-        val isTopBarVisible by screenModel.isTopBarVisible.collectAsState()
         val isBottomBarVisible by screenModel.isBottomBarVisible.collectAsState()
         val windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-        val isCompact = windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.COMPACT
-        val activity = LocalActivity.currentOrThrow
+        val isCompact = !windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
 
         val notConnectedMessage = stringResource(id = R.string.not_connected)
 
@@ -110,7 +102,7 @@ class MainScreen : Screen {
 
         TabNavigator(
             tab = HomeTab,
-        ) { tabNavigator ->
+        ) { _ ->
 
 //            BackHandler {
 //                val previousTab = screenModel.popFromTabHistory()

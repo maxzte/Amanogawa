@@ -1,0 +1,36 @@
+package id.anison.amanogawa.convention
+
+import androidx.room.gradle.RoomExtension
+import com.google.devtools.ksp.gradle.KspExtension
+import id.anison.amanogawa.convention.util.libs
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+
+class RoomConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            apply(plugin = "androidx.room")
+            apply(plugin = "com.google.devtools.ksp")
+
+            extensions.configure<KspExtension> {
+                arg("room.generateKotlin", "true")
+            }
+
+            extensions.configure<RoomExtension> {
+                schemaDirectory("$projectDir/schemas")
+            }
+
+//        runtimeOnly(libs.androidx.room.runtime)
+
+            dependencies {
+                "api"(libs.findLibrary("room.runtime").get()) //imp isn`t working
+                "implementation"(libs.findLibrary("room.ktx").get())
+                "ksp"(libs.findLibrary("room.compiler").get())
+                "implementation"(libs.findLibrary("room.paging").get())
+            }
+        }
+    }
+}

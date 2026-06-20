@@ -1,3 +1,5 @@
+@file:OptIn(InternalVoyagerApi::class)
+
 package id.anison.amanogawa.tab
 
 import androidx.activity.compose.LocalActivity
@@ -11,7 +13,6 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import id.anison.amanogawa.feature.home.HomeScreen
 
 
-@OptIn(InternalVoyagerApi::class)
 @Composable
 internal fun AmanogawaBackHandler(
     navigator: Navigator,

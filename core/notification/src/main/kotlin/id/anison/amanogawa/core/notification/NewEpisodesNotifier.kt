@@ -5,12 +5,12 @@ import android.content.Context
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import id.anison.amanogawa.core.common.Logger
 import id.anison.amanogawa.core.domain.model.Anime
+import org.koin.core.annotation.Single
 
+@Single
 class NewEpisodesNotifier(
     private val context: Context,
-    private val log: Logger,
 ) : Notifier {
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)

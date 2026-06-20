@@ -5,10 +5,10 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.common.mapDataState
+import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.Log
+import id.anison.amanogawa.core.model.SingleEventHandler
+import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.domain.repository.SearchRepo
 import id.anison.amanogawa.core.domain.toSearchResult
 import id.anison.amanogawa.core.domain.toSearchResultUI
@@ -30,10 +30,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Provided
+import org.koin.core.annotation.Single
 
+@Single
 class SearchScreenModel(
-    private val searchRepo: SearchRepo,
-    private val log: Logger,
+    @Provided private val searchRepo: SearchRepo,
 ) : ScreenModel {
     private val singleEventHandler = SingleEventHandler()
 
@@ -74,7 +76,7 @@ class SearchScreenModel(
         )
 
     fun onEvent(event: SearchScreenEvents) {
-        log.d(TAG, "curr event is: $event")
+        Log.d(tag = TAG) { "curr event is: $event" }
         when (event) {
             is SearchScreenEvents.OnAnimeClick -> {
                 if (singleEventHandler.canTrigger()) {

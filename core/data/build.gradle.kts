@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.amanogawa.android.lib)
+    alias(libs.plugins.amanogawa.koin)
 }
 
 android {
@@ -7,10 +8,11 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.common)
-    implementation(projects.core.network)
-    implementation(projects.core.database)
-    implementation(projects.core.domain)
+    api(projects.core.common)
+    api(projects.core.network)
+    api(projects.core.database)
+    api(projects.core.datastore)
+    api(projects.core.domain)
 
 
     implementation(libs.coroutines.android)

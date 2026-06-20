@@ -1,7 +1,7 @@
 package id.anison.amanogawa.core.domain.repository
 
 import androidx.paging.PagingData
-import id.anison.amanogawa.core.common.DataState
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.domain.model.Anime
 import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.AnimeEpisodes

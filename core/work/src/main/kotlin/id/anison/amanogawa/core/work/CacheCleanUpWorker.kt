@@ -5,25 +5,27 @@ import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.RemoteKeyRepo
+import org.koin.android.annotation.KoinWorker
+import org.koin.core.annotation.Provided
 import java.util.concurrent.TimeUnit
 
 
+@KoinWorker
 class CacheCleanUpWorker(
     context: Context,
     workerParams: WorkerParameters,
-    private val remoteKeyRepo: RemoteKeyRepo,
-    private val log: Logger,
+    @Provided private val remoteKeyRepo: RemoteKeyRepo,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         return try {
-            log.d(TAG, "doWork")
+            Log.d(tag = TAG) { "doWork" }
             remoteKeyRepo.cleanUpCache()
             Result.success()
         } catch (e: Exception) {
-            log.e(TAG, "Error clearing cache $e")
+            Log.e(tag = TAG) { "Error clearing cache $e" }
             Result.retry()
         }
     }

@@ -5,22 +5,24 @@ import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.mapDataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.TeamMemberRepo
 import id.anison.amanogawa.core.domain.toTeamUI
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.model.FilterTypeUI
+import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.core.model.TeamUI
+import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Provided
 
+@Factory
 class AboutUsScreenModel(
-    private val teamMemberRepo: TeamMemberRepo,
-    private val log: Logger,
+    @Provided private val teamMemberRepo: TeamMemberRepo,
 ) : ScreenModel {
     private val singleEventHandler = SingleEventHandler()
     private val _navigationEventState = MutableSharedFlow<AboutUsNavigationEvent>()
@@ -34,7 +36,7 @@ class AboutUsScreenModel(
     }
 
     fun onEvents(event: AboutUsScreenEvents) {
-        log.d(TAG, "curr event is: $event")
+        Log.d(tag = TAG) { "curr event is: $event" }
         when (event) {
             is AboutUsScreenEvents.PopBack -> {
                 if (singleEventHandler.canTrigger()) {

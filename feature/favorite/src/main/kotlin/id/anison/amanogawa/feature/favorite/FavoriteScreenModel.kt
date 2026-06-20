@@ -5,14 +5,14 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.common.mapDataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.FavoriteRepo
 import id.anison.amanogawa.core.domain.toFavorite
 import id.anison.amanogawa.core.domain.toFavoriteUI
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.model.FavoriteUI
+import id.anison.amanogawa.core.model.SingleEventHandler
+import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,10 +21,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Provided
+import org.koin.core.annotation.Single
 
+@Single
 class FavoriteScreenModel(
-    private val favoriteRepo: FavoriteRepo,
-    private val log: Logger,
+    @Provided private val favoriteRepo: FavoriteRepo,
 ) : ScreenModel {
     private val singleEventHandler = SingleEventHandler()
     val lazyGridState = LazyGridState()
@@ -41,7 +43,7 @@ class FavoriteScreenModel(
     val navigationEvent = _uiNavigationEvent.asSharedFlow()
 
     fun onEvent(event: FavoritesScreenEvents) {
-        log.d(TAG, "event is: $event")
+        Log.d(tag = TAG) { "event is: $event" }
         when (event) {
             is FavoritesScreenEvents.OnFavoriteClick -> {
                 if (singleEventHandler.canTrigger()) {

@@ -7,14 +7,14 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.common.mapDataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeUI
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.model.PagingEvent
+import id.anison.amanogawa.core.model.SingleEventHandler
+import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +25,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Provided
+import org.koin.core.annotation.Single
 
+@Single
 class HomeScreenModel(
-    private val animeRepo: AnimeRepo,
-    private val log: Logger,
+    @Provided private val animeRepo: AnimeRepo,
 ) : StateScreenModel<HomeState>(HomeState()) {
     private val singleEventHandler = SingleEventHandler()
 
@@ -52,12 +54,12 @@ class HomeScreenModel(
     val lazyGridState = LazyGridState()
 
     init {
-        log.d(TAG, "init")
+        Log.d(tag = TAG) { "init" }
         getCurrentAnimeList()
     }
 
     fun onEvent(event: HomeScreenEvents) {
-        log.d(TAG, "curr event is: $event")
+        Log.d(tag = TAG) { "curr event is: $event" }
         when (event) {
             is HomeScreenEvents.PushAnime -> {
                 if (singleEventHandler.canTrigger()) {
@@ -80,9 +82,11 @@ class HomeScreenModel(
         }
     }
 
-    fun requestScrollToTop() = screenModelScope.launch {
-        if (singleEventHandler.canTrigger()) {
-            _scrollToTopEvent.emit(Unit)
+    fun requestScrollToTop() {
+        screenModelScope.launch {
+            if (singleEventHandler.canTrigger()) {
+                _scrollToTopEvent.emit(Unit)
+            }
         }
     }
 
@@ -94,20 +98,24 @@ class HomeScreenModel(
         _isRefreshing.value = isRefreshing
     }
 
-    private fun onPullToRefresh() = screenModelScope.launch {
-        _pagingEvent.emit(PagingEvent.REFRESH)
+    private fun onPullToRefresh() {
+        screenModelScope.launch {
+            _pagingEvent.emit(PagingEvent.REFRESH)
+        }
     }
 
     private fun refresh() {
         getCurrentAnimeList()
     }
 
-    private fun getCurrentAnimeList() = screenModelScope.launch {
-        mutableState.update { oldState ->
-            oldState.copy(
-                currentAnimeState = animeRepo.getCurrentAnimeList()
-                    .mapDataState { it.map { animeUI -> animeUI.toAnimeUI() } }
-            )
+    private fun getCurrentAnimeList() {
+        screenModelScope.launch {
+            mutableState.update { oldState ->
+                oldState.copy(
+                    currentAnimeState = animeRepo.getCurrentAnimeList()
+                        .mapDataState { it.map { animeUI -> animeUI.toAnimeUI() } }
+                )
+            }
         }
     }
 

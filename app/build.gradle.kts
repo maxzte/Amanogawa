@@ -1,7 +1,6 @@
 plugins {
-    alias(libs.plugins.amanogawa.android.app)
-    alias(libs.plugins.amanogawa.android.app.compose)
-    alias(libs.plugins.amanogawa.koin.app)
+    alias(libs.plugins.amanogawa.app)
+    alias(libs.plugins.amanogawa.koin)
 }
 
 android {
@@ -18,24 +17,23 @@ android {
         release {
             isMinifyEnabled = false
             proguardFile(getDefaultProguardFile("proguard-android-optimize.txt"))
-            proguardFile(file("proguard/"))
+            proguardFile("proguard/")
         }
     }
 }
 
 dependencies {
+    implementation(projects.core.common)
     implementation(projects.core.network)
     implementation(projects.core.database)
     implementation(projects.core.data)
-    implementation(projects.core.datastore)
     implementation(projects.core.domain)
     implementation(projects.core.model)
     implementation(projects.core.navigation)
     implementation(projects.core.ui)
     implementation(projects.core.notification)
     implementation(projects.core.work)
-    implementation(projects.core.common)
-    implementation(projects.core.commonAndroid)
+    implementation(projects.core.model)
 
 
     implementation(projects.feature.home)
@@ -50,6 +48,7 @@ dependencies {
     implementation(libs.material)
 
     //COMPOSE
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material3.adaptive.navigation.suite)
 

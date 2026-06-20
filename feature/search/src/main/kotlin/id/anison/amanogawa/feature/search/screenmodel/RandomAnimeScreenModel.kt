@@ -7,8 +7,8 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
+import id.anison.amanogawa.core.common.Log
+import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.core.domain.repository.SearchRepo
 import id.anison.amanogawa.core.domain.toAnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
@@ -24,10 +24,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Provided
 
+@Factory
 class RandomAnimeScreenModel(
-    private val searchRepo: SearchRepo,
-    private val log: Logger,
+    @Provided private val searchRepo: SearchRepo,
 ) : StateScreenModel<RandomTitleState>(RandomTitleState()) {
     private val singleEventHandler = SingleEventHandler()
     private val _navEventState = MutableSharedFlow<RandomAnimeNavigationEvent>()
@@ -41,7 +43,7 @@ class RandomAnimeScreenModel(
     }
 
     fun onEvents(event: RandomScreenEvents) {
-        log.d(TAG, "curr event is: $event")
+        Log.d(tag = TAG) { "curr event is: $event" }
         when (event) {
             is RandomScreenEvents.PopBack -> {
                 screenModelScope.launch {

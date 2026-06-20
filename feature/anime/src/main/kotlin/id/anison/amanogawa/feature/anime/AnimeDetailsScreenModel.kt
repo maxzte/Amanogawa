@@ -5,10 +5,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.SingleEventHandler
-import id.anison.amanogawa.core.common.mapDataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.repository.FavoriteRepo
 import id.anison.amanogawa.core.domain.toAnimeDetailsUI
@@ -17,7 +14,10 @@ import id.anison.amanogawa.core.domain.toFavorite
 import id.anison.amanogawa.core.domain.toFavoriteUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeEpisodesUI
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.model.FilterTypeUI
+import id.anison.amanogawa.core.model.SingleEventHandler
+import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,12 +28,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.InjectedParam
+import org.koin.core.annotation.Provided
 
+@Factory
 class AnimeDetailsScreenModel(
-    private val animeId: Long,
-    private val animeRepo: AnimeRepo,
-    private val favoriteRepo: FavoriteRepo,
-    private val log: Logger,
+    @InjectedParam private val animeId: Long,
+    @Provided private val animeRepo: AnimeRepo,
+    @Provided private val favoriteRepo: FavoriteRepo,
 ) : StateScreenModel<AnimeState>(AnimeState()) {
     private val singleEventHandler = SingleEventHandler()
     val lazyGridState = LazyGridState()
@@ -44,13 +47,13 @@ class AnimeDetailsScreenModel(
     val scrollToTopEvent = _scrollToTopEvent.asSharedFlow()
 
     init {
-        log.d(TAG, "init")
+        Log.d(tag = TAG) { "init" }
         isFavorite()
         loadAnimeDetails()
     }
 
     fun onEvents(event: AnimeDetailsScreenEvents) {
-        log.d(TAG, "curr event is: $event")
+        Log.d(tag = TAG) { "curr event is: $event" }
         when (event) {
             is AnimeDetailsScreenEvents.PopBack -> {
                 if (singleEventHandler.canTrigger()) {
@@ -124,7 +127,8 @@ class AnimeDetailsScreenModel(
     private fun loadAnimeDetails() = screenModelScope.launch {
         mutableState.update { it.copy(anime = DataState.Loading) }
 
-        val animeDetails = animeRepo.getAnimeDetailsById(animeId).mapDataState { it.toAnimeDetailsUI() }
+        val animeDetails =
+            animeRepo.getAnimeDetailsById(animeId).mapDataState { it.toAnimeDetailsUI() }
         val episodes =
             animeRepo.getAnimeEpisodesById(animeId).mapDataState { it.toAnimeEpisodesUI() }
 
@@ -138,8 +142,8 @@ class AnimeDetailsScreenModel(
                         is DataState.Error -> DataState.Error(episodes.exception)
                         DataState.Loading -> DataState.Loading
                         is DataState.Success -> {
-                            log.d(TAG, "animeDetails is ${animeDetails.data}")
-                            log.d(TAG, "episodes are ${episodes.data}")
+                            Log.d(tag = TAG) { "animeDetails is ${animeDetails.data}" }
+                            Log.d(tag = TAG) { "episodes are ${episodes.data}" }
                             DataState.Success(
                                 AnimeDetailsFull(
                                     anime = animeDetails.data,

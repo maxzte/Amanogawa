@@ -5,14 +5,16 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import id.anison.amanogawa.core.notification.Notification
 import id.anison.amanogawa.core.work.Work
-import id.anison.amanogawa.di.appModule
-import id.anison.amanogawa.di.databaseModule
-import id.anison.amanogawa.di.workerModule
+import id.anison.amanogawa.di.AppModule
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
-import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.annotation.KoinApplication
+import org.koin.plugin.module.dsl.startKoin
+
+@KoinApplication(modules = [AppModule::class])
+class MyApp
 
 class AmanogawaApp : Application(), ImageLoaderFactory {
     private val imageLoader: ImageLoader by inject()
@@ -20,11 +22,10 @@ class AmanogawaApp : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
 
-        startKoin {
+        startKoin<MyApp> {
             androidLogger()
             androidContext(this@AmanogawaApp)
             workManagerFactory()
-            modules(appModule, databaseModule, workerModule)
         }
 
         Notification.init(this)

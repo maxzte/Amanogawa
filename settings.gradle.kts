@@ -14,6 +14,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -27,7 +30,6 @@ include(":app")
 include(":core:network")
 include(":core:database")
 include(":core:common")
-include(":core:common-android")
 include(":core:data")
 include(":core:datastore")
 include(":core:domain")

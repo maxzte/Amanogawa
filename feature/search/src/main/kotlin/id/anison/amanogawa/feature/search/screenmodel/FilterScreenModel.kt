@@ -3,9 +3,9 @@ package id.anison.amanogawa.feature.search.screenmodel
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
-import id.anison.amanogawa.core.common.mapDataState
+import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.Log
+import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.domain.toFilter
 import id.anison.amanogawa.core.domain.toFilterUI
@@ -17,10 +17,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Provided
 
+@Factory
 class FilterScreenModel(
-    private val filterRepo: FilterRepo,
-    private val log: Logger,
+    @Provided private val filterRepo: FilterRepo,
 ) : StateScreenModel<FilterState>(FilterState()) {
     private val _navEventState = MutableSharedFlow<FilterNavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
@@ -30,7 +32,7 @@ class FilterScreenModel(
     }
 
     fun onEvents(event: FilterScreenEvents) {
-        log.d(TAG, "current event is: $event")
+        Log.d(tag = TAG) { "current event is: $event" }
         when (event) {
             is FilterScreenEvents.PopBack -> {
                 screenModelScope.launch {

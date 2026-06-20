@@ -29,10 +29,11 @@ coil = "2.7.0"
 uiTextGoogleFonts = "1.11.3"
 workRuntimeKtx = "2.11.2"
 koinBom = "4.2.2"
-koinAnnotations = "2.1.0"
+koin-plugin = "1.0.1"
 coreSplashscreen = "1.2.0"
 zoomable = "2.12.0"
 androidxBrowser = "1.10.0"
+kermit = "2.1.0"
 
 
 [libraries]
@@ -121,11 +122,11 @@ androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtim
 #KOIN
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinBom" }
+koin-core-coroutines = { module = "io.insert-koin:koin-core-coroutines", version.ref = "koinBom" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinBom" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinBom" }
 koin-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koinBom" }
-koin-annotations-core = { group = "io.insert-koin", name = "koin-annotations", version.ref = "koinAnnotations" }
-koin-annotations-compiler = { group = "io.insert-koin", name = "koin-ksp-compiler", version.ref = "koinAnnotations" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinBom" }
 
 
 #DATASTORE
@@ -141,12 +142,17 @@ google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.re
 #SPLASHSCREEN
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 
+#KERMIT
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+
 #BUILD-LOGIC
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
-room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
+room-gradlePlugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+koin-gradlePlugin = { module = "io.insert-koin:koin-compiler-gradle-plugin", version.ref = "koin-plugin" }
+koin-compilerPlugin = { module = "io.insert-koin:koin-compiler-plugin", version.ref = "koin-plugin" }
 
 
 [plugins]
@@ -161,17 +167,16 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 ktorfit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 
 #CUSTOM
-amanogawa-android-app = { id = "amanogawa.android.app" }
-amanogawa-android-app-compose = { id = "amanogawa.android.app.compose" }
+amanogawa-app = { id = "amanogawa.app" }
 amanogawa-android-lib = { id = "amanogawa.android.lib" }
 amanogawa-android-lib-compose = { id = "amanogawa.android.lib.compose" }
-amanogawa-android-feature = { id = "amanogawa.android.feature" }
-amanogawa-koin-app = { id = "amanogawa.koin.app" }
+amanogawa-feature = { id = "amanogawa.feature" }
 amanogawa-koin = { id = "amanogawa.koin" }
-amanogawa-android-room = { id = "amanogawa.android.room" }
+amanogawa-room = { id = "amanogawa.room" }
 amanogawa-kotlin-lib = { id = "amanogawa.kotlin.lib" }

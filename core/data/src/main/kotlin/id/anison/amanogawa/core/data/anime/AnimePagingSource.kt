@@ -2,7 +2,7 @@ package id.anison.amanogawa.core.data.anime
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
@@ -10,14 +10,13 @@ import kotlinx.coroutines.withContext
 
 class AnimePagingSource(
     private val api: AmanogawaApi,
-    private val log: Logger,
 ) : PagingSource<Int, AnimeDbo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AnimeDbo> =
         withContext(Dispatchers.IO) {
-            log.i(TAG, "Work!")
+            Log.i(tag = TAG) { "Work!" }
             val page = params.key ?: 1
-            log.d(TAG, "key is: $page")
+            Log.d(tag = TAG) { "key is: $page" }
 
             try {
                 val titles: List<AnimeDbo>
@@ -30,10 +29,10 @@ class AnimePagingSource(
                 val totalPage = response.pages
                 next = if (page < totalPage) page + 1 else null
 
-                log.i(TAG, "Prev: $prev, Next: $next")
+                Log.i(tag = TAG) { "Prev: $prev, Next: $next" }
                 LoadResult.Page(data = titles, prevKey = prev, nextKey = next)
             } catch (e: Exception) {
-                log.e(TAG, "ERROR: $e")
+                Log.e(tag = TAG) { "ERROR: $e" }
                 LoadResult.Error(IllegalStateException("Unexpected load result"))
             }
         }

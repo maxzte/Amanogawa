@@ -1,6 +1,5 @@
 package id.anison.amanogawa.core.network
 
-import de.jensklingenberg.ktorfit.Ktorfit
 import id.anison.amanogawa.core.network.model.FilterDto
 import id.anison.amanogawa.core.network.model.TeamDto
 import id.anison.amanogawa.core.network.model.anime.AnimeDetailsDto
@@ -8,48 +7,16 @@ import id.anison.amanogawa.core.network.model.anime.AnimeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodesDto
 import id.anison.amanogawa.core.network.model.anime.AnimeTitlesDto
 import id.anison.amanogawa.core.network.model.anime.SearchResultDto
-import id.anison.amanogawa.core.network.util.AmanogawaApiInterceptor
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.serialization.json.Json
-import java.util.concurrent.TimeUnit
+import org.koin.core.annotation.Single
 
+@Single
 open class AmanogawaApiImpl(
-    baseUrl: String = "https://amanogawa.space/api/"
+    private val service: AmanogawaService
 ) : AmanogawaApi {
-
-    private val client = HttpClient(OkHttp) {
-        engine {
-            addInterceptor(AmanogawaApiInterceptor())
-            config {
-                callTimeout(15, TimeUnit.SECONDS)
-                readTimeout(15, TimeUnit.SECONDS)
-            }
-        }
-        install(ContentNegotiation) {
-            json(Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
-        }
-        install(Logging) {
-            level = LogLevel.INFO
-        }
-    }
-
-    private val service = Ktorfit.Builder()
-        .baseUrl(baseUrl)
-        .httpClient(client)
-        .build()
-        .createAmanogawaService()
 
     private suspend fun <T> safeApiCall(call: suspend () -> T): Result<T> = try {
         Result.success(call())

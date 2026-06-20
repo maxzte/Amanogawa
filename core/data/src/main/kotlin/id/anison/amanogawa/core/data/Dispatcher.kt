@@ -1,6 +1,6 @@
 package id.anison.amanogawa.core.data
 
-import id.anison.amanogawa.core.common.DataState
+import id.anison.amanogawa.core.model.DataState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,7 +1,7 @@
 package id.anison.amanogawa.core.ui.common
 
 import androidx.compose.runtime.Composable
-import id.anison.amanogawa.core.common.DataState
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 

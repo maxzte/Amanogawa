@@ -3,24 +3,24 @@ package id.anison.amanogawa.feature.profile
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.feature.profile.screen.SettingsScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 
 
-class ProfileScreenModel(
-    private val log: Logger,
-) : ScreenModel {
+@Factory
+class ProfileScreenModel : ScreenModel {
 
     private val _navEventState = MutableSharedFlow<ProfileNavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
 
     fun onEvents(event: ProfileNavigationEvent) {
-        log.d(TAG, "current event is: $event")
-        when(event) {
+        Log.d(tag = TAG) { "current event is: $event" }
+        when (event) {
             ProfileNavigationEvent.NavigateToFavorites -> {
                 screenModelScope.launch {
                     _navEventState.emit(value = ProfileNavigationEvent.NavigateToFavorites)
@@ -46,7 +46,7 @@ sealed interface ProfileNavigationEvent {
     data object NavigateToSettings : ProfileNavigationEvent
 }
 
-internal fun ProfileNavigationEvent.toScreen() = when(this) {
+internal fun ProfileNavigationEvent.toScreen() = when (this) {
     ProfileNavigationEvent.NavigateToFavorites -> ScreenRegistry.get(SharedScreen.Favorites)
     ProfileNavigationEvent.NavigateToSettings -> SettingsScreen()
 }

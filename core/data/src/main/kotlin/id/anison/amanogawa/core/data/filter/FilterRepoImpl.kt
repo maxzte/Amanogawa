@@ -1,8 +1,8 @@
 package id.anison.amanogawa.core.data.filter
 
 import androidx.room.Transaction
-import id.anison.amanogawa.core.common.DataState
-import id.anison.amanogawa.core.common.Logger
+import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.database.filter.FilterDao
 import id.anison.amanogawa.core.database.filter.FilterDbo
@@ -28,11 +28,12 @@ import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 
+@Single
 class FilterRepoImpl(
     private val api: AmanogawaApi,
     database: AmanogawaDatabase,
-    private val log: Logger,
 ) : FilterRepo {
     private val filterDao: FilterDao = database.filterDao()
     private val genreDao: GenreDao = database.genreDao()
@@ -64,7 +65,7 @@ class FilterRepoImpl(
 
             DataState.Success(data = filter)
         } else {
-            log.e(TAG, "Error loading filters: ${result.exceptionOrNull()?.message}")
+            Log.e(tag = TAG) { "Error loading filters: ${result.exceptionOrNull()?.message}" }
             DataState.Error(exception = result.exceptionOrNull() ?: Exception("Unknown error"))
         }
     }
@@ -99,7 +100,7 @@ class FilterRepoImpl(
     @Transaction
     private suspend fun insertTeamMembers(teamMembers: List<TeamMember>): List<Long> {
         val distinct = teamMembers.distinctBy { it.name }
-        log.d(TAG, "distinct: $distinct")
+        Log.d(tag = TAG) { "distinct: $distinct" }
         teamMemberDao.insertTeamMembers(
             teamMembers = distinct.map { TeamMemberDbo(name = it.name) }
         )
@@ -117,7 +118,7 @@ class FilterRepoImpl(
                     )
                 }
             }
-            log.d(TAG, "dubbers: $dubbers")
+            Log.d(tag = TAG) { "dubbers: $dubbers" }
             teamMemberDao.insertDubbers(dubbers)
         }
 
@@ -130,7 +131,7 @@ class FilterRepoImpl(
                     )
                 }
             }
-            log.d(TAG, "translators: $translators")
+            Log.d(tag = TAG) { "translators: $translators" }
             teamMemberDao.insertTranslators(translators)
         }
 
@@ -143,7 +144,7 @@ class FilterRepoImpl(
                     )
                 }
             }
-            log.d(TAG, "sounds: $engineers")
+            Log.d(tag = TAG) { "sounds: $engineers" }
             teamMemberDao.insertSoundEngineers(engineers)
         }
 

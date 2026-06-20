@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.amanogawa.android.feature)
+    alias(libs.plugins.amanogawa.feature)
     alias(libs.plugins.amanogawa.android.lib.compose)
 }
 
@@ -10,7 +10,7 @@ android {
 dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.navigation)
-    implementation(projects.core.common)
+    implementation(projects.core.model)
 
     implementation(libs.androidx.core.ktx)
     //COROUTINES

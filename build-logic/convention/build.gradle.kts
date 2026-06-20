@@ -7,13 +7,13 @@ plugins {
 group = "id.anison.amanogawa.buildlogic"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
+        jvmTarget = JvmTarget.JVM_25
     }
 }
 
@@ -23,6 +23,7 @@ dependencies {
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.room.gradlePlugin)
+    compileOnly(libs.koin.gradlePlugin)
 }
 
 tasks {
@@ -34,41 +35,33 @@ tasks {
 
 gradlePlugin {
     plugins {
-        register("androidAppCompose") {
-            id = libs.plugins.amanogawa.android.app.compose.get().pluginId
-            implementationClass = "AndroidAppComposeConventionPlugin"
-        }
-        register("androidApp") {
-            id = libs.plugins.amanogawa.android.app.asProvider().get().pluginId
-            implementationClass = "AndroidAppConventionPlugin"
+        register("app") {
+            id = libs.plugins.amanogawa.app.get().pluginId
+            implementationClass = "id.anison.amanogawa.convention.AppConventionPlugin"
         }
         register("androidLibCompose") {
             id = libs.plugins.amanogawa.android.lib.compose.get().pluginId
-            implementationClass = "AndroidLibComposeConventionPlugin"
+            implementationClass = "id.anison.amanogawa.convention.AndroidLibComposeConventionPlugin"
         }
         register("androidLib") {
             id = libs.plugins.amanogawa.android.lib.asProvider().get().pluginId
-            implementationClass = "AndroidLibConventionPlugin"
+            implementationClass = "id.anison.amanogawa.convention.AndroidLibConventionPlugin"
         }
-        register("androidFeature") {
-            id = libs.plugins.amanogawa.android.feature.get().pluginId
-            implementationClass = "AndroidFeatureConventionPlugin"
-        }
-        register("koinApp") {
-            id = libs.plugins.amanogawa.koin.app.get().pluginId
-            implementationClass = "AndroidKoinAppConventionPlugin"
+        register("feature") {
+            id = libs.plugins.amanogawa.feature.get().pluginId
+            implementationClass = "id.anison.amanogawa.convention.FeatureConventionPlugin"
         }
         register("koin") {
-            id = libs.plugins.amanogawa.koin.asProvider().get().pluginId
-            implementationClass = "AndroidKoinConventionPlugin"
+            id = libs.plugins.amanogawa.koin.get().pluginId
+            implementationClass = "id.anison.amanogawa.convention.KoinConventionPlugin"
         }
-        register("androidRoom") {
-            id = libs.plugins.amanogawa.android.room.get().pluginId
-            implementationClass = "AndroidRoomConventionPlugin"
+        register("room") {
+            id = libs.plugins.amanogawa.room.get().pluginId
+            implementationClass = "id.anison.amanogawa.convention.RoomConventionPlugin"
         }
         register("kotlinLib") {
             id = libs.plugins.amanogawa.kotlin.lib.get().pluginId
-            implementationClass = "KotlinLibConventionPlugin"
+            implementationClass = "id.anison.amanogawa.convention.KotlinLibConventionPlugin"
         }
     }
 }
