@@ -12,4 +12,8 @@ val searchScreenModule = screenModule {
             filterType = provider.filterType
         )
     }
+
+    register<SharedScreen.AllTitles> {
+        FilterResultScreen()
+    }
 }

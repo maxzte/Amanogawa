@@ -7,7 +7,7 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import id.anison.amanogawa.core.common.Log
-import id.anison.amanogawa.core.model.SingleEventHandler
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.domain.model.FilterType
 import id.anison.amanogawa.core.domain.repository.SearchRepo
@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -39,12 +40,16 @@ class FilterResultScreenModel(
     @InjectedParam private val filterParamId: Long? = null,
     @InjectedParam private val filterName: String = "",
     @InjectedParam private val filterType: FilterTypeUI,
+    @InjectedParam private val useSavedSearchFilter: Boolean = false,
     @Provided private val searchRepo: SearchRepo,
     @Provided private val filterRepo: FilterRepo,
+    @Provided private val animeRepo: AnimeRepo,
 ) : StateScreenModel<FilterResultState>(FilterResultState()) {
-    private val singleEventHandler = SingleEventHandler()
+
+    val isAllTitlesMode: Boolean get() = filterParamId == null && filterName == "" && !useSavedSearchFilter
+
     private val _pagingEvent = MutableSharedFlow<PagingEvent>()
-    val pagingEvent: SharedFlow<PagingEvent> = _pagingEvent
+    val pagingEvent: SharedFlow<PagingEvent> = _pagingEvent.asSharedFlow()
 
     private val _navigationEventState = MutableSharedFlow<FilterResultNavigationState>()
     val navigationEventState = _navigationEventState.asSharedFlow()
@@ -53,50 +58,39 @@ class FilterResultScreenModel(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
     init {
-        if (filterName != "") {
-            searchByFilterName()
-        } else {
-            searchByFilter()
+        when {
+            useSavedSearchFilter -> searchByFilter()
+            filterName != "" -> searchByFilterName()
+            filterParamId != null -> searchByFilter()
+            else -> searchAllTitles()
         }
     }
 
     fun onEvents(event: FilterResultScreenEvents) {
         when (event) {
             is FilterResultScreenEvents.PopBack -> {
-                if (singleEventHandler.canTrigger()) {
-                    screenModelScope.launch {
-                        _navigationEventState.emit(
-                            value = FilterResultNavigationState.NavigateToBack
-                        )
-                    }
+                screenModelScope.launch {
+                    _navigationEventState.emit(FilterResultNavigationState.NavigateToBack)
                 }
             }
 
             is FilterResultScreenEvents.PushTitle -> {
-                if (singleEventHandler.canTrigger()) {
-                    screenModelScope.launch {
-                        _navigationEventState.emit(
-                            value = FilterResultNavigationState.NavigateToDetails(
-                                animeId = event.animeId
-                            )
-                        )
-                    }
+                screenModelScope.launch {
+                    _navigationEventState.emit(
+                        FilterResultNavigationState.NavigateToDetails(animeId = event.animeId)
+                    )
                 }
             }
 
             is FilterResultScreenEvents.Refresh -> {
-                if (singleEventHandler.canTrigger()) {
-                    refresh()
-                }
+                refresh()
             }
         }
     }
 
     fun searchByFilter() = screenModelScope.launch {
         val filteredTitles = searchRepo.getTitlesBySearchFilter()
-            .onEach {
-                _pagingEvent.emit(PagingEvent.RELOAD)
-            }
+            .onEach { _pagingEvent.emit(PagingEvent.RELOAD) }
             .map { it.map { dataTitle -> dataTitle.toAnimeUI() } }
             .cachedIn(screenModelScope)
             .stateIn(
@@ -117,9 +111,7 @@ class FilterResultScreenModel(
             filterName,
             FilterType.valueOf(filterType.name)
         )
-            .onEach {
-                _pagingEvent.emit(PagingEvent.RELOAD)
-            }
+            .onEach { _pagingEvent.emit(PagingEvent.RELOAD) }
             .map { it.map { dataTitle -> dataTitle.toAnimeUI() } }
             .cachedIn(screenModelScope)
             .stateIn(
@@ -131,19 +123,33 @@ class FilterResultScreenModel(
         mutableState.update { state -> state.copy(titlesByLink = filteredTitles) }
     }
 
+    fun searchAllTitles() = screenModelScope.launch {
+        val allTitles = animeRepo.getAllWithPagination()
+            .onEach { _pagingEvent.emit(PagingEvent.RELOAD) }
+            .map { it.map { dataTitle -> dataTitle.toAnimeUI() } }
+            .cachedIn(screenModelScope)
+            .stateIn(
+                scope = screenModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = PagingData.empty()
+            )
+
+        mutableState.update { state -> state.copy(allTitles = allTitles) }
+    }
+
     fun setRefreshing(isRefreshing: Boolean) {
         _isRefreshing.value = isRefreshing
     }
 
     private fun refresh() = screenModelScope.launch {
         _isRefreshing.value = true
-        if (filterName != "") {
-            searchByFilterName()
-        } else {
-            searchByFilter()
+        when {
+            useSavedSearchFilter -> searchByFilter()
+            filterName != "" -> searchByFilterName()
+            filterParamId != null -> searchByFilter()
+            else -> searchAllTitles()
         }
     }
-
 
     companion object {
         private const val TAG = "FilterResultSM"
@@ -154,6 +160,7 @@ class FilterResultScreenModel(
 data class FilterResultState(
     val filteredTitles: Flow<PagingData<AnimeUI>> = flowOf(value = PagingData.empty()),
     val titlesByLink: Flow<PagingData<AnimeUI>> = flowOf(value = PagingData.empty()),
+    val allTitles: Flow<PagingData<AnimeUI>> = flowOf(value = PagingData.empty()),
 )
 
 sealed interface FilterResultScreenEvents {

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.search.screen
 
 import androidx.compose.animation.AnimatedVisibility
@@ -98,7 +100,6 @@ import id.anison.amanogawa.feature.search.screenmodel.toScreen
 class RandomAnimeCarouselScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<RandomAnimeScreenModel>()
@@ -144,7 +145,6 @@ class RandomAnimeCarouselScreen : Screen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun RandomAnimeScreenContent(
         randomTitles: LazyPagingItems<AnimeDetailsUI>,
@@ -357,7 +357,6 @@ class RandomAnimeCarouselScreen : Screen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun VerticalPage(
         paddingValues: PaddingValues,
@@ -814,6 +813,5 @@ class RandomAnimeCarouselScreen : Screen {
             )
         }
     }
-
 
 }

@@ -152,5 +152,5 @@ sealed interface FilterNavigationEvent {
 
 internal fun FilterNavigationEvent.toScreen(): Screen? = when (this) {
     is FilterNavigationEvent.NavigateToBack -> null
-    is FilterNavigationEvent.NavigateToResult -> FilterResultScreen()
+    is FilterNavigationEvent.NavigateToResult -> FilterResultScreen(useSavedSearchFilter = true)
 }

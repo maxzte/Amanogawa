@@ -158,8 +158,6 @@ class FilterScreen : Screen {
                                             contentDescription = "Localized Description",
                                             modifier = Modifier.size(FilterChipDefaults.IconSize),
                                         )
-                                    } else {
-                                        null
                                     }
                                 }
                             )
@@ -206,8 +204,6 @@ class FilterScreen : Screen {
                                                 contentDescription = "Localized Description",
                                                 modifier = Modifier.size(FilterChipDefaults.IconSize),
                                             )
-                                        } else {
-                                            null
                                         }
                                     }
                                 )
@@ -253,8 +249,6 @@ class FilterScreen : Screen {
                                             contentDescription = "Localized Description",
                                             modifier = Modifier.size(FilterChipDefaults.IconSize),
                                         )
-                                    } else {
-                                        null
                                     }
                                 }
                             )

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.anime
 
 import androidx.compose.foundation.background
@@ -11,34 +13,38 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
+import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import net.engawapg.lib.zoomable.ScrollGesturePropagation
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -51,27 +57,28 @@ data class ImageScreen(
     val images: List<String>
 ) : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var currentPage by rememberSaveable { mutableIntStateOf(index) }
         val pagerState = rememberPagerState(
-            initialPage = currentPage,
             pageCount = { images.size }
         )
-
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
-                currentPage = page
-            }
-        }
 
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
                     navigationIconContent = {
-                        ArrowBackButton(onClick = { navigator.pop() })
+                        FilledTopBarIcon(
+                            onClick = { navigator.pop() },
+                            backgroundColor = MaterialTheme.colorScheme.background.copy(alpha = 0.5f),
+                            content = {
+                                Icon(
+                                    imageVector = AmanogawaIcon.arrowBack,
+                                    contentDescription = stringResource(id = R.string.arrow_back),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        )
                     },
                     containerColor = Color.Transparent,
                     showBottomLine = false,
@@ -82,14 +89,15 @@ data class ImageScreen(
             val zoomState = rememberZoomState(contentSize = size.toSize())
 
             Box {
-                AmanogawaHorizontalPager(
-                    pagerState = pagerState,
-                    list = images,
+                HorizontalPager(
+                    state = pagerState,
+                    pageSize = PageSize.Fill,
                     key = { images[it] },
-                    contentPadding = PaddingValues(0.dp),
+                    verticalAlignment = Alignment.Top,
+                    beyondViewportPageCount = 1,
                     userScrollEnabled = zoomState.scale == 1f,
                     modifier = Modifier.fillMaxSize(),
-                    pageContent = { image ->
+                    pageContent = { page ->
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -97,7 +105,7 @@ data class ImageScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             AnimeImageLoader(
-                                titleImage = image,
+                                titleImage = images[page],
                                 useCache = false,
                                 showAmanogawaSpinner = true,
                                 modifier = Modifier
@@ -140,7 +148,6 @@ data class ImageScreen(
                 }
             }
         }
-
     }
 
 }

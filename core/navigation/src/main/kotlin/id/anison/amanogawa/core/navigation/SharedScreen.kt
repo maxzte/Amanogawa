@@ -19,4 +19,6 @@ sealed class SharedScreen : ScreenProvider {
 
     object Favorites : SharedScreen()
 
+    data object AllTitles : SharedScreen()
+
 }

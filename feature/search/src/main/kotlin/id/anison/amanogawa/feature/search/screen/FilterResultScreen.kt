@@ -1,11 +1,10 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.search.screen
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -34,13 +33,13 @@ import id.anison.amanogawa.core.model.PagingEvent
 import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
-import id.anison.amanogawa.core.ui.common.columnsInRow
+
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
 import id.anison.amanogawa.core.ui.common.component.ErrorMessage
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
-import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.common.component.layout.AnimeVerticalGrid
 import id.anison.amanogawa.feature.search.screenmodel.FilterResultScreenEvents
 import id.anison.amanogawa.feature.search.screenmodel.FilterResultScreenModel
 import id.anison.amanogawa.feature.search.screenmodel.toScreen
@@ -55,19 +54,20 @@ class FilterResultScreen(
     private val filterId: Long? = null,
     private val filterName: String = "",
     private val filterType: FilterTypeUI = FilterTypeUI.YEAR,
+    private val useSavedSearchFilter: Boolean = false,
 ) : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<FilterResultScreenModel>(
-            parameters = { parametersOf(filterId, filterName, filterType) }
+            parameters = { parametersOf(filterId, filterName, filterType, useSavedSearchFilter) }
         )
         val filterResultState by screenModel.state.collectAsState()
-        val pagingItems = if (filterName == "") {
-            filterResultState.filteredTitles.collectAsLazyPagingItems()
-        } else {
-            filterResultState.titlesByLink.collectAsLazyPagingItems()
+        val pagingItems = when {
+            filterName != "" -> filterResultState.titlesByLink.collectAsLazyPagingItems()
+            filterId != null || useSavedSearchFilter -> filterResultState.filteredTitles.collectAsLazyPagingItems()
+            else -> filterResultState.allTitles.collectAsLazyPagingItems()
         }
 
         NavigationHandler(
@@ -100,7 +100,6 @@ class FilterResultScreen(
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun FilterResultContent(
         pagingItems: LazyPagingItems<AnimeUI>,
@@ -113,7 +112,13 @@ class FilterResultScreen(
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
-                    title = if (filterName == "") stringResource(R.string.found_titles) else filterName,
+                    title = if (filterId == null && filterName == "" && !useSavedSearchFilter) {
+                        stringResource(R.string.all_titles)
+                    } else if (filterName == "") {
+                        stringResource(R.string.found_titles)
+                    } else {
+                        filterName
+                    },
                     navigationIconContent = {
                         ArrowBackButton(onClick = { onEvents(FilterResultScreenEvents.PopBack) })
                     },
@@ -140,21 +145,9 @@ class FilterResultScreen(
                 }
 
                 is LoadState.NotLoading -> {
-                    val count = columnsInRow()
-
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(count),
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = 8.dp,
-                            top = paddingValues.calculateTopPadding() + 8.dp,
-                            end = 8.dp,
-                            bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
-                            else paddingValues.calculateBottomPadding()
-                        ),
+                    AnimeVerticalGrid(
                         state = lazyGridState,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        scaffoldPadding = paddingValues,
                     ) {
                         items(
                             count = pagingItems.itemCount,

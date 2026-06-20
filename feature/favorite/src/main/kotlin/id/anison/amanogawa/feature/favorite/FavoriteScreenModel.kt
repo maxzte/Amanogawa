@@ -35,7 +35,7 @@ class FavoriteScreenModel(
             res.mapDataState { it.map { favorite -> favorite.toFavoriteUI() } }
         }.stateIn(
             scope = screenModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = DataState.Loading
         )
 

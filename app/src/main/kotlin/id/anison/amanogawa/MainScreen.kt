@@ -88,6 +88,7 @@ class MainScreen : Screen {
         val isBottomBarVisible by screenModel.isBottomBarVisible.collectAsState()
         val windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
         val isCompact = !windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+        val isExpanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
         val notConnectedMessage = stringResource(id = R.string.not_connected)
 
