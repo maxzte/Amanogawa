@@ -1,6 +1,5 @@
 package id.anison.amanogawa.core.data.search
 
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import id.anison.amanogawa.core.common.Log
@@ -8,10 +7,11 @@ import id.anison.amanogawa.core.data.anime.toAnimeDetails
 import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 
-@OptIn(ExperimentalPagingApi::class)
 class RandomAnimePagingSource(
     private val api: AmanogawaApi,
 ) : PagingSource<Int, AnimeDetails>() {
@@ -43,10 +43,9 @@ class RandomAnimePagingSource(
                 val page = shuffledPages[index]
                 Log.d(tag = TAG) { "Loading page index $index → page $page" }
 
-                val response = api.getTitlesByPage(page).getOrThrow().data.map {
-                    api.getAnime(it.animeId).getOrThrow()
-                }
-                val titles = response.map { it.toAnimeDetails() }
+                val titles = api.getTitlesByPage(page).getOrThrow().data.map {
+                    async(Dispatchers.IO) { api.getAnime(it.animeId).getOrThrow() }
+                }.awaitAll().map { it.toAnimeDetails() }
 
                 return@withContext LoadResult.Page(
                     data = titles,

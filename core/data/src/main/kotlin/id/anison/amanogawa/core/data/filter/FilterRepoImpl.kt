@@ -3,6 +3,7 @@ package id.anison.amanogawa.core.data.filter
 import androidx.room.Transaction
 import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.common.Log
+import id.anison.amanogawa.core.data.toAppError
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.database.filter.FilterDao
 import id.anison.amanogawa.core.database.filter.FilterDbo
@@ -41,51 +42,54 @@ class FilterRepoImpl(
 
     @Transaction
     override suspend fun updateFilter(): DataState<Filter> = withContext(Dispatchers.IO) {
-        val result = api.getFilter()
-
-        if (result.isSuccess) {
-            val filter = result.getOrNull()!!.toFilter()
-            filterDao.insertFilter(filter = filter.toFilterDbo())
-
-            filterDao.deleteGenreRefs(FilterTypeDbo.DISPLAYED)
-            filterDao.deleteDubberRefs(FilterTypeDbo.DISPLAYED)
-            filterDao.deleteTranslatorRefs(FilterTypeDbo.DISPLAYED)
-            filterDao.deleteSoundEngineerRefs(FilterTypeDbo.DISPLAYED)
-            filterDao.deleteYears(FilterTypeDbo.DISPLAYED)
-
-            insertGenres(genres = filter.genres.map { it.toGenreDbo() })
-            insertTeamMembers(teamMembers = filter.teamMembers)
-
-            insertGenreRefs(genres = filter.genres, filterType = FilterTypeDbo.DISPLAYED)
-            insertTeamMemberRefs(
-                teamMembers = filter.teamMembers,
-                filterType = FilterTypeDbo.DISPLAYED
-            )
-            insertYears(years = filter.years, filterType = FilterTypeDbo.DISPLAYED)
-
-            DataState.Success(data = filter)
-        } else {
-            Log.e(tag = TAG) { "Error loading filters: ${result.exceptionOrNull()?.message}" }
-            DataState.Error(exception = result.exceptionOrNull() ?: Exception("Unknown error"))
-        }
+        api.getFilter().fold(
+            onSuccess = { filterDto ->
+                val filter = filterDto.toFilter()
+                filterDao.insertFilter(filter = filter.toFilterDbo())
+                saveFilterContents(
+                    filterType = FilterTypeDbo.DISPLAYED,
+                    genres = filter.genres,
+                    teamMembers = filter.teamMembers,
+                    years = filter.years,
+                )
+                DataState.Success(data = filter)
+            },
+            onFailure = { e ->
+                Log.e(tag = TAG) { "Error loading filters: ${e.message}" }
+                DataState.Error(exception = e.toAppError())
+            }
+        )
     }
 
     @Transaction
     override suspend fun saveSearchFilter(filter: Filter) = withContext(Dispatchers.IO) {
         filterDao.insertFilter(FilterDbo(FilterTypeDbo.SEARCH))
+        saveFilterContents(
+            filterType = FilterTypeDbo.SEARCH,
+            genres = filter.genres,
+            teamMembers = filter.teamMembers,
+            years = filter.years,
+        )
+    }
 
-        filterDao.deleteGenreRefs(FilterTypeDbo.SEARCH)
-        filterDao.deleteDubberRefs(FilterTypeDbo.SEARCH)
-        filterDao.deleteTranslatorRefs(FilterTypeDbo.SEARCH)
-        filterDao.deleteSoundEngineerRefs(FilterTypeDbo.SEARCH)
-        filterDao.deleteYears(FilterTypeDbo.SEARCH)
+    private suspend fun saveFilterContents(
+        filterType: FilterTypeDbo,
+        genres: List<Genre>,
+        teamMembers: List<TeamMember>,
+        years: List<Short>,
+    ) {
+        filterDao.deleteGenreRefs(filterType)
+        filterDao.deleteDubberRefs(filterType)
+        filterDao.deleteTranslatorRefs(filterType)
+        filterDao.deleteSoundEngineerRefs(filterType)
+        filterDao.deleteYears(filterType)
 
-        insertGenres(genres = filter.genres.map { it.toGenreDbo() })
-        insertTeamMembers(teamMembers = filter.teamMembers)
+        insertGenres(genres = genres.map { it.toGenreDbo() })
+        insertTeamMembers(teamMembers = teamMembers)
 
-        insertGenreRefs(genres = filter.genres, filterType = FilterTypeDbo.SEARCH)
-        insertTeamMemberRefs(teamMembers = filter.teamMembers, filterType = FilterTypeDbo.SEARCH)
-        insertYears(years = filter.years, filterType = FilterTypeDbo.SEARCH)
+        insertGenreRefs(genres = genres, filterType = filterType)
+        insertTeamMemberRefs(teamMembers = teamMembers, filterType = filterType)
+        insertYears(years = years, filterType = filterType)
     }
 
     override suspend fun isExist(filterType: FilterType): Boolean = withContext(Dispatchers.IO) {

@@ -13,7 +13,7 @@ import id.anison.amanogawa.core.database.teammember.SoundEngineerDbo
 import id.anison.amanogawa.core.database.teammember.TranslatorDbo
 
 @Entity(tableName = "filter")
-class FilterDbo(
+data class FilterDbo(
 
     @PrimaryKey
     val filterType: FilterTypeDbo
@@ -40,7 +40,7 @@ enum class FilterTypeDbo {
             childColumns = ["genreId"]
         ),
     ],
-    indices = [Index("genreId")]
+    indices = [Index("filterType"), Index("genreId")]
 )
 data class FilterGenreCrossRef(
     val filterType: FilterTypeDbo,
@@ -63,6 +63,7 @@ data class FilterGenreCrossRef(
             childColumns = ["dubberId"]
         ),
     ],
+    indices = [Index("filterType"), Index("dubberId")],
 )
 data class FilterDubberCrossRef(
     val filterType: FilterTypeDbo,
@@ -84,6 +85,7 @@ data class FilterDubberCrossRef(
             childColumns = ["translatorId"]
         ),
     ],
+    indices = [Index("filterType"), Index("translatorId")],
 )
 data class FilterTranslatorCrossRef(
     val filterType: FilterTypeDbo,
@@ -105,6 +107,7 @@ data class FilterTranslatorCrossRef(
             childColumns = ["soundEngineerId"]
         ),
     ],
+    indices = [Index("filterType"), Index("soundEngineerId")],
 )
 data class FilterSoundEngineerCrossRef(
     val filterType: FilterTypeDbo,
@@ -176,7 +179,10 @@ data class FilterWithSoundEngineers(
     val soundEngineers: List<SoundEngineerDbo>
 )
 
-@Entity(tableName = "filter_year")
+@Entity(
+    tableName = "filter_year",
+    indices = [Index("filterType")],
+)
 data class FilterYearDbo(
 
     @PrimaryKey(autoGenerate = true)

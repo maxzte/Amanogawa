@@ -9,7 +9,7 @@ data class AnimeEpisodesDto(
 
     val pages: Int = 0,
 
-    val data: List<AnimeEpisodeDto>,
+    val data: List<AnimeEpisodeDto> = emptyList(),
 
     @SerialName("bot_url")
     val botUrl: String = "",
@@ -23,7 +23,7 @@ data class AnimeEpisodeDto(
     val episodeId: Long,
 
     @SerialName("title_id")
-    val animeId: Int,
+    val animeId: Long,
 
     @SerialName("bot_id")
     val botId: Long,

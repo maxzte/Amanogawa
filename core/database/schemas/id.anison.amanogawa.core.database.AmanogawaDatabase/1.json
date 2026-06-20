@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6848ee53646509dd50a41671ba83e33d",
+    "identityHash": "ab04abbbe8b9074f635ac68c88d58ff6",
     "entities": [
       {
         "tableName": "anime",
@@ -652,7 +652,7 @@
       },
       {
         "tableName": "dubber",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dubberId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`dubberId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dubberId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`dubberId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "dubberId",
@@ -673,10 +673,21 @@
             "dubberId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_dubber_teamMemberId",
+            "unique": false,
+            "columnNames": [
+              "teamMemberId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dubber_teamMemberId` ON `${TABLE_NAME}` (`teamMemberId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "team_member",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "teamMemberId"
@@ -689,7 +700,7 @@
       },
       {
         "tableName": "translator",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`translatorId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`translatorId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`translatorId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`translatorId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "translatorId",
@@ -710,10 +721,21 @@
             "translatorId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_translator_teamMemberId",
+            "unique": false,
+            "columnNames": [
+              "teamMemberId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_translator_teamMemberId` ON `${TABLE_NAME}` (`teamMemberId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "team_member",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "teamMemberId"
@@ -726,7 +748,7 @@
       },
       {
         "tableName": "sound_engineer",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`soundEngineerId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`soundEngineerId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`soundEngineerId` INTEGER NOT NULL, `teamMemberId` INTEGER NOT NULL, PRIMARY KEY(`soundEngineerId`), FOREIGN KEY(`teamMemberId`) REFERENCES `team_member`(`teamMemberId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "soundEngineerId",
@@ -747,10 +769,21 @@
             "soundEngineerId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_sound_engineer_teamMemberId",
+            "unique": false,
+            "columnNames": [
+              "teamMemberId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sound_engineer_teamMemberId` ON `${TABLE_NAME}` (`teamMemberId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "team_member",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "teamMemberId"
@@ -789,7 +822,18 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_filter_year_filterType",
+            "unique": false,
+            "columnNames": [
+              "filterType"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_year_filterType` ON `${TABLE_NAME}` (`filterType`)"
+          }
+        ]
       },
       {
         "tableName": "filter_genre_cross_ref",
@@ -816,6 +860,15 @@
           ]
         },
         "indices": [
+          {
+            "name": "index_filter_genre_cross_ref_filterType",
+            "unique": false,
+            "columnNames": [
+              "filterType"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_genre_cross_ref_filterType` ON `${TABLE_NAME}` (`filterType`)"
+          },
           {
             "name": "index_filter_genre_cross_ref_genreId",
             "unique": false,
@@ -875,6 +928,26 @@
             "dubberId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_filter_dubber_cross_ref_filterType",
+            "unique": false,
+            "columnNames": [
+              "filterType"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_dubber_cross_ref_filterType` ON `${TABLE_NAME}` (`filterType`)"
+          },
+          {
+            "name": "index_filter_dubber_cross_ref_dubberId",
+            "unique": false,
+            "columnNames": [
+              "dubberId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_dubber_cross_ref_dubberId` ON `${TABLE_NAME}` (`dubberId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "filter",
@@ -924,6 +997,26 @@
             "translatorId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_filter_translator_cross_ref_filterType",
+            "unique": false,
+            "columnNames": [
+              "filterType"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_translator_cross_ref_filterType` ON `${TABLE_NAME}` (`filterType`)"
+          },
+          {
+            "name": "index_filter_translator_cross_ref_translatorId",
+            "unique": false,
+            "columnNames": [
+              "translatorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_translator_cross_ref_translatorId` ON `${TABLE_NAME}` (`translatorId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "filter",
@@ -973,6 +1066,26 @@
             "soundEngineerId"
           ]
         },
+        "indices": [
+          {
+            "name": "index_filter_sound_engineer_cross_ref_filterType",
+            "unique": false,
+            "columnNames": [
+              "filterType"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_sound_engineer_cross_ref_filterType` ON `${TABLE_NAME}` (`filterType`)"
+          },
+          {
+            "name": "index_filter_sound_engineer_cross_ref_soundEngineerId",
+            "unique": false,
+            "columnNames": [
+              "soundEngineerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_filter_sound_engineer_cross_ref_soundEngineerId` ON `${TABLE_NAME}` (`soundEngineerId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "filter",
@@ -1001,7 +1114,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6848ee53646509dd50a41671ba83e33d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ab04abbbe8b9074f635ac68c88d58ff6')"
     ]
   }
 }

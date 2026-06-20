@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Entity(tableName = "anime")
 @Serializable
-class AnimeDbo(
+data class AnimeDbo(
 
     @PrimaryKey
     val animeId: Long,

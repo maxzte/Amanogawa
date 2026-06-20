@@ -1,5 +1,6 @@
 package id.anison.amanogawa.core.data.favorite
 
+import id.anison.amanogawa.core.data.toAppError
 import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
@@ -26,7 +27,7 @@ class FavoriteRepoImpl(
         )
     }.catch { e ->
         Log.e(tag = TAG) { "Error getting data from database. Cause = $e" }
-        emit(DataState.Error(e))
+        emit(DataState.Error(e.toAppError()))
     }
 
     override fun isFavorite(id: Long): Flow<Boolean> = favoriteDao.isFavorite(id)

@@ -41,6 +41,7 @@ interface TeamMemberDao {
     suspend fun getTeamMembersByNames(names: List<String>): List<TeamMemberDbo>
 
 
+    @Transaction
     @Query("SELECT * FROM team_member WHERE name = :name")
     suspend fun getTeamMemberWithRoles(name: String): TeamMemberWithRoles?
 

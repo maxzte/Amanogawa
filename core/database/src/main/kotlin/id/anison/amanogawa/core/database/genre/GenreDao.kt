@@ -13,7 +13,7 @@ interface GenreDao {
     suspend fun insertGenres(genres: List<GenreDbo>)
 
     @Query("SELECT * FROM genre WHERE name = :genreName LIMIT 1")
-    suspend fun getGenreByGenreName(genreName: String): GenreDbo
+    suspend fun getGenreByGenreName(genreName: String): GenreDbo?
 
 
 }

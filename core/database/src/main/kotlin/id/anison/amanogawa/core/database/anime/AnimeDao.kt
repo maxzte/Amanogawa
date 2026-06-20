@@ -40,9 +40,4 @@ interface AnimeDao {
     @Query("DELETE FROM anime WHERE listKey = :listKey")
     suspend fun clearAllByListKey(listKey: String)
 
-    @Transaction
-    suspend fun cleanAndInsert(titles: List<AnimeDbo>) {
-        insert(titles)
-    }
-
 }

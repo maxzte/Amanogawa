@@ -4,8 +4,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import id.anison.amanogawa.core.data.anime.toAnime
 import id.anison.amanogawa.core.data.anime.toAnimeDbo
+import id.anison.amanogawa.core.data.anime.toFilterParams
 import id.anison.amanogawa.core.network.AmanogawaApi
-import id.anison.amanogawa.core.domain.model.TeamMemberType
 import id.anison.amanogawa.core.domain.model.Filter
 import id.anison.amanogawa.core.database.anime.entity.AnimeDbo
 import kotlinx.coroutines.Dispatchers
@@ -28,34 +28,15 @@ class ExtendedSearchPagingSource(
     ): LoadResult<Int, AnimeDbo> = withContext(Dispatchers.IO) {
         val page = params.key ?: 1
 
-        val voices = filter.teamMembers
-            .filter { it.teamMemberType == TeamMemberType.VOICE }
-            .map { it.teamMemberId }
-            .takeIf { it.isNotEmpty() }
-
-        val sounds = filter.teamMembers
-            .filter { it.teamMemberType == TeamMemberType.SOUND }
-            .map { it.teamMemberId }
-            .takeIf { it.isNotEmpty() }
-
-        val translators = filter.teamMembers
-            .filter { it.teamMemberType == TeamMemberType.TRANSLATOR }
-            .map { it.teamMemberId }
-            .takeIf { it.isNotEmpty() }
-
-        val genres = filter.genres
-            .map { it.genreId }
-            .takeIf { it.isNotEmpty() }
-
-        val years = filter.years.takeIf { it.isNotEmpty() }
+        val params = filter.toFilterParams()
 
         val response = api.getFilteredTitles(
             page = page,
-            genres = genres,
-            voices = voices,
-            translators = translators,
-            sounds = sounds,
-            years = years,
+            genres = params.genres,
+            voices = params.voices,
+            translators = params.translators,
+            sounds = params.sounds,
+            years = params.years,
         )
 
         response.fold(

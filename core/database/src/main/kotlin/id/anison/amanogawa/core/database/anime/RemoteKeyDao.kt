@@ -25,9 +25,6 @@ interface RemoteKeyDao {
     @Query("DELETE FROM remote_key WHERE `key` = :key")
     suspend fun deleteKey(key: String)
 
-    @Query("select * from remote_key where `key` = :key")
-    suspend fun getKeys(key: String): RemoteKeyDbo?
-
     @Query("delete from remote_key")
     suspend fun clearKeys()
 

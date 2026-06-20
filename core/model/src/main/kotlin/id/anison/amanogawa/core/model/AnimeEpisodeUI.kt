@@ -3,7 +3,7 @@ package id.anison.amanogawa.core.model
 
 data class AnimeEpisodeUI(
     val episodeId: Long,
-    val animeId: Int,
+    val animeId: Long,
     val botId: Long,
     val isExtra: Boolean = false,
     val isOva: Boolean = false,

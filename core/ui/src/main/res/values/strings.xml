@@ -125,6 +125,7 @@
     <string name="years">Years</string>
     <string name="search">Search!</string>
     <string name="found_titles">Found titles</string>
+    <string name="all_titles">All titles</string>
     <string name="no_titles_found_for_this_filter">No titles found for this filter(</string>
 
     <!-- FAVORITES SCREEN -->

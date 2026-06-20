@@ -11,4 +11,8 @@ android {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+
+    androidTestImplementation(libs.jetbrains.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.runner)
 }

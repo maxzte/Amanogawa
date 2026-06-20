@@ -4,15 +4,19 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
-import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.data.anime.AnimeListType
 import id.anison.amanogawa.core.data.anime.AnimeRemoteMediator
 import id.anison.amanogawa.core.data.anime.toAnime
 import id.anison.amanogawa.core.data.config
 import id.anison.amanogawa.core.data.filter.toGenre
+import id.anison.amanogawa.core.data.toAppError
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.database.filter.FilterTypeDbo
+import id.anison.amanogawa.core.database.teammember.DubberDbo
+import id.anison.amanogawa.core.database.teammember.SoundEngineerDbo
+import id.anison.amanogawa.core.database.teammember.TeamMemberWithRoles
+import id.anison.amanogawa.core.database.teammember.TranslatorDbo
 import id.anison.amanogawa.core.domain.model.Anime
 import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.Filter
@@ -21,6 +25,7 @@ import id.anison.amanogawa.core.domain.model.SearchResult
 import id.anison.amanogawa.core.domain.model.TeamMember
 import id.anison.amanogawa.core.domain.model.TeamMemberType
 import id.anison.amanogawa.core.domain.repository.SearchRepo
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,22 +45,20 @@ class SearchRepoImpl(
     private val searchResultDao = database.searchResultDao()
 
     override fun searchTitle(query: String): Flow<DataState<List<SearchResult>>> = flow {
-        try {
-            val response = api.searchAnimeByName(query.trim())
-            response.fold(
-                onSuccess = { animeList ->
-                    emit(DataState.Success(animeList.map { it.toSearchResult() }))
-                },
-                onFailure = { e -> emit(DataState.Error(e)) }
-            )
-        } catch (e: Exception) {
-            Log.d(tag = TAG) { "EXCEPTION while searchTitle $e" }
-            emit(DataState.Error(e))
-        }
+        val response = api.searchAnimeByName(query.trim())
+        response.fold(
+            onSuccess = { animeList ->
+                emit(DataState.Success(animeList.map { it.toSearchResult() }))
+            },
+            onFailure = { e ->
+                Log.d(tag = TAG) { "Error while searchTitle $e" }
+                emit(DataState.Error(exception = e.toAppError()))
+            }
+        )
     }.flowOn(Dispatchers.IO)
 
     override suspend fun addToSearchHistory(anime: SearchResult) {
-        searchResultDao.insertFavorite(anime.toSearchResultDbo())
+        searchResultDao.insertSearchResult(anime.toSearchResultDbo())
     }
 
     override fun getSearchHistory(): Flow<DataState<List<SearchResult>>> = flow {
@@ -67,7 +70,7 @@ class SearchRepoImpl(
         )
     }.catch { e ->
         Log.d(tag = TAG) { "Error getting data from database. Cause = $e" }
-        emit(DataState.Error(e))
+        emit(DataState.Error(exception = e.toAppError()))
     }.flowOn(Dispatchers.IO)
 
     override suspend fun deleteItemFromSearchHistory(dataAnime: SearchResult) {
@@ -91,35 +94,12 @@ class SearchRepoImpl(
             database.filterDao().getFilterWithSoundEngineers(FilterTypeDbo.SEARCH).soundEngineers
         val years = database.filterDao().getFilterWithYears(FilterTypeDbo.SEARCH).years
 
-        val resultList = buildList {
-            dubbers.forEach { dubber ->
-                add(
-                    TeamMember(
-                        teamMemberId = dubber.dubberId,
-                        teamMemberType = TeamMemberType.VOICE
-                    )
-                )
-            }
-            translators.forEach { translator ->
-                add(
-                    TeamMember(
-                        teamMemberId = translator.translatorId,
-                        teamMemberType = TeamMemberType.TRANSLATOR
-                    )
-                )
-            }
-            soundEngineers.forEach { engineer ->
-                add(
-                    TeamMember(
-                        teamMemberId = engineer.soundEngineerId,
-                        teamMemberType = TeamMemberType.SOUND
-                    )
-                )
-            }
-        }
-
         val filter = Filter(
-            teamMembers = resultList,
+            teamMembers = buildList {
+                addAll(dubbers.toVoiceTeamMembers())
+                addAll(translators.toTranslatorTeamMembers())
+                addAll(soundEngineers.toSoundTeamMembers())
+            },
             genres = genres.map { it.toGenre() },
             years = years.map { it.year },
         )
@@ -135,77 +115,62 @@ class SearchRepoImpl(
         val filter = when (filterType) {
             FilterType.GENRE -> {
                 val genre = database.genreDao().getGenreByGenreName(genreName = filterName)
-                Filter(genres = listOf(genre.toGenre()))
+                Filter(genres = listOfNotNull(genre?.toGenre()))
             }
 
-            FilterType.DUBBER -> {
-                val dubber =
-                    database.teamMemberDao().getTeamMemberWithRoles(name = filterName)?.dubbers
-                Log.d(tag = TAG) { "tm is $dubber" }
-                val teamMember = TeamMember(
-                    teamMemberId = dubber?.first()?.dubberId ?: filterParamId!!,
-                    teamMemberType = TeamMemberType.VOICE
-                )
-                Filter(teamMembers = listOf(teamMember))
-            }
-
-            FilterType.TRANSLATOR -> {
-                val translator =
-                    database.teamMemberDao().getTeamMemberWithRoles(name = filterName)?.translators
-                Log.d(tag = TAG) { "tm is $translator" }
-                val teamMember = TeamMember(
-                    teamMemberId = translator?.first()?.translatorId ?: filterParamId!!,
-                    teamMemberType = TeamMemberType.TRANSLATOR
-                )
-                Filter(teamMembers = listOf(teamMember))
-            }
-
-            FilterType.SOUND_ENGINEER -> {
-                val soundEngineer =
-                    database.teamMemberDao()
-                        .getTeamMemberWithRoles(name = filterName)?.soundEngineers
-                Log.d(tag = TAG) { "tm is $soundEngineer" }
-                val teamMember = TeamMember(
-                    teamMemberId = soundEngineer?.first()?.soundEngineerId ?: filterParamId!!,
-                    teamMemberType = TeamMemberType.SOUND
-                )
-                Filter(teamMembers = listOf(teamMember))
-            }
+            FilterType.DUBBER -> Filter(teamMembers = listOf(voiceMember(filterName, filterParamId)))
+            FilterType.TRANSLATOR -> Filter(teamMembers = listOf(translatorMember(filterName, filterParamId)))
+            FilterType.SOUND_ENGINEER -> Filter(teamMembers = listOf(soundMember(filterName, filterParamId)))
 
             FilterType.ALL_TEAM_MEMBER -> {
-                val teamMembers: MutableList<TeamMember> = mutableListOf()
-                val res = database.teamMemberDao().getTeamMemberWithRoles(name = filterName)
-                if (!res?.dubbers.isNullOrEmpty()) {
-                    teamMembers.add(
-                        TeamMember(
-                            teamMemberId = res.dubbers.first().dubberId,
-                            teamMemberType = TeamMemberType.VOICE
-                        )
-                    )
-                }
-                if (!res?.translators.isNullOrEmpty()) {
-                    teamMembers.add(
-                        TeamMember(
-                            teamMemberId = res.translators.first().translatorId,
-                            teamMemberType = TeamMemberType.TRANSLATOR
-                        )
-                    )
-                }
-                if (!res?.soundEngineers.isNullOrEmpty()) {
-                    teamMembers.add(
-                        TeamMember(
-                            teamMemberId = res.soundEngineers.first().soundEngineerId,
-                            teamMemberType = TeamMemberType.SOUND
-                        )
-                    )
-                }
-
-                Filter(teamMembers = teamMembers)
+                Filter(teamMembers = allTeamMembers(filterName))
             }
 
             else -> Filter(years = listOf(filterName.toShort()))
         }
         return getTitlesByFilter(filter = filter)
+    }
+
+    private suspend fun voiceMember(filterName: String, filterParamId: Long?) = teamMember(
+        filterName = filterName,
+        filterParamId = filterParamId,
+        type = TeamMemberType.VOICE,
+        selector = { dubbers.firstOrNull()?.dubberId },
+    )
+
+    private suspend fun translatorMember(filterName: String, filterParamId: Long?) = teamMember(
+        filterName = filterName,
+        filterParamId = filterParamId,
+        type = TeamMemberType.TRANSLATOR,
+        selector = { translators.firstOrNull()?.translatorId },
+    )
+
+    private suspend fun soundMember(filterName: String, filterParamId: Long?) = teamMember(
+        filterName = filterName,
+        filterParamId = filterParamId,
+        type = TeamMemberType.SOUND,
+        selector = { soundEngineers.firstOrNull()?.soundEngineerId },
+    )
+
+    private suspend fun teamMember(
+        filterName: String,
+        filterParamId: Long?,
+        type: TeamMemberType,
+        selector: suspend TeamMemberWithRoles.() -> Long?,
+    ): TeamMember {
+        val res = database.teamMemberDao().getTeamMemberWithRoles(name = filterName)
+        val id = res?.selector() ?: filterParamId!!
+        Log.d(tag = TAG) { "tm: $type id=$id" }
+        return TeamMember(teamMemberId = id, teamMemberType = type)
+    }
+
+    private suspend fun allTeamMembers(filterName: String): List<TeamMember> {
+        val res = database.teamMemberDao().getTeamMemberWithRoles(name = filterName)
+        return buildList {
+            res?.dubbers?.firstOrNull()?.let { add(TeamMember(teamMemberId = it.dubberId, teamMemberType = TeamMemberType.VOICE)) }
+            res?.translators?.firstOrNull()?.let { add(TeamMember(teamMemberId = it.translatorId, teamMemberType = TeamMemberType.TRANSLATOR)) }
+            res?.soundEngineers?.firstOrNull()?.let { add(TeamMember(teamMemberId = it.soundEngineerId, teamMemberType = TeamMemberType.SOUND)) }
+        }
     }
 
     @OptIn(ExperimentalPagingApi::class)
@@ -232,4 +197,16 @@ class SearchRepoImpl(
         private const val TAG: String = "SearchRepo"
     }
 
+}
+
+private fun List<DubberDbo>.toVoiceTeamMembers(): List<TeamMember> = map {
+    TeamMember(teamMemberId = it.dubberId, teamMemberType = TeamMemberType.VOICE)
+}
+
+private fun List<TranslatorDbo>.toTranslatorTeamMembers(): List<TeamMember> = map {
+    TeamMember(teamMemberId = it.translatorId, teamMemberType = TeamMemberType.TRANSLATOR)
+}
+
+private fun List<SoundEngineerDbo>.toSoundTeamMembers(): List<TeamMember> = map {
+    TeamMember(teamMemberId = it.soundEngineerId, teamMemberType = TeamMemberType.SOUND)
 }

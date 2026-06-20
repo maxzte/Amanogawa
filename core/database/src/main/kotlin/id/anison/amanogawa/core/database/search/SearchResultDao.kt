@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface SearchResultDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavorite(anime: SearchResultDbo)
+    suspend fun insertSearchResult(anime: SearchResultDbo)
 
     @Query("SELECT * FROM search_result ORDER BY timestamp DESC")
     fun getAll(): Flow<List<SearchResultDbo>>

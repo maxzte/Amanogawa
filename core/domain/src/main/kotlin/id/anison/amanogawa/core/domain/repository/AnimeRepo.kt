@@ -13,6 +13,8 @@ interface AnimeRepo {
 
     suspend fun getCurrentAnimeList(): DataState<List<Anime>>
 
+    suspend fun getFirstPage(): DataState<List<Anime>>
+
     suspend fun getAnimeListWithNewEpisodes(): DataState<List<Anime>>
 
     suspend fun getAnimeDetailsById(id: Long): DataState<AnimeDetails>

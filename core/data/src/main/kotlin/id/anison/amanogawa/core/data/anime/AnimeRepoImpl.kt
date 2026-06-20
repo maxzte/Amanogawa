@@ -7,12 +7,13 @@ import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
 import id.anison.amanogawa.core.data.config
-import id.anison.amanogawa.core.data.withDispatcherBlock
+import id.anison.amanogawa.core.data.runDataState
 import id.anison.amanogawa.core.database.AmanogawaDatabase
 import id.anison.amanogawa.core.domain.model.Anime
 import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.AnimeEpisodes
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
+import id.anison.amanogawa.core.model.AppError
 import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
+import kotlin.collections.map
 
 @Single
 class AnimeRepoImpl(
@@ -41,8 +43,12 @@ class AnimeRepoImpl(
         },
     ).flow.map { pd -> pd.map { animeDbo -> animeDbo.toAnime() } }
 
-    override suspend fun getCurrentAnimeList(): DataState<List<Anime>> = withDispatcherBlock {
+    override suspend fun getCurrentAnimeList(): DataState<List<Anime>> = runDataState {
         api.getCurrentTitles().getOrThrow().map { dto -> dto.toAnime() }
+    }
+
+    override suspend fun getFirstPage(): DataState<List<Anime>> = runDataState {
+        api.getTitlesByPage(1).getOrThrow().data.map { dto -> dto.toAnime() }
     }
 
     override suspend fun getAnimeListWithNewEpisodes(): DataState<List<Anime>> {
@@ -77,20 +83,20 @@ class AnimeRepoImpl(
                 }
 
                 else -> {
-                    DataState.Error(exception = NoSuchElementException("Error getting current titles"))
+                    DataState.Error(exception = AppError.Unknown())
                 }
             }
         }
     }
 
     override suspend fun getAnimeDetailsById(id: Long): DataState<AnimeDetails> {
-        return withDispatcherBlock {
+        return runDataState {
             api.getAnime(id).getOrThrow().toAnimeDetails()
         }
     }
 
     override suspend fun getAnimeEpisodesById(id: Long): DataState<AnimeEpisodes> {
-        return withDispatcherBlock {
+        return runDataState {
             api.getAnimeEpisodes(id).getOrThrow().toAnimeEpisodes()
         }
     }

@@ -7,10 +7,10 @@ import id.anison.amanogawa.core.network.model.anime.AnimeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodesDto
 import id.anison.amanogawa.core.network.model.anime.AnimeTitlesDto
 import id.anison.amanogawa.core.network.model.anime.SearchResultDto
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import id.anison.amanogawa.core.network.util.PageDto
+import id.anison.amanogawa.core.network.util.fetchAllPages
+import id.anison.amanogawa.core.network.util.toQueryParam
+import kotlinx.coroutines.CancellationException
 import org.koin.core.annotation.Single
 
 @Single
@@ -20,30 +20,26 @@ open class AmanogawaApiImpl(
 
     private suspend fun <T> safeApiCall(call: suspend () -> T): Result<T> = try {
         Result.success(call())
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Result.failure(e)
     }
 
     override suspend fun getAll(): Result<AnimeTitlesDto<AnimeDto>> = safeApiCall {
         val initialData = service.getTitlesByPage(1)
-        if (initialData.pages <= 1) return@safeApiCall initialData
-
-        val otherPagesData = coroutineScope {
-            (2..initialData.pages).map { page ->
-                async(Dispatchers.IO) {
-                    service.getTitlesByPage(page).data
-                }
-            }.awaitAll().flatten()
-        }
-        initialData.copy(data = initialData.data + otherPagesData)
+        val allData = fetchAllPages(
+            firstPage = PageDto(pages = initialData.pages, data = initialData.data),
+            fetcher = { page -> service.getTitlesByPage(page).data }
+        )
+        initialData.copy(data = allData)
     }
 
     override suspend fun getTitlesByPage(page: Int): Result<AnimeTitlesDto<AnimeDto>> = safeApiCall {
-        if (page <= 0) throw Exception("Page:$page is not exist")
-        service.getTitlesByPage(page).also {
-            if (page > it.pages) throw Exception("Page:$page is not exist")
-            it.currentPage = page
-        }
+        if (page <= 0) throw Exception("Page $page does not exist")
+        val titles = service.getTitlesByPage(page)
+        if (page > titles.pages) throw Exception("Page $page does not exist")
+        titles.copy(currentPage = page)
     }
 
     override suspend fun getCurrentTitles(): Result<List<AnimeDto>> = safeApiCall {
@@ -56,16 +52,11 @@ open class AmanogawaApiImpl(
 
     override suspend fun getAnimeEpisodes(id: Long): Result<AnimeEpisodesDto> = safeApiCall {
         val initialData = service.getAnimeEpisodes(id, 1)
-        if (initialData.pages <= 1) return@safeApiCall initialData
-
-        val otherPagesData = coroutineScope {
-            (2..initialData.pages).map { page ->
-                async(Dispatchers.IO) {
-                    service.getAnimeEpisodes(id, page).data
-                }
-            }.awaitAll().flatten()
-        }
-        initialData.copy(data = initialData.data + otherPagesData)
+        val allData = fetchAllPages(
+            firstPage = PageDto(pages = initialData.pages, data = initialData.data),
+            fetcher = { page -> service.getAnimeEpisodes(id, page).data }
+        )
+        initialData.copy(data = allData)
     }
 
     override suspend fun getFilter(): Result<FilterDto> = safeApiCall {
@@ -80,8 +71,6 @@ open class AmanogawaApiImpl(
         sounds: List<Long>?,
         translators: List<Long>?,
     ): Result<AnimeTitlesDto<AnimeDto>> = safeApiCall {
-        fun List<Any>.toQueryParam() = joinToString(prefix = "[", postfix = "]", separator = ",") { it.toString() }
-
         service.getFilteredTitles(
             page = page,
             years = years?.toQueryParam(),
@@ -93,7 +82,11 @@ open class AmanogawaApiImpl(
     }
 
     override suspend fun getRandomAnime(): Result<Long> = safeApiCall {
-        service.getRandomAnime().first().trim().toLong()
+        val result = service.getRandomAnime()
+        result.firstOrNull()
+            ?.trim()
+            ?.toLongOrNull()
+            ?: throw Exception("Invalid random anime response: $result")
     }
 
     override suspend fun searchAnimeByName(name: String): Result<List<SearchResultDto>> = safeApiCall {

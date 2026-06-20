@@ -3,6 +3,7 @@ package id.anison.amanogawa.core.data
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Build
 import id.anison.amanogawa.core.common.Log
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ class ConnectivityRepo(
     private val connectivityManager = context
         .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    private val _isConnected = MutableStateFlow(false)
+    private val _isConnected = MutableStateFlow(checkCurrentConnectivity())
     val isConnected: Flow<Boolean> = _isConnected.asStateFlow()
 
     init {
@@ -36,6 +37,12 @@ class ConnectivityRepo(
                 }
             )
         }
+    }
+
+    private fun checkCurrentConnectivity(): Boolean {
+        val network = connectivityManager.activeNetwork ?: return false
+        val caps = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     companion object {

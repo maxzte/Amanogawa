@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "team_member",
@@ -24,9 +25,12 @@ data class TeamMemberDbo(
             entity = TeamMemberDbo::class,
             parentColumns = ["teamMemberId"],
             childColumns = ["teamMemberId"],
+            onDelete = ForeignKey.CASCADE,
         )
     ],
+    indices = [Index("teamMemberId")],
 )
+@Serializable
 data class DubberDbo(
     @PrimaryKey
     val dubberId: Long,
@@ -40,8 +44,10 @@ data class DubberDbo(
             entity = TeamMemberDbo::class,
             parentColumns = ["teamMemberId"],
             childColumns = ["teamMemberId"],
+            onDelete = ForeignKey.CASCADE,
         )
     ],
+    indices = [Index("teamMemberId")],
 )
 data class TranslatorDbo(
     @PrimaryKey
@@ -56,8 +62,10 @@ data class TranslatorDbo(
             entity = TeamMemberDbo::class,
             parentColumns = ["teamMemberId"],
             childColumns = ["teamMemberId"],
+            onDelete = ForeignKey.CASCADE,
         )
     ],
+    indices = [Index("teamMemberId")],
 )
 data class SoundEngineerDbo(
     @PrimaryKey

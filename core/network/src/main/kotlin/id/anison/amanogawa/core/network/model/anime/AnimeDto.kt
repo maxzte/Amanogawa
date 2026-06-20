@@ -2,7 +2,6 @@ package id.anison.amanogawa.core.network.model.anime
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 
 /***
@@ -69,12 +68,4 @@ data class AnimeDto(
 
     @SerialName("time_str")
     val timeStr: String = "",
-)
-
-@Serializable
-data class AnimeTitlesDto<E>(
-    val pages: Int,
-    val data: List<E>,
-    @Transient
-    var currentPage: Int = 1
 )

@@ -75,5 +75,5 @@ fun amanogawaDatabase(applicationContext: Context): AmanogawaDatabase {
         applicationContext,
         AmanogawaDatabase::class.java,
         "amanogawa-database"
-    ).build()
+    ).fallbackToDestructiveMigration(false).build()
 }

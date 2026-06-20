@@ -16,14 +16,36 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import id.anison.amanogawa.core.model.AppError
 import id.anison.amanogawa.core.ui.R
 
 
 @Composable
 fun ErrorMessage(
     onUpdate: () -> Unit,
+    error: Throwable? = null,
     modifier: Modifier = Modifier,
 ) {
+    val title: String
+    val description: String
+
+    when (error) {
+        is AppError.Network -> {
+            title = stringResource(R.string.something_wrong)
+            description = stringResource(R.string.check_your_internet_connection_and_try_again)
+        }
+
+        is AppError.Server -> {
+            title = stringResource(R.string.something_wrong)
+            description = stringResource(R.string.check_your_internet_connection_and_try_again)
+        }
+
+        else -> {
+            title = stringResource(R.string.something_wrong)
+            description = stringResource(R.string.check_your_internet_connection_and_try_again)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -40,9 +62,9 @@ fun ErrorMessage(
                 contentDescription = "No internet connection icon",
                 modifier = modifier.size(50.dp)
             )
-            Text(text = stringResource(R.string.something_wrong))
+            Text(text = title)
             Text(
-                text = stringResource(R.string.check_your_internet_connection_and_try_again),
+                text = description,
                 textAlign = TextAlign.Center,
             )
             OutlinedButton(onClick = { onUpdate() }) {
