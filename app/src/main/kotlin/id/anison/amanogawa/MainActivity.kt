@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,8 +12,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import id.anison.amanogawa.core.domain.model.AppTheme
 import id.anison.amanogawa.core.ui.AmanogawaTheme
-import id.anison.amanogawa.core.ui.common.AppSettingsUI
-import id.anison.amanogawa.core.ui.common.LocalAppSettings
 import id.anison.amanogawa.feature.anime.animeDetailsScreenModule
 import id.anison.amanogawa.feature.favorite.favoriteScreenModule
 import id.anison.amanogawa.feature.search.navigation.searchScreenModule
@@ -59,20 +56,10 @@ class MainActivity : ComponentActivity() {
                         isBlackTheme = state.settings.isBlackTheme,
                         isDynamicColors = state.settings.isDynamicColors
                     ) {
-                        CompositionLocalProvider(
-                            value = LocalAppSettings provides AppSettingsUI(
-                                countColumnsInRow = state.settings.countColumnsInRow,
-                                countColumnsInRowLandscape = state.settings.countColumnsInRowLandscape,
-                                countEpisodesInRow = state.settings.countEpisodesInRow,
-                                countEpisodesInRowLandscape = state.settings.countEpisodesInRowLandscape,
-                            )
-                        ) {
-                            MainScreen().Content()
-                        }
+                        MainScreen().Content()
                     }
                 }
             }
         }
     }
-
 }

@@ -60,7 +60,6 @@ import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.DataStateContent
-import id.anison.amanogawa.core.ui.common.columnsInRow
 import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.AmanogawaSpinner
 import id.anison.amanogawa.core.ui.common.component.AnimeCard
@@ -72,7 +71,6 @@ import id.anison.amanogawa.core.ui.common.component.ImageHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
-import id.anison.amanogawa.core.ui.common.episodesInRow
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.anime.ui.AnimeHeader
@@ -136,8 +134,7 @@ class AnimeDetailsScreen(
         lazyGridState: LazyGridState,
     ) {
         val isTopBarVisible by remember { derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 } }
-        val countColumnsInRow = columnsInRow()
-        val countEpisodesInRow = episodesInRow()
+
         val topBarColor = if (isTopBarVisible) MaterialTheme.colorScheme.background.copy(alpha = 0f)
         else MaterialTheme.colorScheme.surface
 
@@ -212,7 +209,7 @@ class AnimeDetailsScreen(
             ) { paddingValues ->
                 LazyVerticalGrid(
                     state = lazyGridState,
-                    columns = GridCells.Fixed(countEpisodesInRow),
+                    columns = GridCells.Adaptive(AmanogawaConst.minCardWidth(isLandscape()).dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(
@@ -264,17 +261,9 @@ class AnimeDetailsScreen(
                             key = "collectionHorizontalPager",
                             span = { GridItemSpan(maxLineSpan) },
                         ) {
-                            var currentPage by rememberSaveable { mutableIntStateOf(0) }
                             val pagerState = rememberPagerState(
-                                initialPage = currentPage,
                                 pageCount = { anime.groupF!!.size }
                             )
-
-                            LaunchedEffect(pagerState) {
-                                snapshotFlow { pagerState.currentPage }.collect { page ->
-                                    currentPage = page
-                                }
-                            }
 
                             Column(
                                 modifier = Modifier
@@ -290,7 +279,6 @@ class AnimeDetailsScreen(
                                 AmanogawaHorizontalPager(
                                     pagerState = pagerState,
                                     list = anime.groupF!!,
-                                    countColumnsInRow = countColumnsInRow,
                                     key = {
                                         anime.groupF!![it].animeId
                                     },

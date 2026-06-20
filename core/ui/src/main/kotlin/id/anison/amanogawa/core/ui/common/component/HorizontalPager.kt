@@ -1,5 +1,6 @@
 package id.anison.amanogawa.core.ui.common.component
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -8,9 +9,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.max
 
 @Composable
 fun <T> AmanogawaHorizontalPager(
@@ -18,38 +20,41 @@ fun <T> AmanogawaHorizontalPager(
     list: List<T>,
     pagerState: PagerState? = null,
     pageContent: @Composable (T) -> Unit,
-    countColumnsInRow: Int? = null,
     key: ((Int) -> Any)? = null,
     contentPadding: PaddingValues = PaddingValues(8.dp),
     pageSpacing: Dp = 8.dp,
     userScrollEnabled: Boolean = true,
+    minPageWidth: Dp = 150.dp,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
+    BoxWithConstraints {
+        val availableWidth =
+            maxWidth - contentPadding.calculateLeftPadding(layoutDirection) - contentPadding.calculateRightPadding(
+                layoutDirection
+            )
 
-    val state = pagerState ?: rememberPagerState(pageCount = { list.size })
-    val pageSize = if (countColumnsInRow != null) {
-        object : PageSize {
-            override fun Density.calculateMainAxisPageSize(
-                availableSpace: Int,
-                pageSpacing: Int,
-            ): Int {
-                val targetCount = countColumnsInRow - 0.35
-                return ((availableSpace - 2 * pageSpacing) / targetCount).toInt()
+        val columns = max(
+            1,
+            (availableWidth / minPageWidth).toInt()
+        )
+
+        val pageWidth = (availableWidth - pageSpacing * (columns - 1).toFloat()) / columns
+
+        val state = pagerState ?: rememberPagerState(pageCount = { list.size })
+
+        HorizontalPager(
+            state = state,
+            pageSize = PageSize.Fixed(pageWidth),
+            key = key,
+            contentPadding = contentPadding,
+            pageSpacing = pageSpacing,
+            verticalAlignment = Alignment.Top,
+            beyondViewportPageCount = 1,
+            userScrollEnabled = userScrollEnabled,
+            modifier = modifier,
+            pageContent = {
+                pageContent(list[it])
             }
-        }
-    } else PageSize.Fill
-
-    HorizontalPager(
-        state = state,
-        pageSize = pageSize,
-        key = key,
-        contentPadding = contentPadding,
-        pageSpacing = pageSpacing,
-        verticalAlignment = Alignment.Top,
-        beyondViewportPageCount = 1,
-        userScrollEnabled = userScrollEnabled,
-        modifier = modifier,
-        pageContent = {
-            pageContent(list[it])
-        }
-    )
+        )
+    }
 }

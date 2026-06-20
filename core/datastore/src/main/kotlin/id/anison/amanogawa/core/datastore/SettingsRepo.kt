@@ -34,10 +34,6 @@ class SettingsRepoImpl(
                 theme = AppTheme.entries[preferences[THEME_KEY] ?: AppTheme.FOLLOW_SYSTEM.ordinal],
                 isDynamicColors = preferences[IS_DYNAMIC_COLOR_THEME] ?: false,
                 isBlackTheme = preferences[IS_BLACK_THEME_KEY] ?: false,
-                countColumnsInRow = preferences[COUNT_COLUMNS_IN_ROW_KEY] ?: 3,
-                countColumnsInRowLandscape = preferences[COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY] ?: 6,
-                countEpisodesInRow = preferences[COUNT_EPISODES_IN_ROW_KEY] ?: 1,
-                countEpisodesInRowLandscape = preferences[COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY] ?: 3,
             )
         }.distinctUntilChanged()
 
@@ -59,49 +55,11 @@ class SettingsRepoImpl(
         }
     }
 
-    override suspend fun saveCountColumnsInRow(count: Int) {
-        dataStore.edit { preferences ->
-            if (preferences[COUNT_COLUMNS_IN_ROW_KEY] != count) {
-                preferences[COUNT_COLUMNS_IN_ROW_KEY] = count
-            }
-        }
-    }
-
-    override suspend fun saveCountColumnsInRowLandscape(count: Int) {
-        dataStore.edit { preferences ->
-            if (preferences[COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY] != count) {
-                preferences[COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY] = count
-            }
-        }
-    }
-
-    override suspend fun saveCountEpisodesInRow(count: Int) {
-        dataStore.edit { preferences ->
-            if (preferences[COUNT_EPISODES_IN_ROW_KEY] != count) {
-                preferences[COUNT_EPISODES_IN_ROW_KEY] = count
-            }
-        }
-    }
-
-    override suspend fun saveCountEpisodesInRowLandscape(count: Int) {
-        dataStore.edit { preferences ->
-            if (preferences[COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY] != count) {
-                preferences[COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY] = count
-            }
-        }
-    }
-
     companion object {
         private const val TAG = "SettingsRepo"
 
         private val THEME_KEY = intPreferencesKey("theme")
         private val IS_DYNAMIC_COLOR_THEME = booleanPreferencesKey("is_dynamic_theme")
         private val IS_BLACK_THEME_KEY = booleanPreferencesKey("is_black_theme")
-        private val COUNT_COLUMNS_IN_ROW_KEY = intPreferencesKey("count_columns_in_row")
-        private val COUNT_COLUMNS_IN_ROW_LANDSCAPE_KEY =
-            intPreferencesKey("count_columns_in_row_landscape")
-        private val COUNT_EPISODES_IN_ROW_KEY = intPreferencesKey("count_episodes_in_row")
-        private val COUNT_EPISODES_IN_ROW_LANDSCAPE_KEY =
-            intPreferencesKey("count_episodes_in_row_landscape")
     }
 }

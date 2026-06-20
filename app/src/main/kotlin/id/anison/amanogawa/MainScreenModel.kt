@@ -48,17 +48,7 @@ class MainScreenModel(
 
     val appSettings: StateFlow<MainUIState> = settingsRepo.settings
         .map { settings ->
-            MainUIState.Success(
-                settings = AppSettings(
-                    theme = settings.theme,
-                    isDynamicColors = settings.isDynamicColors,
-                    isBlackTheme = settings.isBlackTheme,
-                    countColumnsInRow = settings.countColumnsInRow,
-                    countColumnsInRowLandscape = settings.countColumnsInRowLandscape,
-                    countEpisodesInRow = settings.countEpisodesInRow,
-                    countEpisodesInRowLandscape = settings.countEpisodesInRowLandscape,
-                )
-            )
+            MainUIState.Success(settings = settings)
         }
         .stateIn(
             scope = screenModelScope,

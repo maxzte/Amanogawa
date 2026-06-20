@@ -10,4 +10,8 @@ object AmanogawaConst {
 
     val bottomBarInsets = barHeight + bottomBarPaddings * 2
 
+    val maxContentWidth = 1200.dp
+
+    fun minCardWidth(isLandscape: Boolean): Int = 160//if (isLandscape) 200 else 180
+
 }

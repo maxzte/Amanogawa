@@ -13,12 +13,4 @@ interface SettingsRepo {
     suspend fun saveDynamicColor(isDynamic: Boolean)
 
     suspend fun saveBlackTheme(isBlack: Boolean)
-
-    suspend fun saveCountColumnsInRow(count: Int)
-
-    suspend fun saveCountColumnsInRowLandscape(count: Int)
-
-    suspend fun saveCountEpisodesInRow(count: Int)
-
-    suspend fun saveCountEpisodesInRowLandscape(count: Int)
 }

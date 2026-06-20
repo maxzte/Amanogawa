@@ -3,30 +3,20 @@ package id.anison.amanogawa.feature.profile.screen
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,8 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -104,12 +92,6 @@ class AppearanceScreen : Screen {
         appSettings: AppSettings,
         onEvents: (AppearanceScreenEvent) -> Unit,
     ) {
-        val isLandscape = isLandscape()
-        val columns = if (isLandscape) appSettings.countColumnsInRowLandscape
-        else appSettings.countColumnsInRow
-        val episodes = if (isLandscape) appSettings.countEpisodesInRowLandscape
-        else appSettings.countEpisodesInRow
-
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
@@ -127,7 +109,7 @@ class AppearanceScreen : Screen {
                     start = 8.dp,
                     top = paddingValues.calculateTopPadding() + 8.dp,
                     end = 8.dp,
-                    bottom = if (!isLandscape) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
+                    bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                     else paddingValues.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize()
@@ -154,104 +136,6 @@ class AppearanceScreen : Screen {
                 item {
                     AppThemeColumn(theme = appSettings.theme, onEvents = onEvents)
                 }
-
-                item {
-                    ColumnSettingsSection(
-                        title = R.string.columns_in_row,
-                        options = if (isLandscape) listOf(5, 6) else listOf(2, 3),
-                        selected = columns,
-                        onSelect = { value ->
-                            val event = if (isLandscape) {
-                                AppearanceScreenEvent.SaveColumnsInRowLandscape(value)
-                            } else AppearanceScreenEvent.SaveColumnsInRow(value)
-
-                            onEvents(event)
-                        }
-                    )
-                }
-
-                item {
-                    AnimatedContent(
-                        targetState = columns,
-                        transitionSpec = {
-                            if (targetState > initialState) {
-                                slideInHorizontally { -it } togetherWith (slideOutHorizontally { it } + fadeOut())
-                            } else {
-                                slideInHorizontally { it } togetherWith (slideOutHorizontally { -it } + fadeOut())
-                            }
-                        },
-                        label = "cardAnimation",
-                        modifier = Modifier.fillMaxWidth()
-                    ) { target ->
-                        ExampleCardView(target)
-                    }
-                }
-
-                item {
-                    ColumnSettingsSection(
-                        title = R.string.episodes_in_row,
-                        options = if (isLandscape) listOf(3, 4) else listOf(1, 2),
-                        selected = episodes,
-                        onSelect = { value ->
-                            val event = if (isLandscape) {
-                                AppearanceScreenEvent.SaveEpisodesInRowLandscape(value)
-                            } else AppearanceScreenEvent.SaveEpisodesInRow(value)
-
-                            onEvents(event)
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun ColumnSettingsSection(
-        @StringRes title: Int,
-        options: List<Int>,
-        selected: Int,
-        onSelect: (Int) -> Unit
-    ) {
-        Text(text = stringResource(id = title), modifier = Modifier.padding(horizontal = 16.dp))
-
-        Spacer(Modifier.height(8.dp))
-
-        Column(
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                    shape = RoundedCornerShape(12)
-                )
-        ) {
-            options.forEachIndexed { index, option ->
-                if (index > 0) HorizontalDivider()
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            text = when (option) {
-                                1 -> stringResource(id = R.string.one)
-                                2 -> stringResource(id = R.string.two)
-                                3 -> stringResource(id = R.string.three)
-                                4 -> stringResource(id = R.string.four)
-                                5 -> stringResource(id = R.string.five)
-                                else -> stringResource(id = R.string.six)
-                            }
-                        )
-                    },
-                    trailingContent = {
-                        AnimatedVisibility(visible = selected == option) {
-                            Icon(imageVector = AmanogawaIcon.check, contentDescription = null)
-                        }
-                    },
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { onSelect(option) }
-                        )
-                )
             }
         }
     }
@@ -317,46 +201,6 @@ class AppearanceScreen : Screen {
         }
     }
 
-    @Composable
-    private fun ExampleCardView(count: Int) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-
-            val horizontalPadding = if (!isLandscape()) {
-                16.dp   // horizontal padding of parent container * 2
-            } else {
-                16.dp + AmanogawaConst.barHeight + AmanogawaConst.bottomBarPaddings
-            }
-            val spacing = 8 * (count - 1)
-            val available = screenWidth - horizontalPadding - spacing.dp
-            val itemWidthDp = available / count
-
-            repeat(count) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.width(itemWidthDp)
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .aspectRatio(7f / 10f),
-                    ) {}
-
-                    repeat(2) { spacerInd ->
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surfaceContainer)
-                                .clip(RoundedCornerShape(8))
-                                .height(if (spacerInd == 0) 16.dp else 12.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
 
 private data class ThemeOption(
