@@ -20,7 +20,6 @@ import id.anison.amanogawa.core.database.teammember.SoundEngineerDbo
 import id.anison.amanogawa.core.database.teammember.TeamMemberWithRoles
 import id.anison.amanogawa.core.database.teammember.TranslatorDbo
 import id.anison.amanogawa.core.domain.model.Anime
-import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.Filter
 import id.anison.amanogawa.core.domain.model.FilterType
 import id.anison.amanogawa.core.domain.model.SearchResult
@@ -186,7 +185,7 @@ class SearchRepoImpl(
         pagingSourceFactory = { ExtendedSearchPagingSource(api, filter) },
     ).flow.map { it -> it.map { it.toAnime() } }
 
-    override fun getRandomTitles(): Flow<PagingData<AnimeDetails>> = Pager(
+    override fun getRandomTitles(): Flow<PagingData<Anime>> = Pager(
         config = config,
     ) {
         RandomAnimePagingSource(

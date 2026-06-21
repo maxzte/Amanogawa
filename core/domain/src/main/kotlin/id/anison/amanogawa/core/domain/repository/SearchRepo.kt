@@ -3,7 +3,6 @@ package id.anison.amanogawa.core.domain.repository
 import androidx.paging.PagingData
 import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.domain.model.Anime
-import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.FilterType
 import id.anison.amanogawa.core.domain.model.SearchResult
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +27,6 @@ interface SearchRepo {
         filterType: FilterType
     ): Flow<PagingData<Anime>>
 
-    fun getRandomTitles(): Flow<PagingData<AnimeDetails>>
+    fun getRandomTitles(): Flow<PagingData<Anime>>
 
 }

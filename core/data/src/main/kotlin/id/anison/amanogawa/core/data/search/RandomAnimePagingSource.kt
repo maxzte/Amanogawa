@@ -3,25 +3,23 @@ package id.anison.amanogawa.core.data.search
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import id.anison.amanogawa.core.common.Log
-import id.anison.amanogawa.core.data.anime.toAnimeDetails
-import id.anison.amanogawa.core.domain.model.AnimeDetails
+import id.anison.amanogawa.core.data.anime.toAnime
+import id.anison.amanogawa.core.domain.model.Anime
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 
 class RandomAnimePagingSource(
     private val api: AmanogawaApi,
-) : PagingSource<Int, AnimeDetails>() {
+) : PagingSource<Int, Anime>() {
 
     private var totalPages: Int = -1
     private val shuffledPages = mutableListOf<Int>()
 
-    override fun getRefreshKey(state: PagingState<Int, AnimeDetails>): Int? = null
+    override fun getRefreshKey(state: PagingState<Int, Anime>): Int? = null
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AnimeDetails> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Anime> {
         return withContext(Dispatchers.IO) {
             try {
                 if (totalPages == -1) {
@@ -43,9 +41,7 @@ class RandomAnimePagingSource(
                 val page = shuffledPages[index]
                 Log.d(tag = TAG) { "Loading page index $index → page $page" }
 
-                val titles = api.getTitlesByPage(page).getOrThrow().data.map {
-                    async(Dispatchers.IO) { api.getAnime(it.animeId).getOrThrow() }
-                }.awaitAll().map { it.toAnimeDetails() }
+                val titles = api.getTitlesByPage(page).getOrThrow().data.shuffled().map { it.toAnime() }
 
                 return@withContext LoadResult.Page(
                     data = titles,

@@ -10,8 +10,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.core.domain.repository.SearchRepo
+import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.toAnimeDetailsUI
+import id.anison.amanogawa.core.domain.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
+import id.anison.amanogawa.core.model.AnimeUI
+import id.anison.amanogawa.core.model.DataState
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
@@ -30,6 +34,7 @@ import org.koin.core.annotation.Provided
 @Factory
 class RandomAnimeScreenModel(
     @Provided private val searchRepo: SearchRepo,
+    @Provided private val animeRepo: AnimeRepo,
 ) : StateScreenModel<RandomTitleState>(RandomTitleState()) {
     private val singleEventHandler = SingleEventHandler()
     private val _navEventState = MutableSharedFlow<RandomAnimeNavigationEvent>()
@@ -45,7 +50,7 @@ class RandomAnimeScreenModel(
     fun onEvents(event: RandomScreenEvents) {
         Log.d(tag = TAG) { "curr event is: $event" }
         when (event) {
-            is RandomScreenEvents.PopBack -> {
+            RandomScreenEvents.PopBack -> {
                 screenModelScope.launch {
                     _navEventState.emit(value = RandomAnimeNavigationEvent.NavigateToBack)
                 }
@@ -78,15 +83,23 @@ class RandomAnimeScreenModel(
             }
 
             is RandomScreenEvents.SetModalSheetVisibility -> {
+                if (event.isVisible && (event.animeId != null)) {
+                    loadDetails(event.animeId)
+                }
                 _isModalSheetVisible.update { oldState ->
                     oldState.copy(
                         pageIndex = event.pageIndex,
-                        isVisible = event.isVisible
+                        isVisible = event.isVisible,
+                        animeId = event.animeId
                     )
                 }
             }
 
-            is RandomScreenEvents.Refresh -> {
+            is RandomScreenEvents.LoadAnimeDetails -> {
+                loadDetails(event.animeId)
+            }
+
+            RandomScreenEvents.Refresh -> {
                 if (singleEventHandler.canTrigger()) {
                     getRandomTitles()
                 }
@@ -99,9 +112,24 @@ class RandomAnimeScreenModel(
         mutableState.update { oldState ->
             oldState.copy(
                 titles = searchRepo.getRandomTitles()
-                    .map { pagingData -> pagingData.map { animeDetails -> animeDetails.toAnimeDetailsUI() } }
+                    .map { pagingData -> pagingData.map { anime -> anime.toAnimeUI() } }
                     .cachedIn(screenModelScope)
             )
+        }
+    }
+
+    private fun loadDetails(animeId: Long) {
+        if (state.value.details.containsKey(animeId)) return
+
+        screenModelScope.launch {
+            val result = animeRepo.getAnimeDetailsById(animeId)
+            if (result is DataState.Success) {
+                mutableState.update { oldState ->
+                    oldState.copy(
+                        details = oldState.details + (animeId to result.data.toAnimeDetailsUI())
+                    )
+                }
+            }
         }
     }
 
@@ -112,16 +140,18 @@ class RandomAnimeScreenModel(
 }
 
 data class RandomTitleState(
-    val titles: Flow<PagingData<AnimeDetailsUI>> = flowOf(PagingData.empty()),
+    val titles: Flow<PagingData<AnimeUI>> = flowOf(PagingData.empty()),
+    val details: Map<Long, AnimeDetailsUI> = emptyMap(),
 )
 
 data class ModalSheetState(
     val pageIndex: Int? = null,
-    val isVisible: Boolean = false
+    val isVisible: Boolean = false,
+    val animeId: Long? = null,
 )
 
 sealed interface RandomScreenEvents {
-    object PopBack : RandomScreenEvents
+    data object PopBack : RandomScreenEvents
     data class PushAnimeDetailsScreen(val animeId: Long) : RandomScreenEvents
     data class OnLinkClick(
         val filterId: Long?,
@@ -129,10 +159,15 @@ sealed interface RandomScreenEvents {
         val filterType: FilterTypeUI
     ) : RandomScreenEvents
 
-    data class SetModalSheetVisibility(val pageIndex: Int?, val isVisible: Boolean) :
-        RandomScreenEvents
+    data class SetModalSheetVisibility(
+        val pageIndex: Int?,
+        val isVisible: Boolean,
+        val animeId: Long? = null,
+    ) : RandomScreenEvents
 
-    object Refresh : RandomScreenEvents
+    data class LoadAnimeDetails(val animeId: Long) : RandomScreenEvents
+
+    data object Refresh : RandomScreenEvents
 }
 
 sealed interface RandomAnimeNavigationEvent {
@@ -143,7 +178,7 @@ sealed interface RandomAnimeNavigationEvent {
         val filterType: FilterTypeUI
     ) : RandomAnimeNavigationEvent
 
-    object NavigateToBack : RandomAnimeNavigationEvent
+    data object NavigateToBack : RandomAnimeNavigationEvent
 }
 
 internal fun RandomAnimeNavigationEvent.toScreen(): Screen? = when (this) {

@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.VerticalPager
@@ -57,11 +56,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,6 +74,7 @@ import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
 import id.anison.amanogawa.core.model.AnimeDetailsUI
+import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
@@ -94,7 +91,9 @@ import id.anison.amanogawa.core.ui.common.isLandscape
 import id.anison.amanogawa.feature.search.screenmodel.ModalSheetState
 import id.anison.amanogawa.feature.search.screenmodel.RandomAnimeScreenModel
 import id.anison.amanogawa.feature.search.screenmodel.RandomScreenEvents
+import id.anison.amanogawa.feature.search.screenmodel.RandomTitleState
 import id.anison.amanogawa.feature.search.screenmodel.toScreen
+import kotlinx.coroutines.launch
 
 
 class RandomAnimeCarouselScreen : Screen {
@@ -105,18 +104,10 @@ class RandomAnimeCarouselScreen : Screen {
         val screenModel = koinScreenModel<RandomAnimeScreenModel>()
         val state by screenModel.state.collectAsState()
         val randomTitles = state.titles.collectAsLazyPagingItems()
-        val savedPageIndex = rememberSaveable { mutableIntStateOf(0) }
         val pagerState = rememberPagerState(
-            initialPage = savedPageIndex.intValue,
             pageCount = { randomTitles.itemCount }
         )
         val modalSheetState by screenModel.isModalSheetVisible.collectAsState()
-
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
-                savedPageIndex.intValue = page
-            }
-        }
 
         NavigationHandler(
             navigationState = screenModel.navEventState,
@@ -139,7 +130,8 @@ class RandomAnimeCarouselScreen : Screen {
                     randomTitles = randomTitles,
                     pagerState = pagerState,
                     modalSheetState = modalSheetState,
-                    onEvents = { screenModel.onEvents(it) }
+                    onEvents = { screenModel.onEvents(it) },
+                    state = state
                 )
             }
         }
@@ -147,35 +139,37 @@ class RandomAnimeCarouselScreen : Screen {
 
     @Composable
     private fun RandomAnimeScreenContent(
-        randomTitles: LazyPagingItems<AnimeDetailsUI>,
+        randomTitles: LazyPagingItems<AnimeUI>,
         pagerState: PagerState,
         onEvents: (RandomScreenEvents) -> Unit,
         modalSheetState: ModalSheetState,
+        state: RandomTitleState,
     ) {
         val isLandscape = isLandscape()
-        val isDataReady = remember { mutableStateOf(false) }
 
-        LaunchedEffect(pagerState.currentPage) {
+        LaunchedEffect(pagerState.currentPage, randomTitles.itemCount) {
+            // Automatic detail loading for the current page only
+            if (pagerState.currentPage in 0 until randomTitles.itemCount) {
+                randomTitles[pagerState.currentPage]?.let { anime ->
+                    onEvents(RandomScreenEvents.LoadAnimeDetails(anime.animeId))
+                }
+            }
+
             if (modalSheetState.isVisible && modalSheetState.pageIndex != pagerState.currentPage) {
                 onEvents(
                     RandomScreenEvents.SetModalSheetVisibility(
                         pageIndex = null,
-                        isVisible = false
+                        isVisible = false,
+                        animeId = null
                     )
                 )
             }
         }
 
-        LaunchedEffect(pagerState.pageCount) {
-            if (pagerState.pageCount > 0) {
-                isDataReady.value = true
-            }
-
-        }
         Scaffold(
             floatingActionButton = {
                 AnimatedVisibility(
-                    visible = isDataReady.value && !pagerState.canScrollForward,
+                    visible = (pagerState.pageCount > 0) && !pagerState.canScrollForward,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
@@ -197,8 +191,10 @@ class RandomAnimeCarouselScreen : Screen {
                 val isPortrait = !isLandscape
 
                 val pager: @Composable (Int) -> Unit = { index ->
-                    val animeDetailsUI = randomTitles[index]
-                    if (animeDetailsUI != null) {
+                    val animeUI = randomTitles[index]
+                    if (animeUI != null) {
+                        val animeDetailsUI = state.details[animeUI.animeId]
+
                         Box(
                             contentAlignment = Alignment.TopCenter,
                             modifier = Modifier.fillMaxSize()
@@ -206,8 +202,7 @@ class RandomAnimeCarouselScreen : Screen {
                             // Background image + overlay
                             Box(modifier = Modifier.matchParentSize()) {
                                 AnimeImageLoader(
-                                    titleImage = animeDetailsUI.animeUI.posterMini,
-                                    useCache = false,
+                                    titleImage = animeUI.posterMini,
                                     radius = 10,
                                 )
                                 Box(
@@ -221,6 +216,7 @@ class RandomAnimeCarouselScreen : Screen {
                                 VerticalPage(
                                     paddingValues = paddingValues,
                                     pageIndex = index,
+                                    animeUI = animeUI,
                                     animeDetails = animeDetailsUI,
                                     onEvents = onEvents,
                                     modalSheetState = modalSheetState
@@ -229,21 +225,12 @@ class RandomAnimeCarouselScreen : Screen {
                                 HorizontalPage(
                                     paddingValues = paddingValues,
                                     pageIndex = index,
+                                    animeUI = animeUI,
                                     animeDetails = animeDetailsUI,
                                     onEvents = onEvents,
                                     pagerState = pagerState,
                                 )
                             }
-
-                            AmanogawaTopBar(
-                                navigationIconContent = {
-                                    ArrowBackButton {
-                                        onEvents(RandomScreenEvents.PopBack)
-                                    }
-                                },
-                                showBottomLine = false,
-                                containerColor = Color.Transparent
-                            )
 
                             if (!isPortrait && modalSheetState.isVisible && modalSheetState.pageIndex == index) {
                                 val interactionSource =
@@ -256,6 +243,13 @@ class RandomAnimeCarouselScreen : Screen {
                                             interactionSource = interactionSource,
                                             indication = null
                                         ) {
+                                            onEvents(
+                                                RandomScreenEvents.SetModalSheetVisibility(
+                                                    pageIndex = null,
+                                                    isVisible = false,
+                                                    animeId = null
+                                                )
+                                            )
                                         }
                                 )
                             }
@@ -292,26 +286,28 @@ class RandomAnimeCarouselScreen : Screen {
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        IconButton(
-                                            onClick = {
-                                                onEvents(
-                                                    RandomScreenEvents.SetModalSheetVisibility(
-                                                        pageIndex = pagerState.currentPage,
-                                                        isVisible = false
-                                                    )
-                                                )
-                                            },
-                                            content = {
-                                                Icon(
-                                                    imageVector = AmanogawaIcon.close,
-                                                    contentDescription = null
-                                                )
-                                            }
-                                        )
+//                                        IconButton(
+//                                            onClick = {
+//                                                onEvents(
+//                                                    RandomScreenEvents.SetModalSheetVisibility(
+//                                                        pageIndex = null,
+//                                                        isVisible = false,
+//                                                        animeId = null
+//                                                    )
+//                                                )
+//                                            },
+//                                            content = {
+//                                                Icon(
+//                                                    imageVector = AmanogawaIcon.close,
+//                                                    contentDescription = null
+//                                                )
+//                                            }
+//                                        )
 
                                         Text(
                                             text = "Description",
                                             style = MaterialTheme.typography.titleLarge,
+                                            modifier = Modifier.padding(start = 16.dp),
                                         )
                                     }
 
@@ -325,10 +321,14 @@ class RandomAnimeCarouselScreen : Screen {
                                     ) {
                                         Spacer(modifier = Modifier.height(16.dp))
 
-                                        Text(
-                                            text = animeDetailsUI.description,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                        )
+                                        if (animeDetailsUI != null) {
+                                            Text(
+                                                text = animeDetailsUI.description,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                            )
+                                        } else {
+                                            AmanogawaSpinner()
+                                        }
 
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }
@@ -353,6 +353,17 @@ class RandomAnimeCarouselScreen : Screen {
                         pageContent = { pager(it) }
                     )
                 }
+
+                AmanogawaTopBar(
+                    navigationIconContent = {
+                        ArrowBackButton {
+                            onEvents(RandomScreenEvents.PopBack)
+                        }
+                    },
+                    showBottomLine = false,
+                    containerColor = Color.Transparent,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         }
     }
@@ -360,7 +371,8 @@ class RandomAnimeCarouselScreen : Screen {
     @Composable
     private fun VerticalPage(
         paddingValues: PaddingValues,
-        animeDetails: AnimeDetailsUI,
+        animeUI: AnimeUI,
+        animeDetails: AnimeDetailsUI?,
         onEvents: (RandomScreenEvents) -> Unit,
         modalSheetState: ModalSheetState,
         pageIndex: Int,
@@ -381,36 +393,55 @@ class RandomAnimeCarouselScreen : Screen {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
-                if (animeDetails.animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeDetails.animeUI.season)
-                if (animeDetails.animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeDetails.animeUI.part)
+                if (animeDetails != null) {
+                    InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 60.dp, height = 24.dp)
+                            .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                    )
+                }
+                if (animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeUI.season)
+                if (animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeUI.part)
             }
 
             // Poster
             ElevatedCard(
-                onClick = { onEvents(RandomScreenEvents.PushAnimeDetailsScreen(animeDetails.animeUI.animeId)) },
+                onClick = { onEvents(RandomScreenEvents.PushAnimeDetailsScreen(animeUI.animeId)) },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .bounceClick()
             ) {
-                AnimeImageLoader(
-                    titleImage = animeDetails.poster,
-                    useCache = false,
-                    modifier = Modifier.aspectRatio(7f / 10f)
-                )
+                if (animeDetails != null) {
+                    AnimeImageLoader(
+                        titleImage = animeDetails.poster,
+                        modifier = Modifier.aspectRatio(7f / 10f)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(7f / 10f)
+                            .background(Color.Gray.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AmanogawaSpinner()
+                    }
+                }
             }
 
             // Title
             Column(Modifier.fillMaxWidth(0.8f)) {
                 Text(
-                    text = animeDetails.animeUI.name,
+                    text = animeUI.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge,
                     color = Color.White
                 )
                 Text(
-                    text = animeDetails.animeUI.enJpName,
+                    text = animeUI.enJpName,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleSmall,
@@ -420,107 +451,19 @@ class RandomAnimeCarouselScreen : Screen {
             }
 
             // Info buttons
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                item {
-                    OutlinedButton(onClick = {}) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_outline_thumb_up_24),
-                            null,
-                            tint = Color.White
-                        )
-                        VerticalDivider(
-                            Modifier
-                                .height(16.dp)
-                                .padding(horizontal = 4.dp)
-                        )
-                        Text(
-                            "${animeDetails.liked}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color.White
-                        )
-                        Text(
-                            " · ${animeDetails.disliked}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color.White
-                        )
-                        VerticalDivider(
-                            Modifier
-                                .height(16.dp)
-                                .padding(horizontal = 4.dp)
-                        )
-                        Icon(
-                            painterResource(R.drawable.ic_outline_thumb_down_24),
-                            null,
-                            tint = Color.White
-                        )
-                    }
-                }
-
-                animeDetails.duration.takeIf { it.isNotEmpty() }?.let {
-                    item {
-                        OutlinedButton(onClick = {}) {
-                            Icon(
-                                painterResource(R.drawable.ic_access_time_24),
-                                null,
-                                tint = Color.White
-                            )
-                            Text(
-                                " $it",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    YearTag(
-                        year = animeDetails.animeUI.year,
-                        onYearClick = {
-                            onEvents(
-                                RandomScreenEvents.OnLinkClick(
-                                    filterId = -1L,
-                                    filterName = animeDetails.animeUI.year,
-                                    filterType = FilterTypeUI.YEAR
-                                )
-                            )
-                        }
-                    )
-                }
-
-                items(animeDetails.genres, key = { it.genreId }) { genre ->
-                    OutlinedButton(
-                        onClick = {
-                            onEvents(
-                                RandomScreenEvents.OnLinkClick(
-                                    filterId = genre.genreId,
-                                    filterName = genre.name,
-                                    filterType = FilterTypeUI.GENRE
-                                )
-                            )
-                        },
-                        content = {
-                            Text(
-                                text = genre.name,
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.White
-                            )
-
-                        }
-                    )
-                }
-            }
+            AnimeActionButtons(
+                animeUI = animeUI,
+                animeDetails = animeDetails,
+                onEvents = onEvents
+            )
 
             TextButton(
                 onClick = {
                     onEvents(
                         RandomScreenEvents.SetModalSheetVisibility(
                             pageIndex = pageIndex,
-                            isVisible = true
+                            isVisible = true,
+                            animeId = animeUI.animeId
                         )
                     )
                 },
@@ -534,16 +477,28 @@ class RandomAnimeCarouselScreen : Screen {
                     onEvents(
                         RandomScreenEvents.SetModalSheetVisibility(
                             pageIndex = null,
-                            isVisible = false
+                            isVisible = false,
+                            animeId = animeUI.animeId
                         )
                     )
                 },
             ) {
-                Text(
-                    text = animeDetails.description,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(8.dp)
-                )
+                if (animeDetails != null) {
+                    Text(
+                        text = animeDetails.description,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                } else {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AmanogawaSpinner()
+                    }
+                }
             }
         }
     }
@@ -551,27 +506,13 @@ class RandomAnimeCarouselScreen : Screen {
     @Composable
     private fun HorizontalPage(
         paddingValues: PaddingValues,
-        animeDetails: AnimeDetailsUI,
+        animeUI: AnimeUI,
+        animeDetails: AnimeDetailsUI?,
         onEvents: (RandomScreenEvents) -> Unit,
         pagerState: PagerState,
         pageIndex: Int,
     ) {
-        val scrollToBack = remember { mutableStateOf(false) }
-        val scrollToForward = remember { mutableStateOf(false) }
-
-        LaunchedEffect(scrollToBack.value) {
-            if (scrollToBack.value && pagerState.currentPage > 0) {
-                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                scrollToBack.value = false
-            }
-        }
-
-        LaunchedEffect(scrollToForward.value) {
-            if (scrollToForward.value && pagerState.currentPage < pagerState.pageCount - 1) {
-                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                scrollToForward.value = false
-            }
-        }
+        val scope = rememberCoroutineScope()
 
         Box(
             contentAlignment = Alignment.TopCenter,
@@ -594,7 +535,11 @@ class RandomAnimeCarouselScreen : Screen {
             ) {
                 if (pagerState.currentPage > 0) {
                     FilledTopBarIcon(
-                        onClick = { scrollToBack.value = true },
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        },
                         backgroundColor = Color.Gray.copy(alpha = 0.5f),
                         content = {
                             Icon(
@@ -619,17 +564,28 @@ class RandomAnimeCarouselScreen : Screen {
                         onClick = {
                             onEvents(
                                 RandomScreenEvents.PushAnimeDetailsScreen(
-                                    animeId = animeDetails.animeUI.animeId
+                                    animeId = animeUI.animeId
                                 )
                             )
                         },
                         modifier = Modifier.bounceClick()
                     ) {
-                        AnimeImageLoader(
-                            titleImage = animeDetails.poster,
-                            useCache = false,
-                            modifier = Modifier.aspectRatio(7f / 10f)
-                        )
+                        if (animeDetails != null) {
+                            AnimeImageLoader(
+                                titleImage = animeDetails.poster,
+                                modifier = Modifier.aspectRatio(7f / 10f)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .aspectRatio(7f / 10f)
+                                    .background(Color.Gray.copy(alpha = 0.3f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                AmanogawaSpinner()
+                            }
+                        }
                     }
 
                     Column(
@@ -640,13 +596,24 @@ class RandomAnimeCarouselScreen : Screen {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
-                            if (animeDetails.animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeDetails.animeUI.season)
-                            if (animeDetails.animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeDetails.animeUI.part)
+                            if (animeDetails != null) {
+                                InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(width = 60.dp, height = 24.dp)
+                                        .background(
+                                            Color.Gray.copy(alpha = 0.3f),
+                                            RoundedCornerShape(12.dp)
+                                        )
+                                )
+                            }
+                            if (animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeUI.season)
+                            if (animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeUI.part)
                         }
 
                         Text(
-                            text = animeDetails.animeUI.name,
+                            text = animeUI.name,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleLarge,
@@ -654,7 +621,7 @@ class RandomAnimeCarouselScreen : Screen {
                         )
 
                         Text(
-                            text = animeDetails.animeUI.enJpName,
+                            text = animeUI.enJpName,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleSmall,
@@ -663,99 +630,20 @@ class RandomAnimeCarouselScreen : Screen {
 
                         Spacer(Modifier.height(4.dp))
 
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            OutlinedButton(onClick = {}) {
-                                Icon(
-                                    painterResource(id = R.drawable.ic_outline_thumb_up_24),
-                                    null,
-                                    tint = Color.White
-                                )
-                                VerticalDivider(
-                                    Modifier
-                                        .height(16.dp)
-                                        .padding(horizontal = 4.dp)
-                                )
-                                Text(
-                                    "${animeDetails.liked}",
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = Color.White
-                                )
-                                Text(
-                                    " · ${animeDetails.disliked}",
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = Color.White
-                                )
-                                VerticalDivider(
-                                    Modifier
-                                        .height(16.dp)
-                                        .padding(horizontal = 4.dp)
-                                )
-                                Icon(
-                                    painterResource(R.drawable.ic_outline_thumb_down_24),
-                                    null,
-                                    tint = Color.White
-                                )
-                            }
-
-                            animeDetails.duration.takeIf { it.isNotEmpty() }?.let {
-                                OutlinedButton(onClick = {}) {
-                                    Icon(
-                                        painterResource(R.drawable.ic_access_time_24),
-                                        null,
-                                        tint = Color.White
-                                    )
-                                    Text(
-                                        " $it",
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = Color.White
-                                    )
-                                }
-                            }
-
-                            YearTag(
-                                year = animeDetails.animeUI.year,
-                                onYearClick = {
-                                    onEvents(
-                                        RandomScreenEvents.OnLinkClick(
-                                            filterId = -1L,
-                                            filterName = animeDetails.animeUI.year,
-                                            filterType = FilterTypeUI.YEAR
-                                        )
-                                    )
-                                }
-                            )
-
-                            animeDetails.genres.forEach { genreUI ->
-                                OutlinedButton(
-                                    onClick = {
-                                        onEvents(
-                                            RandomScreenEvents.OnLinkClick(
-                                                filterId = genreUI.genreId,
-                                                filterName = genreUI.name,
-                                                filterType = FilterTypeUI.GENRE
-                                            )
-                                        )
-                                    },
-                                    content = {
-                                        Text(
-                                            text = genreUI.name,
-                                            style = MaterialTheme.typography.labelLarge,
-                                            color = Color.White
-                                        )
-                                    }
-                                )
-                            }
-                        }
+                        AnimeActionButtons(
+                            animeUI = animeUI,
+                            animeDetails = animeDetails,
+                            onEvents = onEvents,
+                            isHorizontal = true
+                        )
 
                         TextButton(
                             onClick = {
                                 onEvents(
                                     RandomScreenEvents.SetModalSheetVisibility(
                                         pageIndex = pageIndex,
-                                        isVisible = true
+                                        isVisible = true,
+                                        animeId = animeUI.animeId
                                     )
                                 )
                             },
@@ -764,7 +652,6 @@ class RandomAnimeCarouselScreen : Screen {
                             }
                         )
                     }
-
                 }
 
                 AnimatedVisibility(
@@ -773,7 +660,11 @@ class RandomAnimeCarouselScreen : Screen {
                     exit = fadeOut()
                 ) {
                     FilledTopBarIcon(
-                        onClick = { scrollToForward.value = true },
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        },
                         backgroundColor = Color.Gray.copy(alpha = 0.5f),
                         content = {
                             Icon(
@@ -783,6 +674,144 @@ class RandomAnimeCarouselScreen : Screen {
                             )
                         }
                     )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun AnimeActionButtons(
+        animeUI: AnimeUI,
+        animeDetails: AnimeDetailsUI?,
+        onEvents: (RandomScreenEvents) -> Unit,
+        isHorizontal: Boolean = false
+    ) {
+        val content: @Composable () -> Unit = {
+            if (animeDetails != null) {
+                OutlinedButton(onClick = {}) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_outline_thumb_up_24),
+                        null,
+                        tint = Color.White
+                    )
+                    VerticalDivider(
+                        Modifier
+                            .height(16.dp)
+                            .padding(horizontal = 4.dp)
+                    )
+                    Text(
+                        text = animeDetails.liked.toString(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.White
+                    )
+                    Text(
+                        text = " · ${animeDetails.disliked}",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.White
+                    )
+                    VerticalDivider(
+                        Modifier
+                            .height(16.dp)
+                            .padding(horizontal = 4.dp)
+                    )
+                    Icon(
+                        painterResource(R.drawable.ic_outline_thumb_down_24),
+                        null,
+                        tint = Color.White
+                    )
+                }
+
+                animeDetails.duration.takeIf { it.isNotEmpty() }?.let {
+                    OutlinedButton(onClick = {}) {
+                        Icon(
+                            painterResource(R.drawable.ic_access_time_24),
+                            null,
+                            tint = Color.White
+                        )
+                        Text(
+                            text = " $it",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.White
+                        )
+                    }
+                }
+            } else {
+                // Placeholder for likes and duration
+                Box(
+                    modifier = Modifier
+                        .size(width = 120.dp, height = 40.dp)
+                        .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                )
+                Box(
+                    modifier = Modifier
+                        .size(width = 80.dp, height = 40.dp)
+                        .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                )
+            }
+
+            YearTag(
+                year = animeUI.year,
+                onYearClick = {
+                    onEvents(
+                        RandomScreenEvents.OnLinkClick(
+                            filterId = -1L,
+                            filterName = animeUI.year,
+                            filterType = FilterTypeUI.YEAR
+                        )
+                    )
+                }
+            )
+
+            if (animeDetails != null) {
+                for (genreUI in animeDetails.genres) {
+                    OutlinedButton(
+                        onClick = {
+                            onEvents(
+                                RandomScreenEvents.OnLinkClick(
+                                    filterId = genreUI.genreId,
+                                    filterName = genreUI.name,
+                                    filterType = FilterTypeUI.GENRE
+                                )
+                            )
+                        },
+                        content = {
+                            Text(
+                                text = genreUI.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color.White
+                            )
+                        }
+                    )
+                }
+            } else {
+                // Placeholders for genres
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 70.dp, height = 40.dp)
+                            .background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+                    )
+                }
+            }
+        }
+
+        if (isHorizontal) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                content()
+            }
+        } else {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        content()
+                    }
                 }
             }
         }
