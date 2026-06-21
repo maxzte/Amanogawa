@@ -5,5 +5,6 @@
     <string translatable="false" name="notification_channel_description">Channel for new episodes</string>
     <string name="new_episode_notification_title">New episode</string>
     <string name="new_episode_notification_text">A new episode is available for %1$s.</string>
+    <string name="new_episode_notification_group_summary">%1$d new episodes available</string>
 
 </resources>

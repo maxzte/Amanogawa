@@ -17,6 +17,9 @@ interface CurrentAnimeDao {
     @Query("SELECT * FROM current_anime")
     suspend fun getAll(): List<CurrentAnimeDbo>
 
+    @Query("DELETE FROM current_anime WHERE currentAnimeId NOT IN (:currentIds)")
+    suspend fun deleteNotCurrentAnimeByIds(currentIds: List<Long>)
+
     @Delete
     suspend fun deleteNotCurrentAnimeList(animeList: List<CurrentAnimeDbo>)
 

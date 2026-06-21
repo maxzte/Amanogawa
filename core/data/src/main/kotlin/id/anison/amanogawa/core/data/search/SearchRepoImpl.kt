@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPagingApi::class)
+
 package id.anison.amanogawa.core.data.search
 
 import androidx.paging.ExperimentalPagingApi
@@ -173,7 +175,6 @@ class SearchRepoImpl(
         }
     }
 
-    @OptIn(ExperimentalPagingApi::class)
     private fun getTitlesByFilter(filter: Filter): Flow<PagingData<Anime>> = Pager(
         config = config,
         remoteMediator = AnimeRemoteMediator(

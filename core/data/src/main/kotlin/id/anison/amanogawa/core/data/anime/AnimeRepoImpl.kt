@@ -6,6 +6,8 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
+import id.anison.amanogawa.core.common.ScheduleParser
 import id.anison.amanogawa.core.data.config
 import id.anison.amanogawa.core.data.runDataState
 import id.anison.amanogawa.core.database.AmanogawaDatabase
@@ -64,22 +66,30 @@ class AnimeRepoImpl(
                     }
 
                     val localMap = local.associateBy { it.currentAnimeId }
-
-                    val currentIds = currentTitles.data.map { it.animeId }.toSet()
-                    val forDelete = local.filterNot { it.currentAnimeId in currentIds }
+                    val currentIds = currentTitles.data.map { it.animeId }
 
                     val newEpisodes = currentTitles.data.filter { remote ->
                         val localAnime = localMap[remote.animeId]
-                        localAnime?.newEpisode?.let { remote.newEpisode > it } ?: false
+                        val isActuallyNew = localAnime?.newEpisode?.let { remote.newEpisode > it } ?: false
+                        
+                        // We notify if it's actually a new episode.
+                        // If it's a delay (same episode number but in window), isActuallyNew will be false,
+                        // so we remain silent.
+                        isActuallyNew
                     }
 
-                    currentAnimeDao.insertCurrentAnimeList(
-                        animeList = currentTitles.data.map { it.toCurrentAnimeDbo() }
-                    )
-
-                    currentAnimeDao.deleteNotCurrentAnimeList(forDelete)
+                    database.withTransaction {
+                        currentAnimeDao.insertCurrentAnimeList(
+                            animeList = currentTitles.data.map { it.toCurrentAnimeDbo() }
+                        )
+                        currentAnimeDao.deleteNotCurrentAnimeByIds(currentIds)
+                    }
 
                     DataState.Success(newEpisodes)
+                }
+
+                is DataState.Error -> {
+                    DataState.Error(exception = currentTitles.exception)
                 }
 
                 else -> {
