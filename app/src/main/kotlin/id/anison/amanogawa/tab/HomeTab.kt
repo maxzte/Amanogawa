@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -25,8 +24,8 @@ object HomeTab : AmanogawaTab {
     override val amanogawaTabOptions: AmanogawaTabOptions
         @Composable get() {
             val title = stringResource(id = R.string.home_tab)
-            val icon = rememberVectorPainter(image = AmanogawaIcon.homeOutlined)
-            val selectedIcon = rememberVectorPainter(image = AmanogawaIcon.home)
+            val icon = IconSource.VectorIcon(AmanogawaIcon.homeOutlined)
+            val selectedIcon = IconSource.VectorIcon(AmanogawaIcon.home)
 
             return remember {
                 AmanogawaTabOptions(
@@ -40,8 +39,8 @@ object HomeTab : AmanogawaTab {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<MainScreenModel>()
-        val homeScreenModel = koinScreenModel<HomeScreenModel>()
+        val screenModel: MainScreenModel = koinScreenModel()
+        val homeScreenModel: HomeScreenModel = koinScreenModel()
         Navigator(
             screen = HomeScreen(),
             key = "HomeTabNavigator",

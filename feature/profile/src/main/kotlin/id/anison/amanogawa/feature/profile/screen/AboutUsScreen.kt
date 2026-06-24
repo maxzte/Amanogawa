@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.profile.screen
 
 import androidx.compose.foundation.clickable
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -53,6 +56,7 @@ import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.profile.AboutUsScreenEvents
 import id.anison.amanogawa.feature.profile.AboutUsScreenModel
 import id.anison.amanogawa.feature.profile.toScreen
@@ -63,9 +67,9 @@ class AboutUsScreen : Screen {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<AboutUsScreenModel>()
-        val state by screenModel.teamState
-        val lazyListState = screenModel.lazyListState
+        val screenModel: AboutUsScreenModel = koinScreenModel()
+        val state by screenModel.teamState.collectAsStateWithLifecycle()
+        val lazyListState = rememberLazyListState()
 
         NavigationHandler(
             navigationState = screenModel.navigationEventState,
@@ -91,13 +95,13 @@ class AboutUsScreen : Screen {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun AboutUsContent(
         team: List<TeamUI>,
         lazyListState: LazyListState,
         onEvents: (AboutUsScreenEvents) -> Unit,
     ) {
+        val mediumSpacing = MaterialTheme.spacing.medium
 //        val localUrlHandler = LocalUriHandler.current
         val context = LocalContext.current
         val toolBArColor = MaterialTheme.colorScheme.surface.toArgb()
@@ -115,14 +119,14 @@ class AboutUsScreen : Screen {
             LazyColumn(
                 state = lazyListState,
                 contentPadding = PaddingValues(
-                    start = 8.dp,
-                    top = paddingValues.calculateTopPadding() + 8.dp,
-                    end = 8.dp,
+                    start = mediumSpacing,
+                    top = paddingValues.calculateTopPadding() + mediumSpacing,
+                    end = mediumSpacing,
                     bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                     else paddingValues.calculateBottomPadding()
                 ),
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(mediumSpacing),
             ) {
                 item {
                     DetailText(

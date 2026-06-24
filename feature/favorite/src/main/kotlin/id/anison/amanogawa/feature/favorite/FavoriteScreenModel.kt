@@ -7,12 +7,12 @@ import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.FavoriteRepo
-import id.anison.amanogawa.core.domain.toFavorite
-import id.anison.amanogawa.core.domain.toFavoriteUI
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.model.mapper.toFavorite
+import id.anison.amanogawa.core.model.mapper.toFavoriteUI
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.model.FavoriteUI
 import id.anison.amanogawa.core.model.SingleEventHandler
-import id.anison.amanogawa.core.model.mapDataState
+import id.anison.amanogawa.core.common.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +41,9 @@ class FavoriteScreenModel(
 
     private val _uiNavigationEvent = MutableSharedFlow<FavoriteNavigationEvent>()
     val navigationEvent = _uiNavigationEvent.asSharedFlow()
+
+    private val _scrollToTopEvent = MutableSharedFlow<Unit>()
+    val scrollToTopEvent = _scrollToTopEvent.asSharedFlow()
 
     fun onEvent(event: FavoritesScreenEvents) {
         Log.d(tag = TAG) { "event is: $event" }
@@ -85,6 +88,12 @@ class FavoriteScreenModel(
 
     private fun removeFromFavorite(favorite: FavoriteUI) = screenModelScope.launch {
         favoriteRepo.removeFromFavorite(favorite.toFavorite())
+    }
+
+    fun requestScrollToTop() {
+        screenModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
+        }
     }
 
     companion object {

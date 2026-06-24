@@ -2,7 +2,6 @@ package id.anison.amanogawa.feature.anime.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,9 +22,9 @@ import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.TeamMemberTypeUI
 import id.anison.amanogawa.core.model.TeamMemberUI
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.spacing
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AnimeTeam(
     teamMembers: List<TeamMemberUI>,
@@ -49,7 +48,7 @@ fun AnimeTeam(
             }
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
             ) {
                 TextButton(
                     onClick = {},

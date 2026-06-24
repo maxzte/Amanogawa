@@ -20,8 +20,8 @@ import id.anison.amanogawa.core.ui.R
 fun FavoriteButton(
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
-    backgroundColor: Color? = null,
     modifier: Modifier = Modifier,
+    backgroundColor: Color? = null,
 ) {
     IconButton(
         onClick = { onFavoriteClick() },

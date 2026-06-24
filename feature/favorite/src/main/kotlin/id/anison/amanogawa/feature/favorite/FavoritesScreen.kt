@@ -1,6 +1,7 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.favorite
 
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -14,11 +15,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -33,14 +34,20 @@ import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.component.layout.AnimeVerticalGrid
 import id.anison.amanogawa.feature.favorite.ui.FavoriteCard
 
-class FavoritesScreen : Screen, ComponentActivity() {
+class FavoritesScreen : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<FavoriteScreenModel>()
+        val screenModel: FavoriteScreenModel = koinScreenModel()
         val favoriteState by screenModel.favoriteState.collectAsState()
         val lazyGridState = screenModel.lazyGridState
+
+        LaunchedEffect(Unit) {
+            screenModel.scrollToTopEvent.collect {
+                lazyGridState.animateScrollToItem(0)
+            }
+        }
 
         NavigationHandler(
             navigationState = screenModel.navigationEvent,
@@ -62,7 +69,6 @@ class FavoritesScreen : Screen, ComponentActivity() {
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun FavoriteScreenContent(
         lazyGridState: LazyGridState,

@@ -17,6 +17,7 @@ import id.anison.amanogawa.core.ui.common.grayLine
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmanogawaTopBar(
+    modifier: Modifier = Modifier,
     title: String = "",
     titleContent: @Composable () -> Unit = {},
     navigationIconContent: @Composable () -> Unit = {},
@@ -25,7 +26,6 @@ fun AmanogawaTopBar(
     containerColor: Color = Color.Unspecified,
     scrollContainerColor: Color = Color.Unspecified,
     showBottomLine: Boolean = true,
-    modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         title = {

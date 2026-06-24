@@ -50,7 +50,6 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,7 +61,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,6 +86,7 @@ import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.search.screenmodel.ModalSheetState
 import id.anison.amanogawa.feature.search.screenmodel.RandomAnimeScreenModel
 import id.anison.amanogawa.feature.search.screenmodel.RandomScreenEvents
@@ -101,7 +100,7 @@ class RandomAnimeCarouselScreen : Screen {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<RandomAnimeScreenModel>()
+        val screenModel: RandomAnimeScreenModel = koinScreenModel()
         val state by screenModel.state.collectAsState()
         val randomTitles = state.titles.collectAsLazyPagingItems()
         val pagerState = rememberPagerState(
@@ -403,7 +402,7 @@ class RandomAnimeCarouselScreen : Screen {
                     )
                 }
                 if (animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeUI.season)
-                if (animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeUI.part)
+                if (animeUI.part.isNotEmpty()) InfoTag(text = "Part " + animeUI.part)
             }
 
             // Poster
@@ -457,18 +456,15 @@ class RandomAnimeCarouselScreen : Screen {
                 onEvents = onEvents
             )
 
-            TextButton(
-                onClick = {
-                    onEvents(
-                        RandomScreenEvents.SetModalSheetVisibility(
-                            pageIndex = pageIndex,
-                            isVisible = true,
-                            animeId = animeUI.animeId
-                        )
+            ShowDescriptionButton {
+                onEvents(
+                    RandomScreenEvents.SetModalSheetVisibility(
+                        pageIndex = pageIndex,
+                        isVisible = true,
+                        animeId = animeUI.animeId
                     )
-                },
-                content = { Text("More info") }
-            )
+                )
+            }
         }
 
         if (modalSheetState.isVisible && modalSheetState.pageIndex == pageIndex) {
@@ -487,13 +483,13 @@ class RandomAnimeCarouselScreen : Screen {
                     Text(
                         text = animeDetails.description,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(MaterialTheme.spacing.medium)
                     )
                 } else {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(MaterialTheme.spacing.medium),
                         contentAlignment = Alignment.Center
                     ) {
                         AmanogawaSpinner()
@@ -512,6 +508,7 @@ class RandomAnimeCarouselScreen : Screen {
         pagerState: PagerState,
         pageIndex: Int,
     ) {
+        val mediumSpacing = MaterialTheme.spacing.medium
         val scope = rememberCoroutineScope()
 
         Box(
@@ -523,15 +520,15 @@ class RandomAnimeCarouselScreen : Screen {
                     .fillMaxSize()
                     .padding(
                         PaddingValues(
-                            start = 8.dp,
+                            start = mediumSpacing,
                             top = paddingValues.calculateTopPadding(),
-                            end = 8.dp,
+                            end = mediumSpacing,
                             bottom = paddingValues.calculateBottomPadding()
                         )
                     )
                     .animateContentSize(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(mediumSpacing)
             ) {
                 if (pagerState.currentPage > 0) {
                     FilledTopBarIcon(
@@ -558,7 +555,7 @@ class RandomAnimeCarouselScreen : Screen {
                         .weight(1f)
                         .fillMaxHeight(1f),
                     verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(mediumSpacing)
                 ) {
                     ElevatedCard(
                         onClick = {
@@ -589,12 +586,14 @@ class RandomAnimeCarouselScreen : Screen {
                     }
 
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
                         ) {
                             if (animeDetails != null) {
                                 InfoTag(text = if (animeDetails.isMovie) "Movie" else "Series")
@@ -608,8 +607,13 @@ class RandomAnimeCarouselScreen : Screen {
                                         )
                                 )
                             }
-                            if (animeUI.season.isNotEmpty()) InfoTag(text = "Season " + animeUI.season)
-                            if (animeUI.part.isNotEmpty()) InfoTag(text = "Part" + animeUI.part)
+                            if (animeUI.season.isNotEmpty()) {
+                                InfoTag(text = "Season " + animeUI.season)
+                            }
+
+                            if (animeUI.part.isNotEmpty()) {
+                                InfoTag(text = "Part " + animeUI.part)
+                            }
                         }
 
                         Text(
@@ -628,7 +632,7 @@ class RandomAnimeCarouselScreen : Screen {
                             color = Color.LightGray
                         )
 
-                        Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(MaterialTheme.spacing.extraSmall))
 
                         AnimeActionButtons(
                             animeUI = animeUI,
@@ -637,20 +641,15 @@ class RandomAnimeCarouselScreen : Screen {
                             isHorizontal = true
                         )
 
-                        TextButton(
-                            onClick = {
-                                onEvents(
-                                    RandomScreenEvents.SetModalSheetVisibility(
-                                        pageIndex = pageIndex,
-                                        isVisible = true,
-                                        animeId = animeUI.animeId
-                                    )
+                        ShowDescriptionButton {
+                            onEvents(
+                                RandomScreenEvents.SetModalSheetVisibility(
+                                    pageIndex = pageIndex,
+                                    isVisible = true,
+                                    animeId = animeUI.animeId
                                 )
-                            },
-                            content = {
-                                Text("More info")
-                            }
-                        )
+                            )
+                        }
                     }
                 }
 
@@ -690,14 +689,14 @@ class RandomAnimeCarouselScreen : Screen {
             if (animeDetails != null) {
                 OutlinedButton(onClick = {}) {
                     Icon(
-                        painterResource(id = R.drawable.ic_outline_thumb_up_24),
+                        imageVector = AmanogawaIcon.like,
                         null,
                         tint = Color.White
                     )
                     VerticalDivider(
                         Modifier
                             .height(16.dp)
-                            .padding(horizontal = 4.dp)
+                            .padding(horizontal = MaterialTheme.spacing.extraSmall)
                     )
                     Text(
                         text = animeDetails.liked.toString(),
@@ -712,10 +711,10 @@ class RandomAnimeCarouselScreen : Screen {
                     VerticalDivider(
                         Modifier
                             .height(16.dp)
-                            .padding(horizontal = 4.dp)
+                            .padding(horizontal = MaterialTheme.spacing.extraSmall)
                     )
                     Icon(
-                        painterResource(R.drawable.ic_outline_thumb_down_24),
+                        imageVector = AmanogawaIcon.disLike,
                         null,
                         tint = Color.White
                     )
@@ -724,7 +723,7 @@ class RandomAnimeCarouselScreen : Screen {
                 animeDetails.duration.takeIf { it.isNotEmpty() }?.let {
                     OutlinedButton(onClick = {}) {
                         Icon(
-                            painterResource(R.drawable.ic_access_time_24),
+                            imageVector = AmanogawaIcon.avTime,
                             null,
                             tint = Color.White
                         )
@@ -798,23 +797,35 @@ class RandomAnimeCarouselScreen : Screen {
         if (isHorizontal) {
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
             ) {
                 content()
             }
         } else {
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                contentPadding = PaddingValues(horizontal = MaterialTheme.spacing.medium),
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
             ) {
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)) {
                         content()
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    fun ShowDescriptionButton(
+        onClick: () -> Unit,
+    ) {
+        OutlinedButton(
+            onClick = onClick,
+            content = {
+                Text(text = "More info", color = Color.White)
+            }
+        )
     }
 
     @Composable

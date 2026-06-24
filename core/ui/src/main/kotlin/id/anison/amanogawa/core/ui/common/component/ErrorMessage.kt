@@ -7,24 +7,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import id.anison.amanogawa.core.model.AppError
+import id.anison.amanogawa.core.common.AppError
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
+import id.anison.amanogawa.core.ui.spacing
 
 
 @Composable
 fun ErrorMessage(
     onUpdate: () -> Unit,
-    error: Throwable? = null,
     modifier: Modifier = Modifier,
+    error: Throwable? = null,
 ) {
     val title: String
     val description: String
@@ -55,10 +57,10 @@ fun ErrorMessage(
                 .fillMaxWidth()
                 .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_rounded_language_24),
+                imageVector = AmanogawaIcon.language,
                 contentDescription = "No internet connection icon",
                 modifier = modifier.size(50.dp)
             )

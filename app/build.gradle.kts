@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.amanogawa.app)
     alias(libs.plugins.amanogawa.koin)
+    alias(libs.plugins.aboutlibraries.android)
 }
 
 android {
@@ -33,8 +34,6 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.core.notification)
     implementation(projects.core.work)
-    implementation(projects.core.model)
-
 
     implementation(projects.feature.home)
     implementation(projects.feature.search)
@@ -49,7 +48,6 @@ dependencies {
 
     //COMPOSE
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
     implementation(libs.material3.adaptive.navigation.suite)
 
     //NAVIGATION
@@ -64,6 +62,8 @@ dependencies {
     //SPLASHSCREEN
     implementation(libs.androidx.core.splashscreen)
 
-    // COIL
+    //COIL
     implementation(libs.coil)
+    implementation(libs.coil.network.okhttp)
+//    implementation(libs.coil.core)
 }

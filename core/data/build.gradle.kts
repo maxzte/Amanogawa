@@ -14,9 +14,6 @@ dependencies {
     api(projects.core.datastore)
     api(projects.core.domain)
 
-
     implementation(libs.coroutines.android)
-
-    implementation (libs.androidx.paging.compose)
-
+    implementation(libs.androidx.paging.common)
 }

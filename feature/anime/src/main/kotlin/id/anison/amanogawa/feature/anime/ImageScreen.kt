@@ -5,7 +5,6 @@ package id.anison.amanogawa.feature.anime
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,9 +40,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
-import id.anison.amanogawa.core.ui.common.component.AmanogawaHorizontalPager
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
-import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.button.FilledTopBarIcon
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import net.engawapg.lib.zoomable.ScrollGesturePropagation
@@ -61,6 +58,7 @@ data class ImageScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val pagerState = rememberPagerState(
+            initialPage = index,
             pageCount = { images.size }
         )
 
@@ -106,7 +104,6 @@ data class ImageScreen(
                         ) {
                             AnimeImageLoader(
                                 titleImage = images[page],
-                                useCache = false,
                                 showAmanogawaSpinner = true,
                                 modifier = Modifier
                                     .onSizeChanged { size = it }

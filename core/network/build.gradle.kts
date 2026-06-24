@@ -17,7 +17,6 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)
     implementation(libs.ktorfit.lib)
-    implementation(libs.koin.core)
 
 
     testImplementation(libs.junit)

@@ -1,5 +1,7 @@
 package id.anison.amanogawa.core.ui.common.component
 
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,17 +31,23 @@ fun AnimeCardContent(
     part: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     extraContent: @Composable (BoxScope.() -> Unit)? = null
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         ElevatedCard(
-            onClick = { onClick() },
-            modifier = Modifier.bounceClick()
+            modifier = Modifier
+                .bounceClick(onClick)
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                )
         ) {
             Box {
                 AnimeImageLoader(
                     titleImage = poster,
-                    useCache = true,
                     modifier = Modifier.aspectRatio(7f / 10f)
                 )
                 extraContent?.invoke(this)
@@ -47,8 +56,8 @@ fun AnimeCardContent(
 
         Spacer(
             modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
+                .fillMaxWidth()
+                .height(4.dp)
         )
 
         Text(
@@ -60,8 +69,8 @@ fun AnimeCardContent(
 
         Spacer(
             modifier = Modifier
-            .fillMaxWidth()
-            .height(4.dp)
+                .fillMaxWidth()
+                .height(4.dp)
         )
 
         Row {

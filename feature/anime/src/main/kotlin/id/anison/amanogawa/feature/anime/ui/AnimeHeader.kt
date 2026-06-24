@@ -3,7 +3,6 @@ package id.anison.amanogawa.feature.anime.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,12 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.anime.AnimeDetailsScreenEvents
 
 @Composable
@@ -37,8 +38,9 @@ fun AnimeHeader(
     onEvents: (AnimeDetailsScreenEvents) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
+    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
+    val screenHeight = with(density) { windowInfo.containerSize.height.toDp() }
     var imageSize by remember { mutableStateOf(IntSize.Zero) }
 
     val gradient = Brush.verticalGradient(
@@ -58,7 +60,7 @@ fun AnimeHeader(
         if (isLandscape()) {
             PosterImage(
                 modifier = Modifier
-                    .height(screenHeight + 24.dp)
+                    .height(screenHeight + MaterialTheme.spacing.large)
                     .onGloballyPositioned { imageSize = it.size },
                 imageUrl = anime.animeUI.posterMini,
                 radius = 10,
@@ -102,7 +104,6 @@ private fun PosterImage(
     Box(modifier = modifier) {
         AnimeImageLoader(
             titleImage = imageUrl,
-            useCache = false,
             radius = radius,
             modifier = Modifier
                 .then(
@@ -121,19 +122,19 @@ private fun LandscapeContent(
     anime: AnimeDetailsUI,
     onEvents: (AnimeDetailsScreenEvents) -> Unit
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp - 96.dp
+    val density = LocalDensity.current
+    val windowInfo = LocalWindowInfo.current
+    val screenHeight = with(density) { windowInfo.containerSize.height.toDp() } - 96.dp
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 8.dp)
+            .padding(start = MaterialTheme.spacing.medium)
             .heightIn(max = screenHeight),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.Bottom
     ) {
         ElevatedCard(
             modifier = Modifier
-                .padding(top = 16.dp)
                 .aspectRatio(7f / 10f)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -145,7 +146,6 @@ private fun LandscapeContent(
         ) {
             AnimeImageLoader(
                 titleImage = anime.poster,
-                useCache = false,
             )
         }
 

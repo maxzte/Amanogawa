@@ -1,20 +1,18 @@
 package id.anison.amanogawa.feature.home
 
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
-import id.anison.amanogawa.core.domain.toAnimeUI
+import id.anison.amanogawa.core.model.mapper.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeUI
-import id.anison.amanogawa.core.model.DataState
-import id.anison.amanogawa.core.model.mapDataState
+import id.anison.amanogawa.core.common.DataState
+import id.anison.amanogawa.core.common.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen.AllTitles
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
@@ -35,8 +33,6 @@ class HomeScreenModel(
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
-
-    val lazyGridState = LazyGridState()
 
     init {
         screenModelScope.launch { loadAnime() }

@@ -11,7 +11,7 @@ import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.repository.FilterRepo
 import id.anison.amanogawa.core.domain.model.FilterType
 import id.anison.amanogawa.core.domain.repository.SearchRepo
-import id.anison.amanogawa.core.domain.toAnimeUI
+import id.anison.amanogawa.core.model.mapper.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeUI
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.PagingEvent
@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach

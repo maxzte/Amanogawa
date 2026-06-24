@@ -4,15 +4,31 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ArrowOutward
+import androidx.compose.material.icons.filled.AutoMode
+import androidx.compose.material.icons.filled.AvTimer
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Radar
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
@@ -29,6 +45,7 @@ object AmanogawaIcon {
 
     val arrowBack = Icons.AutoMirrored.Default.ArrowBack
     val arrowForward = Icons.AutoMirrored.Default.ArrowForward
+    val arrowOutward = Icons.Filled.ArrowOutward
     val refresh = Icons.Filled.Refresh
     val close = Icons.Filled.Close
     val check = Icons.Default.Check
@@ -45,6 +62,21 @@ object AmanogawaIcon {
     val person = Icons.Filled.Person
     val personOutlined = Icons.Outlined.Person
     val clear = Icons.Default.Clear
+    val eye = Icons.Default.RemoveRedEye
+    val language = Icons.Default.Language
+    val history = Icons.Default.History
+    val filter = Icons.Default.FilterAlt
+    val radar = Icons.Default.Radar
+    val like = Icons.Default.ThumbUp
+    val disLike = Icons.Default.ThumbDown
+    val avTime = Icons.Default.AvTimer
+    val download = Icons.Default.Download
+    val palette = Icons.Default.Palette
+    val info = Icons.Default.Info
+    val description = Icons.Default.Description
+    val lightMode = Icons.Default.LightMode
+    val darkMode = Icons.Default.DarkMode
+    val followSystemMode = Icons.Default.AutoMode
 
     val amanogawaLogo
         @Composable get() = painterResource(id = R.drawable.amanogawa_logo)

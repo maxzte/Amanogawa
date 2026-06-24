@@ -30,7 +30,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -47,6 +46,7 @@ import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.search.screenmodel.FilterScreenEvents
 import id.anison.amanogawa.feature.search.screenmodel.FilterScreenModel
 import id.anison.amanogawa.feature.search.screenmodel.toScreen
@@ -56,7 +56,7 @@ class FilterScreen : Screen {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<FilterScreenModel>()
+        val screenModel: FilterScreenModel = koinScreenModel()
         val state by screenModel.state.collectAsState()
 
         NavigationHandler(
@@ -120,13 +120,13 @@ class FilterScreen : Screen {
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = 8.dp,
+                    start = MaterialTheme.spacing.medium,
                     top = paddingValues.calculateTopPadding(),
-                    end = 8.dp,
+                    end = MaterialTheme.spacing.medium,
                     bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                     else paddingValues.calculateBottomPadding()
                 ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
             ) {
                 item(key = "genresText") {
                     Text(
@@ -136,7 +136,7 @@ class FilterScreen : Screen {
                 }
 
                 item(key = "genresFlow") {
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)) {
                         searchOptions.genres.forEach { genre ->
                             val isSelected = genre in filter.genres
 
@@ -179,10 +179,10 @@ class FilterScreen : Screen {
                         Text(
                             text = label,
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(vertical = MaterialTheme.spacing.small)
                         )
 
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)) {
                             teamMembersOfType.forEach { teamMemberUI ->
                                 val isSelected = teamMemberUI in filter.teamMembers
 
@@ -221,9 +221,9 @@ class FilterScreen : Screen {
 
                 item(key = "yearsFlow") {
                     LazyRow(
-                        modifier = Modifier.ignoreHorizontalParentPadding(8.dp),
-                        contentPadding = PaddingValues(horizontal = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier.ignoreHorizontalParentPadding(MaterialTheme.spacing.small),
+                        contentPadding = PaddingValues(horizontal = MaterialTheme.spacing.small),
+                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
                     ) {
                         items(
                             items = searchOptions.years,

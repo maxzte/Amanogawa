@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import id.anison.amanogawa.core.ui.spacing
 
 @Composable
 fun CustomListItemSwitch(
@@ -27,7 +28,7 @@ fun CustomListItemSwitch(
     onClick: () -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18))
@@ -46,20 +47,22 @@ fun CustomListItemSwitch(
                     shape = RoundedCornerShape(25)
                 )
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = MaterialTheme.spacing.medium),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = text, style = MaterialTheme.typography.bodyLarge)
+
             Switch(
                 checked = checked,
                 onCheckedChange = { onClick() }
             )
         }
+
         if (supportingContent != null) {
             Text(
                 text = supportingContent,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
             )
         }
     }

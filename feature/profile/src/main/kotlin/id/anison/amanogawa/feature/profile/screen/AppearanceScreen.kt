@@ -1,7 +1,8 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package id.anison.amanogawa.feature.profile.screen
 
 import android.os.Build
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
@@ -12,9 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,7 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -49,19 +48,19 @@ import id.anison.amanogawa.core.ui.common.component.CustomListItemSwitch
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.profile.AppearanceNavigationEvent
 import id.anison.amanogawa.feature.profile.AppearanceScreenEvent
 import id.anison.amanogawa.feature.profile.AppearanceScreenModel
 import id.anison.amanogawa.feature.profile.AppearanceSettingsUIState
 
 class AppearanceScreen : Screen {
-    override val key: ScreenKey
-        get() = "appearanceScreen"
+    override val key: ScreenKey = "appearanceScreen"
 
     @Composable
     override fun Content() {
         val navigator: Navigator = LocalNavigator.currentOrThrow
-        val screenModel = koinScreenModel<AppearanceScreenModel>()
+        val screenModel: AppearanceScreenModel = koinScreenModel()
         val appSettings by screenModel.appSettings.collectAsState()
 
         LaunchedEffect(Unit) {
@@ -86,12 +85,13 @@ class AppearanceScreen : Screen {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun AppearanceContent(
         appSettings: AppSettings,
         onEvents: (AppearanceScreenEvent) -> Unit,
     ) {
+        val mediumSpacing = MaterialTheme.spacing.medium
+
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
@@ -104,11 +104,11 @@ class AppearanceScreen : Screen {
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(mediumSpacing),
                 contentPadding = PaddingValues(
-                    start = 8.dp,
-                    top = paddingValues.calculateTopPadding() + 8.dp,
-                    end = 8.dp,
+                    start = mediumSpacing,
+                    top = paddingValues.calculateTopPadding() + mediumSpacing,
+                    end = mediumSpacing,
                     bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                     else paddingValues.calculateBottomPadding()
                 ),
@@ -149,24 +149,21 @@ class AppearanceScreen : Screen {
             ThemeOption(
                 theme = AppTheme.LIGHT,
                 labelId = R.string.light,
-                iconId = R.drawable.ic_rounded_light_mode_24
+                icon = AmanogawaIcon.lightMode,
             ),
             ThemeOption(
                 theme = AppTheme.DARK,
                 labelId = R.string.dark,
-                iconId = R.drawable.ic_rounded_dark_mode_24
+                icon = AmanogawaIcon.darkMode,
             ),
             ThemeOption(
                 theme = AppTheme.FOLLOW_SYSTEM,
                 labelId = R.string.dynamic,
-                iconId = R.drawable.ic_rounded_brightness_medium_24
+                icon = AmanogawaIcon.followSystemMode,
             ),
         )
 
-        Text(
-            text = stringResource(id = R.string.app_theme),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
+        Text(text = stringResource(id = R.string.app_theme))
 
         Spacer(Modifier.height(8.dp))
 
@@ -174,7 +171,7 @@ class AppearanceScreen : Screen {
             modifier = Modifier
                 .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12))
         ) {
-            themes.forEachIndexed { index, (themeObj, labelId, iconId) ->
+            themes.forEachIndexed { index, (themeObj, labelId, icon) ->
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && themeObj == AppTheme.FOLLOW_SYSTEM) return@forEachIndexed
                 if (index > 0) HorizontalDivider()
                 ListItem(
@@ -182,7 +179,7 @@ class AppearanceScreen : Screen {
                         Text(text = stringResource(labelId))
                     },
                     leadingContent = {
-                        Icon(painter = painterResource(id = iconId), contentDescription = null)
+                        Icon(imageVector = icon, contentDescription = null)
                     },
                     trailingContent = {
                         AnimatedVisibility(visible = theme == themeObj) {
@@ -206,5 +203,5 @@ class AppearanceScreen : Screen {
 private data class ThemeOption(
     val theme: AppTheme,
     @StringRes val labelId: Int,
-    @DrawableRes val iconId: Int,
+    val icon: ImageVector,
 )

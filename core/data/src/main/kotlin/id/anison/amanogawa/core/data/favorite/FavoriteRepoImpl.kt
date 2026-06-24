@@ -1,7 +1,7 @@
 package id.anison.amanogawa.core.data.favorite
 
 import id.anison.amanogawa.core.data.toAppError
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.database.favorite.FavoriteDao
 import id.anison.amanogawa.core.domain.model.Favorite

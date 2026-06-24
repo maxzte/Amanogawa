@@ -11,11 +11,11 @@ import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.core.domain.repository.SearchRepo
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
-import id.anison.amanogawa.core.domain.toAnimeDetailsUI
-import id.anison.amanogawa.core.domain.toAnimeUI
+import id.anison.amanogawa.core.model.mapper.toAnimeDetailsUI
+import id.anison.amanogawa.core.model.mapper.toAnimeUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
 import id.anison.amanogawa.core.model.AnimeUI
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails

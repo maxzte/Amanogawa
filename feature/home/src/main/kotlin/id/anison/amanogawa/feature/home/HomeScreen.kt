@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.navigation.NavigationHandler
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
@@ -54,9 +56,15 @@ class HomeScreen : Screen {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<HomeScreenModel>()
+        val screenModel: HomeScreenModel = koinScreenModel()
         val state by screenModel.state.collectAsState()
-        val lazyGridState = screenModel.lazyGridState
+        val lazyGridState = rememberLazyGridState()
+
+        LaunchedEffect(Unit) {
+            screenModel.scrollToTopEvent.collect {
+                lazyGridState.animateScrollToItem(0)
+            }
+        }
 
         NavigationHandler(
             navigationState = screenModel.navEventState,

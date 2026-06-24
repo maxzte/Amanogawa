@@ -26,6 +26,8 @@ import id.anison.amanogawa.core.database.genre.GenreDao
 import id.anison.amanogawa.core.database.genre.GenreDbo
 import id.anison.amanogawa.core.database.search.SearchResultDao
 import id.anison.amanogawa.core.database.search.SearchResultDbo
+import id.anison.amanogawa.core.database.watch.WatchHistoryDao
+import id.anison.amanogawa.core.database.watch.WatchHistoryDbo
 import id.anison.amanogawa.core.database.teammember.DubberDbo
 import id.anison.amanogawa.core.database.teammember.SoundEngineerDbo
 import id.anison.amanogawa.core.database.teammember.TeamMemberDao
@@ -54,8 +56,9 @@ import id.anison.amanogawa.core.database.util.EnumConverter
         FilterDubberCrossRef::class,
         FilterTranslatorCrossRef::class,
         FilterSoundEngineerCrossRef::class,
+        WatchHistoryDbo::class,
     ],
-    version = 1
+    version = 2
 )
 @TypeConverters(Converters::class, EnumConverter::class)
 abstract class AmanogawaDatabase : RoomDatabase() {
@@ -68,6 +71,7 @@ abstract class AmanogawaDatabase : RoomDatabase() {
     abstract fun teamMemberDao(): TeamMemberDao
     abstract fun searchResultDao(): SearchResultDao
     abstract fun favoriteDao(): FavoriteDao
+    abstract fun watchHistoryDao(): WatchHistoryDao
 }
 
 fun amanogawaDatabase(applicationContext: Context): AmanogawaDatabase {
@@ -75,5 +79,5 @@ fun amanogawaDatabase(applicationContext: Context): AmanogawaDatabase {
         applicationContext,
         AmanogawaDatabase::class.java,
         "amanogawa-database"
-    ).fallbackToDestructiveMigration(false).build()
+    ).fallbackToDestructiveMigration(true).build()
 }

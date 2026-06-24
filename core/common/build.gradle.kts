@@ -7,5 +7,5 @@ android {
 }
 
 dependencies {
-    api(libs.kermit)
+    implementation(libs.kermit)
 }

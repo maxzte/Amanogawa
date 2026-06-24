@@ -11,6 +11,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun <T> NavigationHandler(
@@ -36,7 +37,7 @@ fun <T> NavigationHandler(
                 navigator.pop()
             }
 
-            delay(debounceDelay)
+            delay(debounceDelay.milliseconds)
             isNavigating.value = false
         }
     }

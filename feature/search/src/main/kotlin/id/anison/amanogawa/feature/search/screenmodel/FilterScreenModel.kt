@@ -3,12 +3,12 @@ package id.anison.amanogawa.feature.search.screenmodel
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Log
-import id.anison.amanogawa.core.model.mapDataState
+import id.anison.amanogawa.core.common.mapDataState
 import id.anison.amanogawa.core.domain.repository.FilterRepo
-import id.anison.amanogawa.core.domain.toFilter
-import id.anison.amanogawa.core.domain.toFilterUI
+import id.anison.amanogawa.core.model.mapper.toFilter
+import id.anison.amanogawa.core.model.mapper.toFilterUI
 import id.anison.amanogawa.core.model.FilterUI
 import id.anison.amanogawa.core.model.GenreUI
 import id.anison.amanogawa.core.model.TeamMemberUI

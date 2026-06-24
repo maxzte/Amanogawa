@@ -13,7 +13,7 @@ abstract class DatabaseTest {
     @Before
     open fun setUp() {
         db = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext<Context>(),
+            ApplicationProvider.getApplicationContext(),
             AmanogawaDatabase::class.java,
         ).allowMainThreadQueries().build()
     }

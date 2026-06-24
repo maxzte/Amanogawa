@@ -1,6 +1,6 @@
 package id.anison.amanogawa.core.data
 
-import id.anison.amanogawa.core.model.AppError
+import id.anison.amanogawa.core.common.AppError
 import java.io.IOException
 
 

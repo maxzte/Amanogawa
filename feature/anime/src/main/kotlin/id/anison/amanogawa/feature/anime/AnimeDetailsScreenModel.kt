@@ -1,6 +1,7 @@
 package id.anison.amanogawa.feature.anime
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
@@ -8,16 +9,17 @@ import cafe.adriel.voyager.core.screen.Screen
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
 import id.anison.amanogawa.core.domain.repository.FavoriteRepo
-import id.anison.amanogawa.core.domain.toAnimeDetailsUI
-import id.anison.amanogawa.core.domain.toAnimeEpisodesUI
-import id.anison.amanogawa.core.domain.toFavorite
-import id.anison.amanogawa.core.domain.toFavoriteUI
+import id.anison.amanogawa.core.domain.repository.WatchHistoryRepo
+import id.anison.amanogawa.core.model.mapper.toAnimeDetailsUI
+import id.anison.amanogawa.core.model.mapper.toAnimeEpisodesUI
+import id.anison.amanogawa.core.model.mapper.toFavorite
+import id.anison.amanogawa.core.model.mapper.toFavoriteUI
 import id.anison.amanogawa.core.model.AnimeDetailsUI
+import id.anison.amanogawa.core.model.AnimeEpisodeUI
 import id.anison.amanogawa.core.model.AnimeEpisodesUI
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.SingleEventHandler
-import id.anison.amanogawa.core.model.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,6 +39,7 @@ class AnimeDetailsScreenModel(
     @InjectedParam private val animeId: Long,
     @Provided private val animeRepo: AnimeRepo,
     @Provided private val favoriteRepo: FavoriteRepo,
+    @Provided private val watchHistoryRepo: WatchHistoryRepo,
 ) : StateScreenModel<AnimeState>(AnimeState()) {
     private val singleEventHandler = SingleEventHandler()
     val lazyGridState = LazyGridState()
@@ -116,6 +119,12 @@ class AnimeDetailsScreenModel(
                 }
             }
 
+            is AnimeDetailsScreenEvents.OnEpisodeClick -> {
+                if (singleEventHandler.canTrigger()) {
+                    recordEpisodeWatch(event.episode)
+                }
+            }
+
             is AnimeDetailsScreenEvents.Refresh -> {
                 if (singleEventHandler.canTrigger()) {
                     loadAnimeDetails()
@@ -127,32 +136,23 @@ class AnimeDetailsScreenModel(
     private fun loadAnimeDetails() = screenModelScope.launch {
         mutableState.update { it.copy(anime = DataState.Loading) }
 
-        val animeDetails =
-            animeRepo.getAnimeDetailsById(animeId).mapDataState { it.toAnimeDetailsUI() }
-        val episodes =
-            animeRepo.getAnimeEpisodesById(animeId).mapDataState { it.toAnimeEpisodesUI() }
-
+        val animeDetails = animeRepo.getAnimeDetailsById(animeId)
+        val episodes = animeRepo.getAnimeEpisodesById(animeId)
 
         mutableState.update { oldState ->
-            val newState = when (animeDetails) {
-                is DataState.Error -> DataState.Error(animeDetails.exception)
-                DataState.Loading -> DataState.Loading
-                is DataState.Success -> {
-                    when (episodes) {
-                        is DataState.Error -> DataState.Error(episodes.exception)
-                        DataState.Loading -> DataState.Loading
-                        is DataState.Success -> {
-                            Log.d(tag = TAG) { "animeDetails is ${animeDetails.data}" }
-                            Log.d(tag = TAG) { "episodes are ${episodes.data}" }
-                            DataState.Success(
-                                AnimeDetailsFull(
-                                    anime = animeDetails.data,
-                                    episodes = episodes.data
-                                )
-                            )
-                        }
-                    }
+            val newState = when {
+                animeDetails is DataState.Error -> DataState.Error(animeDetails.exception)
+                episodes is DataState.Error -> DataState.Error(episodes.exception)
+                animeDetails is DataState.Success && episodes is DataState.Success -> {
+                    val animeUI = animeDetails.data.toAnimeDetailsUI()
+                    DataState.Success(
+                        AnimeDetailsFull(
+                            anime = animeUI,
+                            episodes = episodes.data.toAnimeEpisodesUI()
+                        )
+                    )
                 }
+                else -> DataState.Loading
             }
 
             oldState.copy(anime = newState)
@@ -180,18 +180,38 @@ class AnimeDetailsScreenModel(
         }
     }
 
+    private fun recordEpisodeWatch(episode: AnimeEpisodeUI) = screenModelScope.launch {
+        val state = mutableState.value
+        val anime = (state.anime as? DataState.Success)?.data?.anime ?: return@launch
+        watchHistoryRepo.recordWatch(
+            animeId = anime.animeUI.animeId,
+            animeName = anime.animeUI.name,
+            animeEnJpName = anime.animeUI.enJpName,
+            animePoster = anime.poster,
+            animePosterThumb = anime.animeUI.posterThumb,
+            lastEpisodeId = episode.episodeId,
+            lastEpisodeNumber = episode.number,
+            lastEpisodeTitle = episode.name,
+            lastSeason = anime.animeUI.season,
+            lastPart = anime.animeUI.part,
+            lastYear = anime.animeUI.year,
+        )
+    }
+
     companion object {
         private const val TAG = "AnimeDetailsSM"
     }
 
 }
 
+@Immutable
 data class AnimeState(
     val anime: DataState<AnimeDetailsFull> = DataState.Loading,
     val isFavorite: Boolean = false,
     val scrollToTop: Boolean = false,
 )
 
+@Immutable
 data class AnimeDetailsFull(
     val anime: AnimeDetailsUI,
     val episodes: AnimeEpisodesUI,
@@ -212,6 +232,8 @@ sealed interface AnimeDetailsScreenEvents {
         val index: Int,
         val images: List<String>
     ) : AnimeDetailsScreenEvents
+
+    data class OnEpisodeClick(val episode: AnimeEpisodeUI) : AnimeDetailsScreenEvents
 
     object Refresh : AnimeDetailsScreenEvents
 }

@@ -12,6 +12,7 @@
 
     <!-- ABOUT SCREEN -->
     <string name="about_us">About us</string>
+    <string name="open_source_licenses">Open source licenses</string>
     <string name="amanogawa" translatable="false">Amanogawa</string>
     <string name="amanogawa_about">" – this is a Ukrainian anime community… Ukrainian anime dubbing. Quite logical. We translate and voice your favorite titles, manage social networks, cut videos for YouTube, make a podcast and have our own discord server. On January 12, 2020, a team called Amanogawa began its history, which means "Milky Way" in Japanese💫 Ambitious people gathered here who were passionate about anime and voice acting and saw each other's potential, which will help them move through the thorns to the stars and beyond! Amanogawa is a team that currently includes 10 male and female translators, 4 translators, a publisher responsible for partnerships - in short, this is a lot of people who work at night and on weekends, and in their sleep they still come up with ideas for posts and Tik Tok."</string>
     <string name="mission">"Mission: "</string>
@@ -170,6 +171,14 @@
 
     <!-- SETTINGS SCREEN -->
     <string name="settings">Settings</string>
+    <string name="recently_watched">Recently watched</string>
+    <string name="statistics">Statistics</string>
+    <string name="favorites_count">Favorites: %1$d</string>
+    <string name="watched_count">Watched: %1$d</string>
+    <string name="no_recently_watched">No recently watched anime</string>
+    <string name="delete_watch_history_confirmation">Remove this anime from history?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
     <string name="black_theme">Black theme</string>
     <string name="our_socials">Our socials</string>
     <string name="keyboardarrowright" translatable="false">KeyboardArrowRight</string>

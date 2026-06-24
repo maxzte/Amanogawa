@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -97,9 +96,7 @@ class TeamMemberDaoTest : DatabaseTest() {
     fun `cascade delete removes child roles`() = runTest {
         val id = dao.insertTeamMember(TeamMemberDbo(name = "Alice"))
         dao.insertDubber(DubberDbo(dubberId = 100, teamMemberId = id))
-        db.teamMemberDao().let {
-            it.insertDubber(DubberDbo(dubberId = 101, teamMemberId = id))
-        }
+        db.teamMemberDao().insertDubber(DubberDbo(dubberId = 101, teamMemberId = id))
         db.clearAllTables()
         val result = dao.getTeamMemberWithRoles("Alice")
         assertNull(result)

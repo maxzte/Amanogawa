@@ -1,17 +1,20 @@
+@file:OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+
 package id.anison.amanogawa.feature.search.screenmodel
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.text.input.TextFieldValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.screen.Screen
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.model.SingleEventHandler
-import id.anison.amanogawa.core.model.mapDataState
+import id.anison.amanogawa.core.common.mapDataState
 import id.anison.amanogawa.core.domain.repository.SearchRepo
-import id.anison.amanogawa.core.domain.toSearchResult
-import id.anison.amanogawa.core.domain.toSearchResultUI
+import id.anison.amanogawa.core.model.mapper.toSearchResult
+import id.anison.amanogawa.core.model.mapper.toSearchResultUI
 import id.anison.amanogawa.core.model.SearchResultUI
 import id.anison.amanogawa.core.navigation.SharedScreen.AnimeDetails
 import id.anison.amanogawa.feature.search.screen.FilterScreen
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Provided
 import org.koin.core.annotation.Single
+import kotlin.time.Duration.Companion.milliseconds
 
 @Single
 class SearchScreenModel(
@@ -45,9 +49,13 @@ class SearchScreenModel(
     private val _navEventState = MutableSharedFlow<NavigationEvent>()
     val navEventState = _navEventState.asSharedFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private val _scrollToTopEvent = MutableSharedFlow<Unit>()
+    val scrollToTopEvent = _scrollToTopEvent.asSharedFlow()
+
+    val lazyListState = LazyListState()
+
     val searchResultState: StateFlow<DataState<List<SearchResultUI>>> = query
-        .debounce(500)
+        .debounce(500.milliseconds)
         .flatMapLatest { queryStr ->
             if (queryStr.text.trim().length < 2) {
                 flowOf(DataState.Loading)
@@ -118,6 +126,12 @@ class SearchScreenModel(
             is SearchScreenEvents.OnSearchQueryChange -> {
                 updateQuery(event.query)
             }
+        }
+    }
+
+    fun requestScrollToTop() {
+        screenModelScope.launch {
+            _scrollToTopEvent.emit(Unit)
         }
     }
 

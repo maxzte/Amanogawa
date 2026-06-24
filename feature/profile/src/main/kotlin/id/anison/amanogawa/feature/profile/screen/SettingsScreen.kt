@@ -14,9 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -26,15 +24,14 @@ import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.button.ArrowBackButton
 import id.anison.amanogawa.core.ui.common.component.layout.AmanogawaTopBar
-import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
 import id.anison.amanogawa.core.ui.common.isLandscape
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.profile.SettingsScreenEvent
 import id.anison.amanogawa.feature.profile.SettingsScreenModel
 import id.anison.amanogawa.feature.profile.toScreen
 
 class SettingsScreen : Screen {
-    override val key: ScreenKey
-        get() = "settingsScreen"
+    override val key: ScreenKey = "settingsScreen"
 
     @Composable
     override fun Content() {
@@ -54,6 +51,8 @@ class SettingsScreen : Screen {
     private fun SettingsScreenContent(
         onEvents: (SettingsScreenEvent) -> Unit,
     ) {
+        val mediumSpacing = MaterialTheme.spacing.medium
+
         Scaffold(
             topBar = {
                 AmanogawaTopBar(
@@ -67,9 +66,7 @@ class SettingsScreen : Screen {
         ) { paddingValues ->
             LazyColumn(
                 contentPadding = PaddingValues(
-                    start = 8.dp,
-                    top = paddingValues.calculateTopPadding() + 8.dp,
-                    end = 8.dp,
+                    top = paddingValues.calculateTopPadding() + mediumSpacing,
                     bottom = if (!isLandscape()) paddingValues.calculateBottomPadding() + AmanogawaConst.bottomBarInsets
                     else paddingValues.calculateBottomPadding()
                 ),
@@ -85,7 +82,7 @@ class SettingsScreen : Screen {
                         },
                         leadingContent = {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_rounded_palette_24),
+                                imageVector = AmanogawaIcon.palette,
                                 contentDescription = "Appearance icon",
                             )
                         },
@@ -96,7 +93,6 @@ class SettingsScreen : Screen {
                             )
                         },
                         modifier = Modifier
-                            .ignoreHorizontalParentPadding(8.dp)
                             .clickable(
                                 onClick = { onEvents(SettingsScreenEvent.PushAppearance) }
                             )
@@ -113,7 +109,7 @@ class SettingsScreen : Screen {
                         },
                         leadingContent = {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_rounded_info_24),
+                                imageVector = AmanogawaIcon.info,
                                 contentDescription = "Info icon",
                             )
                         },
@@ -124,9 +120,35 @@ class SettingsScreen : Screen {
                             )
                         },
                         modifier = Modifier
-                            .ignoreHorizontalParentPadding(8.dp)
                             .clickable(
                                 onClick = { onEvents(SettingsScreenEvent.PushAboutUs) }
+                            )
+                    )
+                }
+
+                item {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.open_source_licenses),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = AmanogawaIcon.description,
+                                contentDescription = "Open source licenses icon",
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = AmanogawaIcon.keyboardArrowRight,
+                                contentDescription = stringResource(id = R.string.keyboardarrowright),
+                            )
+                        },
+                        modifier = Modifier
+                            .clickable(
+                                onClick = { onEvents(SettingsScreenEvent.PushLicenses) }
                             )
                     )
                 }

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -17,6 +16,7 @@ import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.feature.anime.ImageScreen
 import id.anison.amanogawa.feature.search.screen.RandomAnimeCarouselScreen
 import id.anison.amanogawa.feature.search.screen.SearchScreen
+import id.anison.amanogawa.feature.search.screenmodel.SearchScreenModel
 
 object SearchTab : AmanogawaTab {
     private fun readResolve(): Any = SearchTab
@@ -26,8 +26,8 @@ object SearchTab : AmanogawaTab {
         @Composable
         get() {
             val title = stringResource(id = R.string.search_tab)
-            val icon = rememberVectorPainter(image = AmanogawaIcon.searchOutlined)
-            val selectedIcon = rememberVectorPainter(image = AmanogawaIcon.search)
+            val icon = IconSource.VectorIcon(AmanogawaIcon.searchOutlined)
+            val selectedIcon = IconSource.VectorIcon(AmanogawaIcon.search)
 
             return remember {
                 AmanogawaTabOptions(
@@ -41,7 +41,8 @@ object SearchTab : AmanogawaTab {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<MainScreenModel>()
+        val screenModel: MainScreenModel = koinScreenModel()
+        val searchScreenModel: SearchScreenModel = koinScreenModel()
 
         Navigator(
             screen = SearchScreen(),
@@ -71,7 +72,7 @@ object SearchTab : AmanogawaTab {
                 screenModel.events.collect { event ->
                     when (event) {
                         is MainUIEvent.ScrollToTop -> {
-
+                            searchScreenModel.requestScrollToTop()
                         }
 
                         is MainUIEvent.NavigateToRoot -> {

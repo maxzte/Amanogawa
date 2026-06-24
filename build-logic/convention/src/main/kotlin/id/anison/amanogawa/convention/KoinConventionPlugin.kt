@@ -1,7 +1,6 @@
 package id.anison.amanogawa.convention
 
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
 import id.anison.amanogawa.convention.util.libs
 import org.gradle.api.Plugin

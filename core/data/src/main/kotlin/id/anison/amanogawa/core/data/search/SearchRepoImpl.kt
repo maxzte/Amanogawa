@@ -26,7 +26,7 @@ import id.anison.amanogawa.core.domain.model.SearchResult
 import id.anison.amanogawa.core.domain.model.TeamMember
 import id.anison.amanogawa.core.domain.model.TeamMemberType
 import id.anison.amanogawa.core.domain.repository.SearchRepo
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

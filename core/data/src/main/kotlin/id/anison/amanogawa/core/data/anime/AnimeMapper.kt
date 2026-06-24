@@ -14,7 +14,6 @@ import id.anison.amanogawa.core.network.model.anime.AnimeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodeDto
 import id.anison.amanogawa.core.network.model.anime.AnimeEpisodesDto
 import kotlin.math.round
-import kotlin.math.roundToInt
 
 internal fun AnimeDto.toAnime() = Anime(
     animeId = animeId,

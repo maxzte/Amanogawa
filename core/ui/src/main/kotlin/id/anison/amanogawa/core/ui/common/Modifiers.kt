@@ -63,7 +63,9 @@ fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
     }
 }
 
-fun Modifier.bounceClick() = composed {
+fun Modifier.bounceClick(
+    onClick: () -> Unit = {}
+) = composed {
     var buttonState by remember { mutableStateOf(ButtonState.Idle) }
     val scale by animateFloatAsState(
         targetValue = if (buttonState == ButtonState.Pressed) {
@@ -82,7 +84,7 @@ fun Modifier.bounceClick() = composed {
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,
-            onClick = { }
+            onClick = onClick
         )
         .pointerInput(buttonState) {
             awaitPointerEventScope {

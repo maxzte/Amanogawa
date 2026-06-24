@@ -23,12 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.core.ui.common.LineSide
 import id.anison.amanogawa.core.ui.common.grayLine
 import id.anison.amanogawa.feature.search.screenmodel.SearchScreenEvents
@@ -45,14 +45,19 @@ internal fun AmanogawaSearchBar(
             .windowInsetsPadding(SearchBarDefaults.windowInsets)
             .fillMaxWidth()
             .grayLine(side = LineSide.Bottom)
-            .padding(start = 8.dp, top = 16.dp, end = 8.dp, bottom = 8.dp),
+            .padding(
+                start = MaterialTheme.spacing.small,
+                top = MaterialTheme.spacing.medium,
+                end = MaterialTheme.spacing.small,
+                bottom = MaterialTheme.spacing.small
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
     ) {
         Row(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
         ) {
             Icon(
                 imageVector = AmanogawaIcon.search,
@@ -63,7 +68,7 @@ internal fun AmanogawaSearchBar(
                 modifier = Modifier
                     .weight(1f)
                     .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = MaterialTheme.spacing.small)
             ) {
                 Row(
                     modifier = Modifier
@@ -117,7 +122,7 @@ internal fun AmanogawaSearchBar(
                 onClick = { onEvents(SearchScreenEvents.OnRandomButtonClick) },
                 content = {
                     Icon(
-                        painter = painterResource(R.drawable.ic_rounded_arrow_outward_24),
+                        imageVector = AmanogawaIcon.radar,
                         contentDescription = stringResource(R.string.filter_icon)
                     )
                 }
@@ -127,7 +132,7 @@ internal fun AmanogawaSearchBar(
                 onClick = { onEvents(SearchScreenEvents.OnExtendedButtonClick) },
                 content = {
                     Icon(
-                        painter = painterResource(R.drawable.ic_filter_24),
+                        imageVector = AmanogawaIcon.filter,
                         contentDescription = stringResource(R.string.filter_icon)
                     )
                 }

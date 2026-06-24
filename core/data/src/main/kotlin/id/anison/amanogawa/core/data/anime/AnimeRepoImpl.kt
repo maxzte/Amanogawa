@@ -7,7 +7,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
-import id.anison.amanogawa.core.common.ScheduleParser
 import id.anison.amanogawa.core.data.config
 import id.anison.amanogawa.core.data.runDataState
 import id.anison.amanogawa.core.database.AmanogawaDatabase
@@ -15,8 +14,8 @@ import id.anison.amanogawa.core.domain.model.Anime
 import id.anison.amanogawa.core.domain.model.AnimeDetails
 import id.anison.amanogawa.core.domain.model.AnimeEpisodes
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
-import id.anison.amanogawa.core.model.AppError
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.AppError
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.network.AmanogawaApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

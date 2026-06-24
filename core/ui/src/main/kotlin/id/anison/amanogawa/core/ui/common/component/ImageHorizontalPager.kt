@@ -35,7 +35,6 @@ fun ImageHorizontalPager(
             ) {
                 AnimeImageLoader(
                     titleImage = image,
-                    useCache = false,
                     modifier = modifier.aspectRatio(16f / 9f),
                 )
             }

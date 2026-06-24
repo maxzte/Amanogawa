@@ -1,6 +1,8 @@
 package id.anison.amanogawa
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -71,6 +73,7 @@ import id.anison.amanogawa.core.ui.common.AmanogawaConst
 import id.anison.amanogawa.core.ui.common.LineSide
 import id.anison.amanogawa.core.ui.common.grayLine
 import id.anison.amanogawa.tab.AmanogawaTab
+import id.anison.amanogawa.tab.AmanogawaTabIcon
 import id.anison.amanogawa.tab.HomeTab
 import id.anison.amanogawa.tab.ProfileTab
 import id.anison.amanogawa.tab.SearchTab
@@ -81,7 +84,7 @@ class MainScreen : Screen {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<MainScreenModel>()
+        val screenModel: MainScreenModel = koinScreenModel()
         val isOnline by screenModel.isOnline.collectAsState()
         val snackbarHostState = remember { SnackbarHostState() }
 
@@ -103,16 +106,17 @@ class MainScreen : Screen {
 
         TabNavigator(
             tab = HomeTab,
-        ) { _ ->
+        ) { tabNavigator ->
+            val activity = LocalActivity.current
 
-//            BackHandler {
-//                val previousTab = screenModel.popFromTabHistory()
-//                if (previousTab != null) {
-//                    tabNavigator.current = previousTab
-//                } else {
-//                    activity.moveTaskToBack(true)
-//                }
-//            }
+            BackHandler {
+                val previousTab = screenModel.popFromTabHistory()
+                if (previousTab != null) {
+                    tabNavigator.current = previousTab
+                } else {
+                    activity?.moveTaskToBack(true)
+                }
+            }
 
             Scaffold(
                 bottomBar = {
@@ -267,7 +271,7 @@ class MainScreen : Screen {
 
                         else -> {
                             tabNavigator.current = tab
-//                            screenModel.pushTabToHistory(tab)
+                            screenModel.pushTabToHistory(tab)
                         }
                     }
                 },
@@ -277,10 +281,12 @@ class MainScreen : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Icon(
-                    painter = icon!!,
-                    contentDescription = tab.options.title,
-                )
+                if (icon != null) {
+                    AmanogawaTabIcon(
+                        icon = icon,
+                        contentDescription = tab.options.title,
+                    )
+                }
 
                 Text(
                     text = tab.options.title,
@@ -319,15 +325,17 @@ class MainScreen : Screen {
 
                     else -> {
                         tabNavigator.current = tab
-//                        screenModel.pushTabToHistory(tab)
+                        screenModel.pushTabToHistory(tab)
                     }
                 }
             },
             icon = {
-                Icon(
-                    painter = icon!!,
-                    contentDescription = tab.options.title,
-                )
+                if (icon != null) {
+                    AmanogawaTabIcon(
+                        icon = icon,
+                        contentDescription = tab.options.title,
+                    )
+                }
             },
             label = {
                 Text(

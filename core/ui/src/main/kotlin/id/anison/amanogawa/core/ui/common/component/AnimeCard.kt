@@ -15,12 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.ui.R
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
+import id.anison.amanogawa.core.ui.spacing
 
 
 @Composable
@@ -52,7 +53,7 @@ fun AnimeCard(
                     .clip(RoundedCornerShape(bottomEnd = 16.dp))
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.75f)),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
             ) {
                 Text(
                     text = views,
@@ -63,9 +64,11 @@ fun AnimeCard(
                 )
 
                 Icon(
-                    painter = painterResource(R.drawable.ic_watch_eye),
+                    imageVector = AmanogawaIcon.eye,
                     contentDescription = stringResource(id = R.string.views_icon),
-                    modifier = Modifier.size(16.dp).padding(end = 4.dp)
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(end = MaterialTheme.spacing.extraSmall)
                 )
             }
 

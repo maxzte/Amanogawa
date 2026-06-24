@@ -14,25 +14,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import android.graphics.BitmapFactory
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.graphics.drawable.toBitmap
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.transformations
 import androidx.palette.graphics.Palette
-import coil.Coil
-import coil.ImageLoader
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.BlurTransformation
-import org.koin.compose.koinInject
-import org.koin.core.qualifier.qualifier
+import java.net.URL
 
 
 @Composable
 fun CoilImageLoader(
     titleImage: String,
-    imageLoader: ImageLoader,
     modifier: Modifier = Modifier,
     radius: Int = 0,
     showAmanogawaSpinner: Boolean = false,
@@ -44,10 +41,9 @@ fun CoilImageLoader(
         model = if (radius > 0) {
             ImageRequest.Builder(LocalContext.current)
                 .data(imageUrl)
-                .transformations(BlurTransformation(radius = radius))
+                .transformations(BlurTransformation(radius))
                 .build()
         } else imageUrl,
-        imageLoader = imageLoader,
         onState = { state ->
             isLoading = state is AsyncImagePainter.State.Loading
             isError = state is AsyncImagePainter.State.Error
@@ -74,16 +70,11 @@ fun CoilImageLoader(
 fun AnimeImageLoader(
     modifier: Modifier = Modifier,
     titleImage: String,
-    useCache: Boolean = false,
     radius: Int = 0,
     showAmanogawaSpinner: Boolean = false,
 ) {
-    val qualifier = if (useCache) qualifier("default") else qualifier("noCache")
-    val imageLoader = koinInject<ImageLoader>()
-
     CoilImageLoader(
         titleImage = titleImage,
-        imageLoader = imageLoader,
         radius = radius,
         showAmanogawaSpinner = showAmanogawaSpinner,
         modifier = modifier,
@@ -97,18 +88,13 @@ fun getDominantColor(imageUrl: String): Color {
     val baseUrl = stringResource(R.string.base_link)
 
     LaunchedEffect(imageUrl) {
-        val bitmap = Coil.imageLoader(context)
-            .execute(
-                ImageRequest.Builder(context)
-                    .data(baseUrl + imageUrl)
-                    .allowHardware(false)
-                    .build()
-            ).drawable?.toBitmap()
-
-        bitmap?.let {
-            val palette = Palette.from(it).generate()
-            color = Color(palette.getDominantColor(Color.DarkGray.toArgb()))
-        }
+        try {
+            val bitmap = BitmapFactory.decodeStream(URL(baseUrl + imageUrl).openStream())
+            bitmap?.let {
+                val palette = Palette.from(it).generate()
+                color = Color(palette.getDominantColor(Color.DarkGray.toArgb()))
+            }
+        } catch (_: Exception) { }
     }
 
     return color

@@ -2,6 +2,7 @@ package id.anison.amanogawa.feature.search.screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,18 +27,19 @@ import id.anison.amanogawa.feature.search.ui.AmanogawaSearchBar
 import id.anison.amanogawa.feature.search.ui.SearchHistory
 import id.anison.amanogawa.feature.search.ui.SearchResultList
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 class SearchScreen : Screen {
-    override val key: ScreenKey
-        get() = "searchScreen"
+    override val key: ScreenKey = "searchScreen"
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<SearchScreenModel>()
+        val screenModel: SearchScreenModel = koinScreenModel()
         val query by screenModel.query.collectAsState()
         val searchResultState by screenModel.searchResultState.collectAsState()
         val searchHistoryState by screenModel.searchHistoryState.collectAsState()
         val isSearching = query.text.trim().length >= 2
+        val lazyListState = screenModel.lazyListState
 
         val focusRequester = remember { FocusRequester() }
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -52,7 +54,11 @@ class SearchScreen : Screen {
             toScreen = { toScreen() },
         )
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
             AmanogawaSearchBar(
                 searchQuery = query,
                 onEvents = { screenModel.onEvent(it) },
@@ -75,6 +81,7 @@ class SearchScreen : Screen {
                                     )
                                 )
                             },
+                            lazyListState = lazyListState,
                         )
                     }
                 )
@@ -85,6 +92,7 @@ class SearchScreen : Screen {
                         SearchHistory(
                             searchHistory = searchResultList,
                             onEvents = { screenModel.onEvent(it) },
+                            lazyListState = lazyListState,
                         )
                     },
                     loadingContent = {}
@@ -93,7 +101,13 @@ class SearchScreen : Screen {
         }
 
         LaunchedEffect(Unit) {
-            delay(200)
+            screenModel.scrollToTopEvent.collect {
+                lazyListState.animateScrollToItem(0)
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            delay(200.milliseconds)
             focusRequester.requestFocus()
             keyboardController?.show()
         }

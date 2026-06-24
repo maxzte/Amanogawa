@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -15,6 +14,7 @@ import id.anison.amanogawa.MainUIEvent
 import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.feature.anime.ImageScreen
+import id.anison.amanogawa.feature.profile.ProfileScreenModel
 import id.anison.amanogawa.feature.profile.screen.ProfileScreen
 
 object ProfileTab : AmanogawaTab {
@@ -25,8 +25,8 @@ object ProfileTab : AmanogawaTab {
         @Composable
         get() {
             val title = stringResource(id = R.string.profile_tab)
-            val icon = rememberVectorPainter(image = AmanogawaIcon.personOutlined)
-            val selectedIcon = rememberVectorPainter(image = AmanogawaIcon.person)
+            val icon = IconSource.VectorIcon(AmanogawaIcon.personOutlined)
+            val selectedIcon = IconSource.VectorIcon(AmanogawaIcon.person)
 
             return remember {
                 AmanogawaTabOptions(
@@ -40,7 +40,8 @@ object ProfileTab : AmanogawaTab {
 
     @Composable
     override fun Content() {
-        val screenModel = koinScreenModel<MainScreenModel>()
+        val screenModel: MainScreenModel = koinScreenModel()
+        val profileScreenModel: ProfileScreenModel = koinScreenModel()
 
         Navigator(
             screen = ProfileScreen(),
@@ -62,7 +63,7 @@ object ProfileTab : AmanogawaTab {
                 screenModel.events.collect { event ->
                     when (event) {
                         is MainUIEvent.ScrollToTop -> {
-
+                            profileScreenModel.requestScrollToTop()
                         }
 
                         is MainUIEvent.NavigateToRoot -> {

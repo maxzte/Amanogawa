@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,10 +19,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -31,7 +31,7 @@ import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaIcon
 import id.anison.amanogawa.core.ui.common.component.UserRatingBar
 import id.anison.amanogawa.core.ui.common.component.layout.showWebPage
-import id.anison.amanogawa.core.ui.common.ignoreHorizontalParentPadding
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.feature.anime.AnimeDetailsScreenEvents
 
 @Composable
@@ -40,31 +40,37 @@ fun AnimeHeaderDetails(
     onEvents: (AnimeDetailsScreenEvents) -> Unit,
     isLandscape: Boolean = false,
 ) {
-//    val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
+    val mediumSpacing = MaterialTheme.spacing.medium
 
     Column(
-        modifier = Modifier.padding(horizontal = 8.dp)
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
     ) {
-        UserRatingBar(rating = anime.rating)
+        if (anime.rating > 0) {
+            UserRatingBar(
+                rating = anime.rating,
+                modifier = Modifier.padding(horizontal = mediumSpacing),
+            )
+        }
 
         Text(
             text = anime.animeUI.name,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = mediumSpacing)
         )
 
         Text(
             text = anime.animeUI.enJpName,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = mediumSpacing)
         )
 
         LazyRow(
-            modifier = Modifier.ignoreHorizontalParentPadding(8.dp),
-            contentPadding = PaddingValues(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            contentPadding = PaddingValues(horizontal = mediumSpacing),
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall)
         ) {
             item(
                 key = "yearButton"
@@ -94,7 +100,9 @@ fun AnimeHeaderDetails(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = mediumSpacing),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -118,12 +126,12 @@ fun AnimeHeaderDetails(
 
             Row(
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = MaterialTheme.spacing.small)
                     .weight(1f),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 OutlinedIconButton(
-                    icon = painterResource(id = R.drawable.ic_download_24),
+                    icon = AmanogawaIcon.download,
                     text = if (isLandscape) {
                         stringResource(id = R.string.download_btn)
                     } else null
@@ -137,12 +145,18 @@ fun AnimeHeaderDetails(
                 }
 
                 if (anime.duration.isNotEmpty()) {
-                    TextButton(onClick = {}, contentPadding = PaddingValues(0.dp)) {
+                    TextButton(
+                        onClick = {},
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_access_time_24),
+                            imageVector = AmanogawaIcon.avTime,
                             contentDescription = stringResource(id = R.string.duration)
                         )
-                        Text(text = " ${anime.duration}")
+
+                        Spacer(modifier = Modifier.padding(start = MaterialTheme.spacing.extraSmall))
+
+                        Text(text = anime.duration)
                     }
                 }
             }
@@ -167,7 +181,7 @@ private fun GenreButton(text: String, onClick: () -> Unit) {
 
 @Composable
 private fun OutlinedIconButton(
-    icon: Painter,
+    icon: ImageVector,
     text: String? = null,
     onClick: () -> Unit
 ) {
@@ -177,7 +191,7 @@ private fun OutlinedIconButton(
             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.35f)
         )
     ) {
-        Icon(painter = icon, contentDescription = null)
+        Icon(imageVector = icon, contentDescription = null)
         if (!text.isNullOrBlank()) {
             Text(text = text, style = MaterialTheme.typography.labelLarge)
         }

@@ -16,6 +16,7 @@ class FeatureConventionPlugin : Plugin<Project> {
                 "implementation"(project(":core:ui"))
                 "implementation"(project(":core:common"))
                 "implementation"(project(":core:navigation"))
+                "implementation"(project(":core:model"))
 
                 "implementation"(libs.findLibrary("koin.androidx.compose").get())
 
@@ -26,6 +27,9 @@ class FeatureConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("voyager.koin").get())
 
                 "implementation"(libs.findLibrary("androidx.lifecycle.runtime.ktx").get())
+                "implementation"(libs.findLibrary("androidx.lifecycle.runtime.compose").get())
+                "implementation"(libs.findLibrary("androidx.activity.compose").get())
+                "implementation"(libs.findLibrary("androidx.core.ktx").get())
                 "implementation"(libs.findLibrary("coroutines.android").get())
             }
         }

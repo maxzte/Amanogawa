@@ -9,6 +9,7 @@
 
     <!-- ABOUT SCREEN -->
     <string name="about_us">Про нас</string>
+    <string name="open_source_licenses">Ліцензії з відкритим кодом</string>
     <string name="amanogawa_about">" – це українська аніме спільнота… озвучення аніме українською. Цілком логічно. Ми перекладаємо та озвучуємо ваші улюблені тайтли, ведемо соцмережі, пиляємо відео для YouTube, робимо подкаст і маємо власний дискорд-сервер. 12 січня 2020 року почала свою історію команда з назвою Amanogawa, що в перекладі з японської означає «Чумацький Шлях»💫 Тут зібралися амбіційні люди, які горіли аніме та озвучкою і бачили один в одному потенціал, що допоможе рухатись через терни до зірок і далі! Аманоґава — це команда, яка зараз налічує 10 даберів і даберок, 4 перекладачі та перекладачки, релізера, відповідального за партнерства — словом це багато людей, що працюють і вночі, і на вихідних, а уві сні ще вигадують ідеї для постів і Тік-Току."</string>
     <string name="mission">"Місія: "</string>
     <string name="translators_mission">не вмерти, коли у серії 400 рядків тексту</string>
@@ -118,6 +119,14 @@
 
     <!-- SETTINGS SCREEN -->
     <string name="settings">Налаштування</string>
+    <string name="recently_watched">Нещодавно переглянуті</string>
+    <string name="statistics">Статистика</string>
+    <string name="favorites_count">Улюблених: %1$d</string>
+    <string name="watched_count">Переглянуто: %1$d</string>
+    <string name="no_recently_watched">Немає нещодавно переглянутих</string>
+    <string name="delete_watch_history_confirmation">Видалити це аніме з історії?</string>
+    <string name="delete">Видалити</string>
+    <string name="cancel">Скасувати</string>
     <string name="black_theme">Чорна тема</string>
     <string name="our_socials">Наші соціальні мережі</string>
     <string name="support_us">Підтримати нас</string>

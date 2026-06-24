@@ -1,5 +1,4 @@
 plugins {
-    alias(libs.plugins.amanogawa.android.lib)
     alias(libs.plugins.amanogawa.android.lib.compose)
 }
 
@@ -8,17 +7,13 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.model)
-
-    //KOIN
-    implementation(libs.koin.androidx.compose)
+    implementation(projects.core.common)
 
     //COIL
-    implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
 
-    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.icons.core)
     implementation(libs.androidx.compose.icons.extended)
 

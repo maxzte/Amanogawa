@@ -9,7 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.AnimeRepo
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.notification.Notifier
 import org.koin.android.annotation.KoinWorker
 import org.koin.core.annotation.Provided

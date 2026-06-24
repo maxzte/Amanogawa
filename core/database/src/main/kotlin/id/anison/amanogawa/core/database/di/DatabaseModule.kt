@@ -12,6 +12,7 @@ import id.anison.amanogawa.core.database.filter.FilterDao
 import id.anison.amanogawa.core.database.genre.GenreDao
 import id.anison.amanogawa.core.database.search.SearchResultDao
 import id.anison.amanogawa.core.database.teammember.TeamMemberDao
+import id.anison.amanogawa.core.database.watch.WatchHistoryDao
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
@@ -48,4 +49,7 @@ class DatabaseModule {
 
     @Single
     fun teamMemberDao(database: AmanogawaDatabase): TeamMemberDao = database.teamMemberDao()
+
+    @Single
+    fun watchHistoryDao(database: AmanogawaDatabase): WatchHistoryDao = database.watchHistoryDao()
 }

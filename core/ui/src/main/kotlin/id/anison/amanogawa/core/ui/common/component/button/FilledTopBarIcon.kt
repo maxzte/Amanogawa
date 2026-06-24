@@ -35,13 +35,12 @@ fun FilledTopBarIcon(
 
 @Preview
 @Composable
-fun te(modifier: Modifier = Modifier) {
+fun FilledTopBarIconPreview(modifier: Modifier = Modifier) {
     FilledTopBarIcon(
       onClick = {},
         content = {
             Icon(
                 imageVector = Icons.Filled.Favorite,
-//                tint = MaterialTheme.colorScheme.error,
                 contentDescription = stringResource(id = R.string.liked)
             )
         }

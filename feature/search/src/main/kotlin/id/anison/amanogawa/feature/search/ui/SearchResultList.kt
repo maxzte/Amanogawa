@@ -19,16 +19,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import id.anison.amanogawa.core.model.SearchResultUI
-import id.anison.amanogawa.core.ui.R
 import id.anison.amanogawa.core.ui.common.AmanogawaConst
+import id.anison.amanogawa.core.ui.common.AmanogawaIcon
+import id.anison.amanogawa.core.ui.spacing
 import id.anison.amanogawa.core.ui.common.component.AnimeImageLoader
 import id.anison.amanogawa.core.ui.common.isLandscape
 
@@ -36,19 +35,16 @@ import id.anison.amanogawa.core.ui.common.isLandscape
 internal fun SearchResultList(
     searchResult: List<SearchResultUI>,
     onAnimeClick: (SearchResultUI) -> Unit,
+    lazyListState: LazyListState,
 ) {
-    val lazyListState = rememberSaveable(saver = LazyListState.Saver) {
-        LazyListState()
-    }
-
     LazyColumn(
         state = lazyListState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            top = 8.dp,
+            top = MaterialTheme.spacing.medium,
             bottom = if (!isLandscape()) AmanogawaConst.bottomBarInsets else AmanogawaConst.bottomBarPaddings
         ),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium)
     ) {
         items(
             items = searchResult,
@@ -77,7 +73,7 @@ private fun SearchResultItem(
 
     Row(
         modifier = modifier.clickable { onAnimeClick() },
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.medium),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(modifier = Modifier.fillMaxHeight())
@@ -89,14 +85,13 @@ private fun SearchResultItem(
             content = {
                 AnimeImageLoader(
                     titleImage = anime.posterMini,
-                    useCache = true,
                 )
             }
         )
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
         ) {
             Text(
                 text = anime.name,
@@ -141,7 +136,7 @@ private fun SearchResultItem(
         }
 
         Icon(
-            painter = painterResource(id = R.drawable.ic_rounded_arrow_outward_24),
+            imageVector = AmanogawaIcon.arrowOutward,
             contentDescription = null,
         )
 

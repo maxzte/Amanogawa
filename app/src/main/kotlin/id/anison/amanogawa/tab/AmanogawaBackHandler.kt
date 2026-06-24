@@ -10,7 +10,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.internal.BackHandler
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import id.anison.amanogawa.feature.home.HomeScreen
 
 
 @Composable
@@ -21,16 +20,10 @@ internal fun AmanogawaBackHandler(
     val activity = LocalActivity.currentOrThrow
 
     BackHandler(
-        enabled = true,
+        enabled = navigator.canPop,
         onBack = {
             if (navigator.canPop) {
                 navigator.pop()
-            } else {
-                if (navigator.lastItem is HomeScreen) {
-                    activity.moveTaskToBack(true)
-                } else {
-                    localTabNavigator.current = HomeTab
-                }
             }
         }
     )

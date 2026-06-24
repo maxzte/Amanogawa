@@ -7,6 +7,7 @@ import id.anison.amanogawa.core.domain.repository.SettingsRepo
 import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.feature.profile.screen.AboutUsScreen
 import id.anison.amanogawa.feature.profile.screen.AppearanceScreen
+import id.anison.amanogawa.feature.profile.screen.LicensesScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -54,6 +55,16 @@ class SettingsScreenModel(
                     }
                 }
             }
+
+            is SettingsScreenEvent.PushLicenses -> {
+                if (singleEventHandler.canTrigger()){
+                    screenModelScope.launch {
+                        _navigateEventState.emit(
+                            value = SettingsNavigationEvent.NavigateToLicenses
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -69,16 +80,19 @@ sealed interface SettingsScreenEvent {
     object PopBack: SettingsScreenEvent
     object PushAppearance: SettingsScreenEvent
     object PushAboutUs: SettingsScreenEvent
+    object PushLicenses: SettingsScreenEvent
 }
 
 sealed interface SettingsNavigationEvent {
     object NavigateToBack: SettingsNavigationEvent
     object NavigateToAppearance: SettingsNavigationEvent
     object NavigateToAboutUs: SettingsNavigationEvent
+    object NavigateToLicenses: SettingsNavigationEvent
 }
 
 internal fun SettingsNavigationEvent.toScreen() = when(this) {
     SettingsNavigationEvent.NavigateToBack -> null
     SettingsNavigationEvent.NavigateToAboutUs -> AboutUsScreen()
     SettingsNavigationEvent.NavigateToAppearance -> AppearanceScreen()
+    SettingsNavigationEvent.NavigateToLicenses -> LicensesScreen()
 }

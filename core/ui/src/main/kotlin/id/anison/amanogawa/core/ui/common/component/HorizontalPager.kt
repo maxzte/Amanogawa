@@ -6,12 +6,14 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import id.anison.amanogawa.core.ui.spacing
 import kotlin.math.max
 
 @Composable
@@ -21,8 +23,8 @@ fun <T> AmanogawaHorizontalPager(
     pagerState: PagerState? = null,
     pageContent: @Composable (T) -> Unit,
     key: ((Int) -> Any)? = null,
-    contentPadding: PaddingValues = PaddingValues(8.dp),
-    pageSpacing: Dp = 8.dp,
+    contentPadding: PaddingValues = PaddingValues(MaterialTheme.spacing.medium),
+    pageSpacing: Dp = MaterialTheme.spacing.small,
     userScrollEnabled: Boolean = true,
     minPageWidth: Dp = 150.dp,
 ) {

@@ -1,7 +1,7 @@
 package id.anison.amanogawa.core.data.filter
 
 import androidx.room.Transaction
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.data.toAppError
 import id.anison.amanogawa.core.database.AmanogawaDatabase

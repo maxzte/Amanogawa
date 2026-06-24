@@ -5,7 +5,6 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import id.anison.amanogawa.core.data.ConnectivityRepo
 import id.anison.amanogawa.core.domain.model.AppSettings
 import id.anison.amanogawa.core.domain.repository.SettingsRepo
-import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.tab.AmanogawaTab
 import id.anison.amanogawa.tab.HomeTab
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -57,29 +56,22 @@ class MainScreenModel(
         )
 
     fun pushTabToHistory(newTab: AmanogawaTab) {
+        if (newTab == HomeTab) {
+            tabHistory.clear()
+            tabHistory.add(HomeTab)
+            return
+        }
+
         if (tabHistory.contains(newTab)) {
-            if (newTab != HomeTab || tabHistory.first() != HomeTab) {
-                tabHistory.remove(newTab)
-            }
+            tabHistory.remove(newTab)
         }
 
         tabHistory.add(newTab)
-
-        if (tabHistory.first() != HomeTab) {
-            tabHistory.remove(HomeTab)
-            tabHistory.add(HomeTab)
-            val reordered = linkedSetOf<AmanogawaTab>()
-            reordered.add(HomeTab)
-            reordered.addAll(tabHistory.filter { it != HomeTab })
-            tabHistory.clear()
-            tabHistory.addAll(reordered)
-        }
     }
 
     fun popFromTabHistory(): AmanogawaTab? {
         if (tabHistory.size > 1) {
             tabHistory.removeAt(tabHistory.lastIndex)
-            Log.d(tag = TAG) { "pop tabHistory = $tabHistory" }
             return tabHistory.last()
         }
         return null

@@ -1,21 +1,21 @@
 package id.anison.amanogawa.feature.profile
 
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import id.anison.amanogawa.core.common.Log
 import id.anison.amanogawa.core.domain.repository.TeamMemberRepo
-import id.anison.amanogawa.core.domain.toTeamUI
-import id.anison.amanogawa.core.model.DataState
+import id.anison.amanogawa.core.model.mapper.toTeamUI
+import id.anison.amanogawa.core.common.DataState
 import id.anison.amanogawa.core.model.FilterTypeUI
 import id.anison.amanogawa.core.model.SingleEventHandler
 import id.anison.amanogawa.core.model.TeamUI
-import id.anison.amanogawa.core.model.mapDataState
+import id.anison.amanogawa.core.common.mapDataState
 import id.anison.amanogawa.core.navigation.SharedScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Provided
@@ -27,9 +27,8 @@ class AboutUsScreenModel(
     private val singleEventHandler = SingleEventHandler()
     private val _navigationEventState = MutableSharedFlow<AboutUsNavigationEvent>()
     val navigationEventState = _navigationEventState.asSharedFlow()
-    private val _teamState = mutableStateOf<DataState<List<TeamUI>>>(DataState.Loading)
-    val teamState = _teamState
-    val lazyListState = LazyListState()
+    private val _teamState = MutableStateFlow<DataState<List<TeamUI>>>(DataState.Loading)
+    val teamState = _teamState.asStateFlow()
 
     init {
         getTeam()
@@ -62,8 +61,11 @@ class AboutUsScreenModel(
         }
     }
 
-    private fun getTeam() = screenModelScope.launch {
-        _teamState.value = teamMemberRepo.getTeam().mapDataState { it.map { team -> team.toTeamUI() } }
+    private fun getTeam() {
+        screenModelScope.launch {
+            _teamState.value = teamMemberRepo.getTeam()
+                .mapDataState { it.map { team -> team.toTeamUI() } }
+        }
     }
 
     companion object {
