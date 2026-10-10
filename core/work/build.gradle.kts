@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     alias(libs.plugins.amanogawa.android.lib)
     alias(libs.plugins.amanogawa.koin)
@@ -17,4 +19,14 @@ dependencies {
 
     //WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
+
+    testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.mockk)
+    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

@@ -7,7 +7,7 @@
 [![Target SDK](https://img.shields.io/badge/Target%20SDK-37-brightgreen.svg?logo=android)](https://developer.android.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Modular-blueviolet.svg)](#architecture)
 
-**Amanogawa** is a modern, responsive, and open-source Android client designed for browsing, searching, tracking, and streaming anime titles powered by the Amanogawa API (`https://amanogawa.space/api/`). Built entirely with modern Android development standards, featuring Jetpack Compose, Material 3, Koin, Ktorfit, Room, and a modular architecture.
+**Amanogawa** is a modern, responsive, and open-source Android client designed for browsing, searching and tracking anime titles powered by the Amanogawa API (`https://amanogawa.space/api/`). Built entirely with modern Android development standards, featuring Jetpack Compose, Material 3, Koin, Ktorfit, Room, and a modular architecture.
 
 ---
 
@@ -17,9 +17,9 @@
 | :---: | :---: | :---: |
 | <img src="screenshots/home_screen.png" width="260" alt="Home Screen"/> | <img src="screenshots/details_screen.png" width="260" alt="Details Screen"/> | <img src="screenshots/search_screen.png" width="260" alt="Search Screen"/> |
 
-|                                 Random Carousel                                 | Favorites & History | Profile & Appearance |
-|:-------------------------------------------------------------------------------:| :---: | :---: |
-| <img src="screenshots/carousel_screen.png" width="260" alt="Carousel Screen"/> | <img src="screenshots/favorites_screen.png" width="260" alt="Favorites Screen"/> | <img src="screenshots/profile_screen.png" width="260" alt="Profile Screen"/> |
+| Random Carousel | Profile tab |
+| :---: | :---: |
+| <img src="screenshots/carousel_screen.png" width="260" alt="Carousel Screen"/> | <img src="screenshots/profile_screen.png" width="260" alt="Profile Screen"/> |
 
 ---
 

@@ -40,7 +40,7 @@ import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -89,7 +89,7 @@ class MainScreen : Screen {
         val snackbarHostState = remember { SnackbarHostState() }
 
         val isBottomBarVisible by screenModel.isBottomBarVisible.collectAsState()
-        val windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+        val windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
         val isCompact = !windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
         val isExpanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
