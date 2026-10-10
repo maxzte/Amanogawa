@@ -21,10 +21,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Provided
-import org.koin.core.annotation.Single
 
-@Single
+@Factory
 class FavoriteScreenModel(
     @Provided private val favoriteRepo: FavoriteRepo,
 ) : ScreenModel {

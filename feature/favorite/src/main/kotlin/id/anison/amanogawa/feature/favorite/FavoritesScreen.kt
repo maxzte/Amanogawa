@@ -16,10 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
@@ -40,7 +40,7 @@ class FavoritesScreen : Screen {
     @Composable
     override fun Content() {
         val screenModel: FavoriteScreenModel = koinScreenModel()
-        val favoriteState by screenModel.favoriteState.collectAsState()
+        val favoriteState by screenModel.favoriteState.collectAsStateWithLifecycle()
         val lazyGridState = screenModel.lazyGridState
 
         LaunchedEffect(Unit) {
