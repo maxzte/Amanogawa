@@ -1,10 +1,10 @@
 [versions]
-agp = "9.2.1"
+agp = "9.4.1"
 kotlin = "2.4.21"
-coreKtx = "1.19.1"
+core-ktx = "1.19.1"
 junit = "6.1.3"
-junitVersion = "1.3.0"
-espressoCore = "3.7.0"
+junit-version = "1.3.0"
+espresso-core = "3.7.0"
 appcompat = "1.8.0"
 material = "1.14.0"
 kotlinx-serialization-json = "1.11.0"
@@ -16,9 +16,9 @@ ksp = "2.3.6"
 palette = "1.0.0"
 room = "2.8.5"
 
-kotlinxCoroutines = "1.11.0"
+kotlinx-coroutines = "1.11.0"
 paging = "3.5.2"
-dataStoreVersion = "1.2.1"
+data-store = "1.2.1"
 
 compose-bom = "2026.09.00"
 activity-compose = "1.13.0"
@@ -26,30 +26,30 @@ lifecycle-runtime-ktx = "2.11.0"
 material3 = "1.4.0"
 voyager = "2.2.21-1.10.3"
 coil = "3.6.3"
-uiTextGoogleFonts = "1.12.1"
-workRuntimeKtx = "2.12.0"
-koinBom = "4.2.2"
+google-fonts = "1.12.1"
+work-runtime-ktx = "2.12.0"
+koin-bom = "4.2.2"
 koin-plugin = "1.2.1"
-coreSplashscreen = "1.2.0"
+core-splashscreen = "1.2.0"
 zoomable = "2.16.0"
-androidxBrowser = "1.10.0"
+androidx-browser = "1.10.0"
 kermit = "2.2.0"
 robolectric = "4.17"
 androidx-test-core = "1.7.0"
 androidx-test-runner = "1.7.0"
-mockk = "1.13.17"
+mockk = "1.14.11"
 aboutlibraries = "15.2.0"
 
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 palette = { module = "androidx.palette:palette-ktx", version.ref = "palette" }
 
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit-version" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
@@ -78,9 +78,9 @@ room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 
 #COROUTINES
-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
-jetbrains-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+jetbrains-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 #PAGING
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
@@ -121,34 +121,34 @@ material3-adaptive-navigation-suite = { module = "androidx.compose.material3:mat
 zoomable = { module = "net.engawapg.lib:zoomable", version.ref = "zoomable" }
 
 #WEBVIEW
-androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidx-browser" }
 
 #LIFECYCLE
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-runtime-ktx" }
 
 #KOIN
-koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinBom" }
-koin-core-coroutines = { module = "io.insert-koin:koin-core-coroutines", version.ref = "koinBom" }
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinBom" }
-koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinBom" }
-koin-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koinBom" }
-koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinBom" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-bom" }
+koin-core-coroutines = { module = "io.insert-koin:koin-core-coroutines", version.ref = "koin-bom" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-bom" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-bom" }
+koin-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koin-bom" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-bom" }
 
 
 #DATASTORE
-androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStoreVersion" }
-androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "dataStoreVersion" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "data-store" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "data-store" }
 
 #WORKMANAGER
-androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime-ktx" }
 
 #FONTS
-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "google-fonts" }
 
 #SPLASHSCREEN
-androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "core-splashscreen" }
 
 #ABOUTLIBRARIES
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutlibraries" }
